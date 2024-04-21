@@ -1,14 +1,11 @@
 public class Camera {
 
-    private double posX, dirX;
-    private double posY, dirY;
-    private double posZ, dirZ;
+    private double posX, dirX, normDirX;
+    private double posY, dirY, normDirY;
+    private double posZ, dirZ, normDirZ;
+    private double posMagnitude, dirMagnitude;
 
-    public static void main(String[] args)
-    {
-
-    }
-
+    public static void main(String[] args) {}
 
     //Constructor
     public Camera(double posX, double posY, double posZ, double dirX, double dirY, double dirZ)
@@ -20,6 +17,12 @@ public class Camera {
         this.dirX = dirX;
         this.dirY = dirY;
         this.dirZ = dirZ;
+
+        this.dirMagnitude = Math.sqrt(dirX*dirX + dirY*dirY + dirZ*dirZ);
+        this.normDirX = (this.dirX / this.dirMagnitude);
+        this.normDirY = (this.dirY / this.dirMagnitude);
+        this.normDirZ = (this.dirZ / this.dirMagnitude);
+
     }
 
     //Getter
@@ -29,6 +32,10 @@ public class Camera {
     public double getDirX() {return this.dirX;}
     public double getDirY() {return this.dirY;}
     public double getDirZ() {return this.dirZ;}
+    public double getNormDirX() {return this.normDirX;}
+    public double getNormDirY() {return this.normDirY;}
+    public double getNormDirZ() {return this.normDirZ;}
+    public double getDirMagnitude() {return this.dirMagnitude;}
 
     //Setter
     public void setPosX(double posX) {this.posX = posX;}
