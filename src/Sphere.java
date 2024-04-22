@@ -28,19 +28,19 @@ public class Sphere {
     public void intersectionCheck(Ray ray) {
         // caculate the vector from the spheres center to the origin of the ray
         // oc = o - c
-        vectorx = ray.getPosX() - this.centerx;
-        vectory = ray.getPosY() - this.centery;
-        vectorz = ray.getPosZ() - this.centerz;
+        vectorx = ray.getRayPointX() - this.centerx;
+        vectory = ray.getRayPointY() - this.centery;
+        vectorz = ray.getRayPointX() - this.centerz;
 
         // calculate values of a, b, c for the quadratic equation
-        // the normalised direction should always be 1 (so it doesnt matter if you use x, y or z)
+        // the normalised direction should always be 1 (so it doesn't matter if you use x, y or z)
         this.a = (ray.getNormDirX() * ray.getNormDirX()) + (ray.getNormDirY() * ray.getNormDirY() + (ray.getNormDirZ() * ray.getNormDirZ()));
         this.b = 2 * ((vectorx * ray.getNormDirX()) + (vectory * ray.getNormDirY()) + (vectorz * ray.getNormDirZ()));
         this.c = ((vectorx * vectorx) + (vectory * vectory) + (vectorz * vectorz) - (this.sradius * this.sradius));
         System.out.println("a = " + a + ". b = " + b + ". c = " + c);
 
         // calculate the discriminant
-        this.discriminant = (b * b) - 4 * (a * c);
+        this.discriminant = (b * b) - (4 * (a * c));
 
         if (this.discriminant < 0)
         {
@@ -52,6 +52,7 @@ public class Sphere {
         }
         else if (this.discriminant > 0) {
             System.out.println("The ray intersects at two points");
+            System.out.println("----------------------------------------");
         }
 
     }

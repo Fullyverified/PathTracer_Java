@@ -44,7 +44,6 @@ public class Ray {
         this.rayPointX = this.oX + (tscalar * normDirX);
         this.rayPointY = this.oY + (tscalar * normDirY);
         this.rayPointZ = this.oZ + (tscalar * normDirZ);
-        System.out.println("ray pointx = " + this.rayPointX + ". raypointy = " + rayPointY + ". raypointz = " + rayPointZ);
     }
 
 
