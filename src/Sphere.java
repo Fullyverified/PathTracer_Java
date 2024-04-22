@@ -1,8 +1,8 @@
 public class Sphere {
 
-    private double centerx, vectorx;
-    private double centery, vectory;
-    private double centerz, vectorz;
+    private double centerx, centerOriginX;
+    private double centery, centerOriginY;
+    private double centerz, centerOriginZ;
     private double sradius;
     private double a, b, c, discriminant;
 
@@ -17,7 +17,7 @@ public class Sphere {
         this.sradius = sradius;
     }
 
-    //b^2 - 2ac
+    // discriminant = b^2 - 2ac
 
     // p = o + td
     // p new ray position
@@ -28,15 +28,17 @@ public class Sphere {
     public void intersectionCheck(Ray ray) {
         // calculate the vector from the spheres center to the origin of the ray
         // oc = o - c
-        vectorx = ray.getRayPointX() - this.centerx;
-        vectory = ray.getRayPointY() - this.centery;
-        vectorz = ray.getRayPointX() - this.centerz;
+        centerOriginX = ray.getRayPointX() - this.centerx;
+        centerOriginY = ray.getRayPointY() - this.centery;
+        centerOriginZ = ray.getRayPointZ() - this.centerz;
+        System.out.println("oc = " + centerOriginX + ", " + centerOriginY + ", " + centerOriginZ);
+        // oc = (vectorx, vectory, vectorz)
 
         // calculate values of a, b, c for the quadratic equation
         // the normalised direction should always be 1 (so it doesn't matter if you use x, y or z)
         this.a = (ray.getNormDirX() * ray.getNormDirX()) + (ray.getNormDirY() * ray.getNormDirY() + (ray.getNormDirZ() * ray.getNormDirZ()));
-        this.b = 2 * ((vectorx * ray.getNormDirX()) + (vectory * ray.getNormDirY()) + (vectorz * ray.getNormDirZ()));
-        this.c = ((vectorx * vectorx) + (vectory * vectory) + (vectorz * vectorz) - (this.sradius * this.sradius));
+        this.b = 2 * ((centerOriginX * ray.getNormDirX()) + (centerOriginY * ray.getNormDirY()) + (centerOriginZ * ray.getNormDirZ()));
+        this.c = ((centerOriginX * centerOriginX) + (centerOriginY * centerOriginY) + (centerOriginZ * centerOriginZ) - (this.sradius * this.sradius));
         System.out.println("a = " + a + ". b = " + b + ". c = " + c);
 
         // calculate the discriminant
