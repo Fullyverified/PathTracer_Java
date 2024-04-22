@@ -18,6 +18,7 @@ public class Camera {
         this.dirY = dirY;
         this.dirZ = dirZ;
 
+        //Calculate magnitude and normalised direction vectors
         this.dirMagnitude = Math.sqrt(dirX*dirX + dirY*dirY + dirZ*dirZ);
         this.normDirX = (this.dirX / this.dirMagnitude);
         this.normDirY = (this.dirY / this.dirMagnitude);
