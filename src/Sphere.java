@@ -26,7 +26,7 @@ public class Sphere {
     // d direction vector
 
     public void intersectionCheck(Ray ray) {
-        // caculate the vector from the spheres center to the origin of the ray
+        // calculate the vector from the spheres center to the origin of the ray
         // oc = o - c
         vectorx = ray.getRayPointX() - this.centerx;
         vectory = ray.getRayPointY() - this.centery;
