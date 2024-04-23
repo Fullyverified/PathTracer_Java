@@ -5,7 +5,7 @@ public class Sphere {
     private double centerz, centerOriginZ;
     private double sradius;
     private double a, b, c, discriminant;
-    private double distance;
+    private double distanceToC, distanceToR;
 
 
     //Equation of a sphere: (x - cx)^2 + (y - cy)^2 + (z - cz)^2 = r^2
@@ -69,19 +69,26 @@ public class Sphere {
     public void intersectionCheck(Ray ray)
     {
         // distance of the ray to the center of the sphere
-        distance = Math.sqrt(Math.pow((ray.getRayPointX() - this.centerx),2) + Math.pow((ray.getRayPointY() - this.centery),2) + Math.pow((ray.getRayPointZ() - this.centerz),2));
+        this.distanceToC = Math.sqrt(Math.pow((ray.getRayPointX() - this.centerx),2) + Math.pow((ray.getRayPointY() - this.centery),2) + Math.pow((ray.getRayPointZ() - this.centerz),2));
+        this.distanceToR = this.distanceToC - this.sradius;
 
-
-        if (distance > sradius)
+        // check if we have hit the sphere yet
+        if (distanceToC > sradius)
         {
-            System.out.println("Not intersected yet. " + ray.getRayPointX() + " y: " + ray.getRayPointY() + " z: " + ray.getRayPointZ());
+            System.out.println("Not intersected yet. x: " + ray.getRayPointX() + " y: " + ray.getRayPointY() + " z: " + ray.getRayPointZ());
         }
-        if (distance == sradius)
+        else if (distanceToC == sradius)
         {
-            System.out.println("Perfect intersection. " + ray.getRayPointX() + " y: " + ray.getRayPointY() + " z: " + ray.getRayPointZ());
+            System.out.println("Perfect intersection. x: " + ray.getRayPointX() + " y: " + ray.getRayPointY() + " z: " + ray.getRayPointZ());
         }
-        if (distance < sradius)
-            System.out.println("Ray inside sphere. " + ray.getRayPointX() + " y: " + ray.getRayPointY() + " z: " + ray.getRayPointZ());
-
+        else if (distanceToC < sradius)
+        {
+            System.out.println("Ray inside sphere. x: " + ray.getRayPointX() + " y: " + ray.getRayPointY() + " z: " + ray.getRayPointZ());
+        }
+        else {System.out.println("Something is wrong");}
     }
+
+    // Getter
+    public double getDistanceRadius() {return this.distanceToR;}
+
 }

@@ -1,5 +1,8 @@
 public class Main {
 
+    final static double small = 0.1;
+    final static double large = 1;
+
     public static void main(String[] args)
     {
         Camera cam = new Camera(1,0,0,1,0,0);
@@ -8,7 +11,7 @@ public class Main {
 
         if (sphere1.intersectionDiscard(ray1))
         {
-            for (double i = 0; i <= 10; i = i + 0.1)
+            for (double i = 0; i <= 100; i = i + large)
             {
                 sphere1.intersectionCheck(ray1);
                 ray1.rayMarch(i);
