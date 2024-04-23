@@ -5,6 +5,7 @@ public class Sphere {
     private double centerz, centerOriginZ;
     private double sradius;
     private double a, b, c, discriminant;
+    private double distance;
 
 
     //Equation of a sphere: (x - cx)^2 + (y - cy)^2 + (z - cz)^2 = r^2
@@ -23,13 +24,13 @@ public class Sphere {
     // t tscalar (amount to march the ray by)
     // d direction vector
 
-    public void intersectionCheck(Ray ray) {
+    // initial check to see if the ray will or will not hit an object (for performance)
+    public boolean intersectionDiscard(Ray ray) {
         // calculate the vector from the spheres center to the origin of the ray
         // oc = o - c
-        centerOriginX = ray.getRayPointX() - this.centerx;
-        centerOriginY = ray.getRayPointY() - this.centery;
-        centerOriginZ = ray.getRayPointZ() - this.centerz;
-        System.out.println("oc = " + centerOriginX + ", " + centerOriginY + ", " + centerOriginZ);
+        centerOriginX = ray.getPosX() - this.centerx;
+        centerOriginY = ray.getPosY() - this.centery;
+        centerOriginZ = ray.getPosZ() - this.centerz;
         // oc = (vectorx, vectory, vectorz)
 
         // calculate values of a, b, c for the quadratic equation
@@ -39,23 +40,48 @@ public class Sphere {
         this.b = 2 * ((centerOriginX * ray.getNormDirX()) + (centerOriginY * ray.getNormDirY()) + (centerOriginZ * ray.getNormDirZ()));
         // c = the dot product of centerorigin by itself, - the radius^2 of the sphere
         this.c = ((centerOriginX * centerOriginX) + (centerOriginY * centerOriginY) + (centerOriginZ * centerOriginZ) - (this.sradius * this.sradius));
-        System.out.println("a = " + a + ". b = " + b + ". c = " + c);
 
         // calculate the discriminant | b^2 - 2ac
         this.discriminant = (b * b) - (4 * (a * c));
 
         if (this.discriminant < 0)
         {
-            System.out.println("No intersection");
+            System.out.println("No intersection. x: ");
+            System.out.println("----------------------------------------");
+            return false;
         }
         else if(this.discriminant == 0)
         {
             System.out.println("Exactly one intersection");
+            System.out.println("----------------------------------------");
+            return true;
         }
         else if (this.discriminant > 0) {
             System.out.println("The ray intersects at two points");
             System.out.println("----------------------------------------");
+            return true;
         }
+        return false;
+    }
+
+    // check the distance between the current ray and the sphere
+    // distance = sqrt(rayposxyz^2 - spherecenterxyz^2))
+    public void intersectionCheck(Ray ray)
+    {
+        // distance of the ray to the center of the sphere
+        distance = Math.sqrt(Math.pow((ray.getRayPointX() - this.centerx),2) + Math.pow((ray.getRayPointY() - this.centery),2) + Math.pow((ray.getRayPointZ() - this.centerz),2));
+
+
+        if (distance > sradius)
+        {
+            System.out.println("Not intersected yet. " + ray.getRayPointX() + " y: " + ray.getRayPointY() + " z: " + ray.getRayPointZ());
+        }
+        if (distance == sradius)
+        {
+            System.out.println("Perfect intersection. " + ray.getRayPointX() + " y: " + ray.getRayPointY() + " z: " + ray.getRayPointZ());
+        }
+        if (distance < sradius)
+            System.out.println("Ray inside sphere. " + ray.getRayPointX() + " y: " + ray.getRayPointY() + " z: " + ray.getRayPointZ());
 
     }
 }
