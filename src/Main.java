@@ -1,7 +1,6 @@
 public class Main {
 
-    final static double small = 0.1;
-    final static double large = 1;
+    public static double tscalar = 0;
 
     public static void main(String[] args)
     {
@@ -11,7 +10,7 @@ public class Main {
 
         if (sphere1.intersectionDiscard(ray1))
         {
-            for (double i = 0; i <= 100; i = i + large)
+            for (double i = 0; i <= 100; i++)
             {
                 sphere1.intersectionCheck(ray1);
                 ray1.rayMarch(i);
