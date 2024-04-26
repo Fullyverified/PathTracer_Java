@@ -4,6 +4,7 @@ public class Ray {
     private double oZ, dirZ, normDirZ;
     private double dirMagnitude;
     private double rayPointX, rayPointY, rayPointZ, tscalar;
+    private double hitPointX, hitPointY, hitPointZ;
 
     //Constructor
     public Ray(double oX, double oY, double oZ, double dirX, double dirY, double dirZ)
@@ -61,6 +62,9 @@ public class Ray {
     public double getRayPointX() {return this.rayPointX;}
     public double getRayPointY() {return this.rayPointY;}
     public double getRayPointZ() {return this.rayPointZ;}
+    public double getHitPointX() {return this.hitPointX;}
+    public double getHitPointY() {return this.hitPointY;}
+    public double getHitPointZ() {return this.hitPointZ;}
 
 
     //Setter
@@ -70,5 +74,9 @@ public class Ray {
     public void setDirX(double dirX) {this.oX = dirX;}
     public void setDirY(double dirY) {this.oY = dirY;}
     public void setDirZ(double dirZ) {this.oZ = dirZ;}
+    public void setHitPointX(double pointX) {this.hitPointX = pointX;}
+    public void setHitPointY(double pointY) {this.hitPointY = pointY;}
+    public void setHitPointZ(double pointZ) {this.hitPointZ = pointZ;}
+
 
 }
