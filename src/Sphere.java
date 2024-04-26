@@ -1,4 +1,6 @@
-public class Sphere {
+import java.awt.*;
+
+public class Sphere implements SceneObjects {
 
     private double centerx, centerOriginX;
     private double centery, centerOriginY;
@@ -66,7 +68,7 @@ public class Sphere {
 
     // check the distance between the current ray and the sphere
     // distance = sqrt(rayposxyz^2 - spherecenterxyz^2))
-    public void intersectionCheck(Ray ray)
+    public boolean intersectionCheck(Ray ray)
     {
         // distance of the ray to the center of the sphere
         this.distanceToC = Math.sqrt(Math.pow((ray.getRayPointX() - this.centerx),2) + Math.pow((ray.getRayPointY() - this.centery),2) + Math.pow((ray.getRayPointZ() - this.centerz),2));
@@ -76,16 +78,20 @@ public class Sphere {
         if (distanceToC > sradius)
         {
             System.out.println("Not intersected yet. x: " + ray.getRayPointX() + " y: " + ray.getRayPointY() + " z: " + ray.getRayPointZ());
+            return false;
         }
         else if (distanceToC == sradius)
         {
             System.out.println("Perfect intersection. x: " + ray.getRayPointX() + " y: " + ray.getRayPointY() + " z: " + ray.getRayPointZ());
+            return true;
         }
         else if (distanceToC < sradius)
         {
             System.out.println("Ray inside sphere. x: " + ray.getRayPointX() + " y: " + ray.getRayPointY() + " z: " + ray.getRayPointZ());
+            return true;
         }
         else {System.out.println("Something is wrong");}
+        return false;
     }
 
     // Getter
