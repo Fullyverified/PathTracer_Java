@@ -13,6 +13,7 @@ Done:
 TODO:
 
 1. Create more than one ray, such that each ray is a pixel of the camera.
-2. Spawn a new ray at the intersection point to simulate light bounces
+2. Spawn a new ray at the intersection towards the direction of each lightsource to test for shadows
 3. Create a lookup table for values of brightess and their corresponding character, e.g. . , : ; / % # @
 4. Print (render) the final output :)
+5. Implemenet path tracing (?)
