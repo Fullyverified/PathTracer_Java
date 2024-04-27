@@ -6,7 +6,7 @@ public class Ray {
     private double rayPointX, rayPointY, rayPointZ, tscalar;
     private double hitPointX, hitPointY, hitPointZ;
 
-    //Constructor
+    // constructor
     public Ray(double oX, double oY, double oZ, double dirX, double dirY, double dirZ)
     {
         this.oX = oX;
@@ -16,14 +16,14 @@ public class Ray {
         this.dirY = dirY;
         this.dirZ = dirZ;
 
-        //Calculate magnitude and normalised direction vectors
+        // calculate magnitude and normalised direction vectors
         this.dirMagnitude = Math.sqrt(dirX*dirX + dirY*dirY + dirZ*dirZ);
         this.normDirX = (this.dirX / this.dirMagnitude);
         this.normDirY = (this.dirY / this.dirMagnitude);
         this.normDirZ = (this.dirZ / this.dirMagnitude);
     }
 
-    //Update magnitude and normalised directions vectors
+    // update magnitude and normalised directions vectors
     public void updateMagnitude()
     {
         this.dirMagnitude = Math.sqrt(this.dirX*this.dirX + this.dirY*this.dirY + this.dirZ*this.dirZ);
@@ -45,6 +45,16 @@ public class Ray {
         this.rayPointX = this.oX + (tscalar * normDirX);
         this.rayPointY = this.oY + (tscalar * normDirY);
         this.rayPointZ = this.oZ + (tscalar * normDirZ);
+    }
+
+
+    // Set ray position and direction to each new point, relative to the camera
+    // rayDirection = lookDirection + rightVector x pixelX + upVector x pixelY
+    public void rayDirection()
+    {
+
+
+
     }
 
 
