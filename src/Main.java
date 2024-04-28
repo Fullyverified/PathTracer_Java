@@ -11,8 +11,16 @@ public class Main {
         List<Object> sceneObjects = new ArrayList<>();
         sceneObjects.add(new Sphere(5, 0, 0, 1));
 
-        Camera cam = new Camera(1, 0, 0, 1, 0, 0, 0, 1, 0, 0,0,1);
+        Camera cam = new Camera(0, 0, 0, 1, 0, 0, 0, 1, 0,90, 16,9);
+        cam.directionVector();
+        cam.upVector();
+        cam.rightVector();
+
+
+
         Ray ray1 = new Ray(cam.getPosX(), cam.getPosY(), cam.getPosZ(), cam.getDirX(), cam.getDirY(), cam.getDirZ());
+
+
 
         // iterate through each sceneObject
         for (Object sceneObject : sceneObjects)

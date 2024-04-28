@@ -1,48 +1,80 @@
+import java.lang.Math;
+
 public class Camera {
 
     private double posX, dirX, normDirX, upX, normUpX, rightX, normRightX;
     private double posY, dirY, normDirY, upY, normUpY, rightY, normRightY;
     private double posZ, dirZ, normDirZ, upZ, normUpZ, rightZ, normRightZ;
-    private double posMagnitude, dirMagnitude;
+    private double dirMagnitude, upMagnitude, rightMagnitude;
+    private double fOV, planeWidth, planeHeight;
+    private double aspectRatioX, aspectRatioY;
 
     public static void main(String[] args) {}
 
     // constructor
-    public Camera(double posX, double posY, double posZ, double dirX, double dirY, double dirZ, double upX, double upY, double upZ, double rightX, double rightY, double rightZ)
+    public Camera(double posX, double posY, double posZ, double dirX, double dirY, double dirZ, double upX, double upY, double upZ, double fOV, double aspectX, double aspectY)
     {
         this.posX = posX;
         this.posY = posY;
         this.posZ = posZ;
-
         this.dirX = dirX;
         this.dirY = dirY;
         this.dirZ = dirZ;
+        this.upX = upX;
+        this.upY = upY;
+        this.upZ = upZ;
+        this.fOV = fOV;
+        this.aspectRatioX = aspectX;
+        this.aspectRatioY = aspectY;
+    }
 
-        // calculate magnitude and normalised direction vectors
-        this.dirMagnitude = Math.sqrt(dirX*dirX + dirY*dirY + dirZ*dirZ);
+    public void directionVector()
+    {
+        // calculate magnitude and normalised direction vector
+        this.dirMagnitude = Math.sqrt(this.dirX*this.dirX + this.dirY*this.dirY + this.dirZ*this.dirZ);
         this.normDirX = (this.dirX / this.dirMagnitude);
         this.normDirY = (this.dirY / this.dirMagnitude);
         this.normDirZ = (this.dirZ / this.dirMagnitude);
+    }
 
-        this.normUpX = (this.upX / this.dirMagnitude);
-        this.normUpY = (this.upY / this.dirMagnitude);
-        this.normUpZ = (this.upZ / this.dirMagnitude);;
+    public void upVector()
+    {
+        // calculate magnitude and normalised up vector
+        this.upMagnitude = Math.sqrt(this.upX*this.upX + this.upY*this.upY + this.upZ*this.upZ);
+        this.normUpX = (this.upX / this.upMagnitude);
+        this.normUpY = (this.upY / this.upMagnitude);
+        this.normUpZ = (this.upZ / this.upMagnitude);;
+    }
 
+    public void rightVector()
+    {
         // calculate the right vector of the camera
         // rvector = cross product: normalised direction * up vector
         // a * b = (a2b3 - a3b2, a3b1 - a1b3, a1b2 - a2b1)
+        this.rightX = (this.normUpY * this.normDirZ) - (this.normUpZ * this.normDirY);
+        this.rightY = (this.normUpZ * this.normDirX) - (this.normUpX * this.normDirZ);
+        this.rightZ = (this.normUpX * this.normDirY) - (this.normUpY * this.normDirX);
 
-
-
-        this.rightX = this.upX * this.normDirX;
-        this.rightY = this.upY * this.normDirX;
-        this.rightZ = this.upZ * this.normDirX;
-
-        this.normRightX = this.rightX / Math.abs(this.rightX);
-
+        // calculate magnitude and normalised right vector
+        this.rightMagnitude = Math.sqrt(this.rightX*this.rightX + this.rightY*this.rightY + this.rightZ*this.rightZ);
+        this.normRightX = this.rightX / this.rightMagnitude;
+        this.normRightY = this.rightY / this.rightMagnitude;
+        this.normRightZ = this.rightZ / this.rightMagnitude;
+        System.out.println(this.normRightX + ", " + this.normRightY + ", " + this.normRightZ);
     }
 
-    //Getter
+    // calculate the image plane size
+    // image plane width = 2 * tan(fov/2) * distanceToImagePlane
+    // image plane height = width / aspectRatio
+    public void imagePlane()
+    {
+        this.planeWidth = 2 * Math.tan((Math.toRadians(this.fOV) / 2) * (Math.PI / Math.toRadians(180)))
+        this.planeHeight = 2/(this.aspectRatioX/this.aspectRatioY);
+    }
+
+
+
+    // getter
     public double getPosX() {return this.posX;}
     public double getPosY() {return this.posY;}
     public double getPosZ() {return this.posZ;}
@@ -64,15 +96,28 @@ public class Camera {
     public double getNormRightZ() {return this.normRightZ;}
 
     public double getDirMagnitude() {return this.dirMagnitude;}
+    public double getUpMagnitude() {return this.upMagnitude;}
+    public double getRightMagnitude() {return this.rightMagnitude;}
 
-    //Setter
+    // setter
+    // pos
     public void setPosX(double posX) {this.posX = posX;}
     public void setPosY(double posY) {this.posY = posY;}
     public void setPosZ(double posZ) {this.posZ = posZ;}
 
-    public void setDirX(double dirX) {this.posX = dirX;}
-    public void setDirY(double dirY) {this.posY = dirY;}
-    public void setDirZ(double dirZ) {this.posZ = dirZ;}
+    // dir
+    public void setDirX(double dirX) {this.dirX = dirX;}
+    public void setDirY(double dirY) {this.dirY = dirY;}
+    public void setDirZ(double dirZ) {this.dirZ = dirZ;}
 
+    // up vector (rotation)
+    public void setUpX(double upX) {this.upX = upX;}
+    public void setUpY(double upY) {this.upX = upY;}
+    public void setUpZ(double upZ) {this.upX = upZ;}
+
+    // fov and aspect ratio
+    public void setFOV(double fOV) {this.fOV = fOV;}
+    public void setAspectX(double aspectRatioX) {this.aspectRatioX = aspectRatioX;}
+    public void setAspectY(double aspectRatioY) {this.aspectRatioY = aspectRatioY;}
 
 }
