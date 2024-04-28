@@ -68,7 +68,7 @@ public class Camera {
     // image plane height = width / aspectRatio
     public void imagePlane()
     {
-        this.planeWidth = 2 * Math.tan((Math.toRadians(this.fOV) / 2) * (Math.PI / Math.toRadians(180)))
+        this.planeWidth = 2 * Math.tan((Math.toRadians(this.fOV) / 2) * (Math.PI / Math.toRadians(180)));
         this.planeHeight = 2/(this.aspectRatioX/this.aspectRatioY);
     }
 
