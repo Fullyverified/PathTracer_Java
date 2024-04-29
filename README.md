@@ -19,4 +19,3 @@ TODO:
 4. Implemenet path tracing (?)
 
 Known Bugs:
-Certain resolutions will cause an Array Index out of bounds error.
