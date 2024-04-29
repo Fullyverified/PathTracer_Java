@@ -1,5 +1,8 @@
 I'm trying to make an Ascii Raytracer. Nothing that hasn't been done before :)
 
+![Render1](https://github.com/Fullyverified/ASCII_RayTracer/assets/138776324/6e0ac66e-0060-47a6-9862-81371c078f15)
+Left Sphere: x: 12, y: 2, z: 3, radius 2. Right Sphere: x: 6, y: 0, z: 0, radius 1.
+
 Done:
 1. Create ray and sphere objects.
 2. Give the ray a positon and a direction vector.
