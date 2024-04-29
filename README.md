@@ -13,7 +13,7 @@ Done:
 
 TODO:
 
-2. Spawn a new ray at the intersection towards the direction of each lightsource to test for shadows
-3. Create a lookup table for values of brightess and their corresponding character, e.g. . , : ; / % # @
-4. Print (render) the final output :)
-5. Implemenet path tracing (?)
+1. Create a lookup table for values of brightess and their corresponding character, e.g. . , : ; / % # @
+2. Print (render) the final output :)
+3. Spawn a new ray at the intersection towards the direction of each lightsource to test for shadows
+4. Implemenet path tracing (?)
