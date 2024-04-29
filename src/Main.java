@@ -10,7 +10,7 @@ public class Main {
     public static void main(String[] args) {
         // create new sceneObjects ArrayList. initialise and store each object in it.
         List<Object> sceneObjects = new ArrayList<>();
-        sceneObjects.add(new Sphere(10, 0, 0, 1));
+        sceneObjects.add(new Sphere(6, 0, 0, 1));
 
         // create camera object and initialise it
         Camera cam = new Camera(1, 0, 0, 1, 0, 0, 0, 1, 0,90, 4,3,60);
@@ -73,7 +73,7 @@ public class Main {
                                 }
                                 else {
                                     rayIndex[i][j].setHit(0);}
-                                r = r + 0.1;
+                                r = r + 0.01;
                             }
                         }
                     }
@@ -88,11 +88,11 @@ public class Main {
             {
                 if (rayIndex[i][j].getHit() == 1)
                 {
-                    System.out.print("@");
+                    System.out.print("##");
                 }
                 else if (rayIndex[i][j].getHit() == 0)
                 {
-                    System.out.print(" ");
+                    System.out.print("  ");
                 }
             }
             System.out.println("|");
