@@ -5,9 +5,12 @@ public class Ray {
     private double dirMagnitude;
     private double rayPointX, rayPointY, rayPointZ, tscalar;
     private double hitPointX, hitPointY, hitPointZ;
+    private int hit;
+    private double px, py, pixelIndexX, pixelIndexY, pixelPosX, pixelPosY;
+
 
     // constructor
-    public Ray(double oX, double oY, double oZ, double dirX, double dirY, double dirZ)
+    public Ray()
     {
         this.oX = oX;
         this.oY = oY;
@@ -42,9 +45,9 @@ public class Ray {
     public void rayMarch(double tscalar)
     {
         this.tscalar = tscalar;
-        this.rayPointX = this.oX + (tscalar * normDirX);
-        this.rayPointY = this.oY + (tscalar * normDirY);
-        this.rayPointZ = this.oZ + (tscalar * normDirZ);
+        this.rayPointX = this.pixelPosX + (tscalar * normDirX);
+        this.rayPointY = this.pixelPosY + (tscalar * normDirY);
+        this.rayPointZ = this.pixelPosZ + (tscalar * normDirZ);
     }
 
 
@@ -53,40 +56,65 @@ public class Ray {
     public void rayDirection()
     {
 
-
-
     }
 
 
-    //Getter
+    // getter
+    // pos
     public double getPosX() {return this.oX;}
     public double getPosY() {return this.oY;}
     public double getPosZ() {return this.oZ;}
+    // direction
     public double getDirX() {return this.dirX;}
     public double getDirY() {return this.dirY;}
     public double getDirZ() {return this.dirZ;}
+    // normalised direction
     public double getNormDirX() {return this.normDirX;}
     public double getNormDirY() {return this.normDirY;}
     public double getNormDirZ() {return this.normDirZ;}
     public double getDirMagnitude() {return this.dirMagnitude;}
+    // current ray point
     public double getRayPointX() {return this.rayPointX;}
     public double getRayPointY() {return this.rayPointY;}
     public double getRayPointZ() {return this.rayPointZ;}
+    // final intersection point
     public double getHitPointX() {return this.hitPointX;}
     public double getHitPointY() {return this.hitPointY;}
     public double getHitPointZ() {return this.hitPointZ;}
+    // hit true or false
+    public int getHit() {return this.hit;}
+    // get pixel index
+    public double getPixelIndexX() {return this.pixelIndexX;}
+    public double getPixelIndexY() {return this.pixelIndexY;}
+    // get pixelPosX
+    public double getPixelPosX() {return this.pixelPosX;}
+    public double getPixelPosY() {return this.pixelPosY;}
 
-
-    //Setter
+    // setter
+    // pos
     public void setPosX(double posX) {this.oX = posX;}
     public void setPosY(double posY) {this.oY = posY;}
     public void setPosZ(double posZ) {this.oZ = posZ;}
+    // direction
     public void setDirX(double dirX) {this.oX = dirX;}
     public void setDirY(double dirY) {this.oY = dirY;}
     public void setDirZ(double dirZ) {this.oZ = dirZ;}
+    // hitpoint
     public void setHitPointX(double pointX) {this.hitPointX = pointX;}
     public void setHitPointY(double pointY) {this.hitPointY = pointY;}
     public void setHitPointZ(double pointZ) {this.hitPointZ = pointZ;}
+    public void setHit(int hit){this.hit = hit;}
+    // set current pixel
+    public void setPixelX(int px) {this.px = px;}
+    public void setPixelY(int py) {this.py = py;}
+    // set pixelindex
+    public void setPixelIndeX(int px) {this.pixelIndexX = px;}
+    public void setPixelIndeY(int py) {this.pixelIndexY = py;}
+    // set pixelpos
+    public void setPixelPosX(double px) {this.pixelPosX = px;}
+    public void setPixelPosY(double py) {this.pixelPosY = py;}
+
+
 
 
 }

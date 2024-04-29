@@ -7,12 +7,12 @@ public class Camera {
     private double posZ, dirZ, normDirZ, upZ, normUpZ, rightZ, normRightZ;
     private double dirMagnitude, upMagnitude, rightMagnitude;
     private double fOV, planeWidth, planeHeight;
-    private double aspectRatioX, aspectRatioY;
+    private double aspectRatioX, aspectRatioY, resX, resY;
 
     public static void main(String[] args) {}
 
     // constructor
-    public Camera(double posX, double posY, double posZ, double dirX, double dirY, double dirZ, double upX, double upY, double upZ, double fOV, double aspectX, double aspectY)
+    public Camera(double posX, double posY, double posZ, double dirX, double dirY, double dirZ, double upX, double upY, double upZ, double fOV, double aspectX, double aspectY, double resX)
     {
         this.posX = posX;
         this.posY = posY;
@@ -26,6 +26,8 @@ public class Camera {
         this.fOV = fOV;
         this.aspectRatioX = aspectX;
         this.aspectRatioY = aspectY;
+        this.resX = resX;
+        this.resY = this.resX / (this.aspectRatioX / this.aspectRatioY);
     }
 
     public void directionVector()
@@ -68,7 +70,7 @@ public class Camera {
     // image plane height = width / aspectRatio
     public void imagePlane()
     {
-        this.planeWidth = 2 * Math.tan((Math.toRadians(this.fOV) / 2) * (Math.PI / Math.toRadians(180)));
+        this.planeWidth = 2 * Math.tan((Math.toRadians(this.fOV) / 2));
         this.planeHeight = 2/(this.aspectRatioX/this.aspectRatioY);
     }
 
@@ -99,6 +101,13 @@ public class Camera {
     public double getUpMagnitude() {return this.upMagnitude;}
     public double getRightMagnitude() {return this.rightMagnitude;}
 
+    public double getResX() {return this.resX;}
+    public double getResY() {return this.resY;}
+
+    public double getCamWidth() {return this.planeWidth;}
+    public double getCamHeight() {return this.planeHeight;}
+
+
     // setter
     // pos
     public void setPosX(double posX) {this.posX = posX;}
@@ -116,8 +125,8 @@ public class Camera {
     public void setUpZ(double upZ) {this.upX = upZ;}
 
     // fov and aspect ratio
-    public void setFOV(double fOV) {this.fOV = fOV;}
-    public void setAspectX(double aspectRatioX) {this.aspectRatioX = aspectRatioX;}
-    public void setAspectY(double aspectRatioY) {this.aspectRatioY = aspectRatioY;}
+    public void setFOV(int fOV) {this.fOV = fOV;}
+    public void setAspectX(int aspectRatioX) {this.aspectRatioX = aspectRatioX;}
+    public void setAspectY(int aspectRatioY) {this.aspectRatioY = aspectRatioY;}
 
 }
