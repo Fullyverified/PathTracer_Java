@@ -28,6 +28,8 @@ public class Camera {
         this.aspectRatioY = aspectY;
         this.resX = resX;
         this.resY = this.resX / (this.aspectRatioX / this.aspectRatioY);
+        // round the vertical resolution of the camera up to fix an array index out of bounds error
+        this.resY = Math.ceil(this.resY);
     }
 
     public void directionVector()

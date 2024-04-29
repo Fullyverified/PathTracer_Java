@@ -14,7 +14,7 @@ public class Main {
         sceneObjects.add(new Sphere(3, 0, 0, 1));
 
         // create camera object and initialise it
-        Camera cam = new Camera(1, 0, 0, 1, 0, 0, 0, 1, 0,10, 4,3,8);
+        Camera cam = new Camera(1, 0, 0, 1, 0, 0, 0, 1, 0,10, 4,3,6);
         // each cam. method calculates the various properties of the camera
         cam.directionVector();
         cam.upVector();
@@ -23,13 +23,14 @@ public class Main {
         // create a 2D array of rays with the size of resolution of the camera
         Ray[][] rayIndex = new Ray[(int) cam.getResX()][(int) cam.getResY()];
 
-        // iterate through each sceneObject
-        for (int i = 0; i < cam.getResX(); i++)
+        // iterate through each ray, left to right, top to bottom, for each scene object.
+        for (int j = 0; j < cam.getResY(); j++)
         {
             //System.out.println("i: " + i);
-            for (int j = 0; j < cam.getResY(); j++)
+            for (int i = 0; i < cam.getResX(); i++)
             {
-                //System.out.println("j: " + j);
+                System.out.println("i: " + i);
+                System.out.println("j: " + j);
                 rayIndex[i][j] = new Ray(cam.getPosX(), cam.getPosY(), cam.getPosZ());
 
                 // update the rays index to the current pixel
