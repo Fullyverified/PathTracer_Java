@@ -95,7 +95,5 @@ public class Sphere implements SceneObjects {
         return false;
     }
 
-    // Getter
-    public double getDistanceRadius() {return this.distanceToR;}
 
 }

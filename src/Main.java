@@ -11,6 +11,7 @@ public class Main {
         // create new sceneObjects ArrayList. initialise and store each object in it.
         List<Object> sceneObjects = new ArrayList<>();
         sceneObjects.add(new Sphere(6, 0, 0, 1));
+        sceneObjects.add(new Sphere(12, 2, 3, 1));
 
         // create camera object and initialise it
         Camera cam = new Camera(1, 0, 0, 1, 0, 0, 0, 1, 0,90, 4,3,60);
@@ -81,7 +82,7 @@ public class Main {
             }
         }
 
-
+        // iterate through each rays hit value and print the output
         for (int j = 0; j < cam.getResY(); j++)
         {
             for (int i = 0; i < cam.getResX(); i++)
