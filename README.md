@@ -10,12 +10,12 @@ Done:
 7. End the ray if it finds an intersection
 8. Store the intersection location as part of the ray object.
 9. Create more than one ray, such that each ray is a pixel of the camera.
+10. Print (render) the final output :)
 
 TODO:
 
 1. Create a lookup table for values of brightess and their corresponding character, e.g. . , : ; / % # @
-2. Print (render) the final output :)
-3. Spawn a new ray at the intersection towards the direction of each lightsource to test for shadows
-4. Implemenet path tracing (?)
+2. Spawn a new ray at the intersection towards the direction of each lightsource to test for shadows
+3. Implemenet path tracing (?)
 
 Known Bugs:
