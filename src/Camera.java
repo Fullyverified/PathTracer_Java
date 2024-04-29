@@ -62,7 +62,6 @@ public class Camera {
         this.normRightX = this.rightX / this.rightMagnitude;
         this.normRightY = this.rightY / this.rightMagnitude;
         this.normRightZ = this.rightZ / this.rightMagnitude;
-        System.out.println(this.normRightX + ", " + this.normRightY + ", " + this.normRightZ);
     }
 
     // calculate the image plane size

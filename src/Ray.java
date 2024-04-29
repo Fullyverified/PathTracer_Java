@@ -10,7 +10,7 @@ public class Ray {
 
 
     // constructor
-    public Ray()
+    public Ray(double oX, double oY, double oZ)
     {
         this.oX = oX;
         this.oY = oY;
@@ -45,9 +45,10 @@ public class Ray {
     public void rayMarch(double tscalar)
     {
         this.tscalar = tscalar;
-        this.rayPointX = this.pixelPosX + (tscalar * normDirX);
-        this.rayPointY = this.pixelPosY + (tscalar * normDirY);
-        this.rayPointZ = this.pixelPosZ + (tscalar * normDirZ);
+        this.rayPointX = this.oX + (tscalar * normDirX);
+        this.rayPointY = this.oY + (tscalar * normDirY);
+        this.rayPointZ = this.oZ + (tscalar * normDirZ);
+        System.out.println("x: " + rayPointX + ", y: " + rayPointY + ", z: " + rayPointZ);
     }
 
 
@@ -108,8 +109,8 @@ public class Ray {
     public void setPixelX(int px) {this.px = px;}
     public void setPixelY(int py) {this.py = py;}
     // set pixelindex
-    public void setPixelIndeX(int px) {this.pixelIndexX = px;}
-    public void setPixelIndeY(int py) {this.pixelIndexY = py;}
+    public void setPixelIndeX(double px) {this.pixelIndexX = px;}
+    public void setPixelIndexY(double py) {this.pixelIndexY = py;}
     // set pixelpos
     public void setPixelPosX(double px) {this.pixelPosX = px;}
     public void setPixelPosY(double py) {this.pixelPosY = py;}

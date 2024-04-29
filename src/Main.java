@@ -15,7 +15,7 @@ public class Main {
 
 
 
-        Camera cam = new Camera(0, 0, 0, 1, 0, 0, 0, 1, 0,90, 16,9,30);
+        Camera cam = new Camera(0, 0, 0, 1, 0, 0, 0, 1, 0,90, 4,3,800);
         cam.directionVector();
         cam.upVector();
         cam.rightVector();
@@ -32,13 +32,17 @@ public class Main {
 
         for (int i = 0; i < cam.getResX(); i++)
         {
-            for (int j = 0; j < cam.getResY() - 1; j++)
+            //System.out.println("i: " + i);
+            for (int j = 0; j < cam.getResY(); j++)
             {
-                rayIndex[i][j] = new Ray();
+                //System.out.println("j: " + j);
+                rayIndex[i][j] = new Ray(cam.getPosX(), cam.getPosY(), cam.getPosZ());
                 rayIndex[i][j].setPixelX(i);
-                rayIndex[i][j].setPixelX(j);
-                rayIndex[i][j].setPixelIndeX(i / (int) cam.getResX() * 2 - 1);
-                rayIndex[i][j].setPixelIndeY(1 - (i / (int) cam.getResY()) * 2);
+                rayIndex[i][j].setPixelY(j);
+                rayIndex[i][j].setPixelIndeX((i + 0.5 / cam.getResX()) * 2 - 1);
+                System.out.println(i / cam.getResX() * 2 - 1);
+                rayIndex[i][j].setPixelIndexY(1 - (j / cam.getResY()) * 2);
+                System.out.println("J: " + j + "indexY: " + (1 - (j + 0.5 / cam.getResY()) * 2));
 
                 rayIndex[i][j].setPixelPosX(rayIndex[i][j].getPixelIndexX() * cam.getCamHeight() / 2);
                 rayIndex[i][j].setPixelPosY(rayIndex[i][j].getPixelIndexY() * cam.getCamHeight() / 2);
@@ -46,6 +50,7 @@ public class Main {
                 rayIndex[i][j].setDirX(cam.getNormDirX() + cam.getNormRightX() * rayIndex[i][j].getPixelPosX() + cam.getNormUpX() * rayIndex[i][j].getPixelPosY());
                 rayIndex[i][j].setDirY(cam.getNormDirY() + cam.getNormRightY() * rayIndex[i][j].getPixelPosX() + cam.getNormUpY() * rayIndex[i][j].getPixelPosY());
                 rayIndex[i][j].setDirZ(cam.getNormDirZ() + cam.getNormRightZ() * rayIndex[i][j].getPixelPosX() + cam.getNormUpZ() * rayIndex[i][j].getPixelPosY());
+                rayIndex[i][j].updateMagnitude();
 
                 for (Object sceneObject : sceneObjects)
                 {
