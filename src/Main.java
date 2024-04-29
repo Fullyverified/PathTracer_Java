@@ -8,13 +8,12 @@ public class Main {
 
 
     public static void main(String[] args) {
-
         // create new sceneObjects ArrayList. initialise and store each object in it.
         List<Object> sceneObjects = new ArrayList<>();
-        sceneObjects.add(new Sphere(3, 0, 0, 1));
+        sceneObjects.add(new Sphere(10, 0, 0, 1));
 
         // create camera object and initialise it
-        Camera cam = new Camera(1, 0, 0, 1, 0, 0, 0, 1, 0,10, 4,3,6);
+        Camera cam = new Camera(1, 0, 0, 1, 0, 0, 0, 1, 0,90, 4,3,60);
         // each cam. method calculates the various properties of the camera
         cam.directionVector();
         cam.upVector();
@@ -29,8 +28,8 @@ public class Main {
             //System.out.println("i: " + i);
             for (int i = 0; i < cam.getResX(); i++)
             {
-                System.out.println("i: " + i);
-                System.out.println("j: " + j);
+                //System.out.println("i: " + i);
+                //System.out.println("j: " + j);
                 rayIndex[i][j] = new Ray(cam.getPosX(), cam.getPosY(), cam.getPosZ());
 
                 // update the rays index to the current pixel
@@ -72,7 +71,8 @@ public class Main {
                                     rayIndex[i][j].setHitPointZ(rayIndex[i][j].getRayPointZ());
                                     rayIndex[i][j].setHit(1);
                                 }
-                                else {rayIndex[i][j].setHit(0);}
+                                else {
+                                    rayIndex[i][j].setHit(0);}
                                 r = r + 0.1;
                             }
                         }
@@ -82,6 +82,21 @@ public class Main {
         }
 
 
+        for (int j = 0; j < cam.getResY(); j++)
+        {
+            for (int i = 0; i < cam.getResX(); i++)
+            {
+                if (rayIndex[i][j].getHit() == 1)
+                {
+                    System.out.print("@");
+                }
+                else if (rayIndex[i][j].getHit() == 0)
+                {
+                    System.out.print(" ");
+                }
+            }
+            System.out.println("|");
+        }
 
 
     }
