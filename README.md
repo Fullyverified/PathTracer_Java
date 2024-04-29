@@ -17,3 +17,6 @@ TODO:
 2. Print (render) the final output :)
 3. Spawn a new ray at the intersection towards the direction of each lightsource to test for shadows
 4. Implemenet path tracing (?)
+
+Known Bugs:
+Certain resolutions will cause an Array Index out of bounds error.
