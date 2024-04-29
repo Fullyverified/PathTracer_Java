@@ -15,19 +15,10 @@ public class Ray {
         this.oX = oX;
         this.oY = oY;
         this.oZ = oZ;
-        this.dirX = dirX;
-        this.dirY = dirY;
-        this.dirZ = dirZ;
-
-        // calculate magnitude and normalised direction vectors
-        this.dirMagnitude = Math.sqrt(dirX*dirX + dirY*dirY + dirZ*dirZ);
-        this.normDirX = (this.dirX / this.dirMagnitude);
-        this.normDirY = (this.dirY / this.dirMagnitude);
-        this.normDirZ = (this.dirZ / this.dirMagnitude);
     }
 
     // update magnitude and normalised directions vectors
-    public void updateMagnitude()
+    public void updateNormalisation()
     {
         this.dirMagnitude = Math.sqrt(this.dirX*this.dirX + this.dirY*this.dirY + this.dirZ*this.dirZ);
         this.normDirX = (this.dirX / this.dirMagnitude);
@@ -48,17 +39,8 @@ public class Ray {
         this.rayPointX = this.oX + (tscalar * normDirX);
         this.rayPointY = this.oY + (tscalar * normDirY);
         this.rayPointZ = this.oZ + (tscalar * normDirZ);
-        System.out.println("x: " + rayPointX + ", y: " + rayPointY + ", z: " + rayPointZ);
+        //System.out.println("x: " + rayPointX + ", y: " + rayPointY + ", z: " + rayPointZ);
     }
-
-
-    // Set ray position and direction to each new point, relative to the camera
-    // rayDirection = lookDirection + rightVector x pixelX + upVector x pixelY
-    public void rayDirection()
-    {
-
-    }
-
 
     // getter
     // pos
@@ -97,9 +79,9 @@ public class Ray {
     public void setPosY(double posY) {this.oY = posY;}
     public void setPosZ(double posZ) {this.oZ = posZ;}
     // direction
-    public void setDirX(double dirX) {this.oX = dirX;}
-    public void setDirY(double dirY) {this.oY = dirY;}
-    public void setDirZ(double dirZ) {this.oZ = dirZ;}
+    public void setDirX(double dirX) {this.dirX = dirX;}
+    public void setDirY(double dirY) {this.dirY = dirY;}
+    public void setDirZ(double dirZ) {this.dirZ = dirZ;}
     // hitpoint
     public void setHitPointX(double pointX) {this.hitPointX = pointX;}
     public void setHitPointY(double pointY) {this.hitPointY = pointY;}
@@ -109,7 +91,7 @@ public class Ray {
     public void setPixelX(int px) {this.px = px;}
     public void setPixelY(int py) {this.py = py;}
     // set pixelindex
-    public void setPixelIndeX(double px) {this.pixelIndexX = px;}
+    public void setPixelIndexX(double px) {this.pixelIndexX = px;}
     public void setPixelIndexY(double py) {this.pixelIndexY = py;}
     // set pixelpos
     public void setPixelPosX(double px) {this.pixelPosX = px;}

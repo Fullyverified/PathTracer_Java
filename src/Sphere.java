@@ -45,6 +45,7 @@ public class Sphere implements SceneObjects {
 
         // calculate the discriminant | b^2 - 2ac
         this.discriminant = (b * b) - (4 * (a * c));
+        System.out.println("Discriminant: " + this.discriminant);
 
         if (this.discriminant < 0)
         {
