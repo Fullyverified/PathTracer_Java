@@ -49,19 +49,19 @@ public class Sphere implements SceneObjects {
 
         if (this.discriminant < 0)
         {
-            System.out.println("No intersection. x: ");
-            System.out.println("----------------------------------------");
+            //System.out.println("No intersection. x: ");
+            //System.out.println("----------------------------------------");
             return false;
         }
         else if(this.discriminant == 0)
         {
-            System.out.println("Exactly one intersection");
-            System.out.println("----------------------------------------");
+            //System.out.println("Exactly one intersection");
+            //System.out.println("----------------------------------------");
             return true;
         }
         else if (this.discriminant > 0) {
-            System.out.println("The ray intersects at two points");
-            System.out.println("----------------------------------------");
+            //System.out.println("The ray intersects at two points");
+            //System.out.println("----------------------------------------");
             return true;
         }
         return false;
@@ -78,17 +78,17 @@ public class Sphere implements SceneObjects {
         // check if we have hit the sphere yet
         if (distanceToC > sradius)
         {
-            System.out.println("Not intersected yet. x: " + ray.getRayPointX() + " y: " + ray.getRayPointY() + " z: " + ray.getRayPointZ());
+            //System.out.println("Not intersected yet. x: " + ray.getRayPointX() + " y: " + ray.getRayPointY() + " z: " + ray.getRayPointZ());
             return false;
         }
         else if (distanceToC == sradius)
         {
-            System.out.println("Perfect intersection. x: " + ray.getRayPointX() + " y: " + ray.getRayPointY() + " z: " + ray.getRayPointZ());
+            //System.out.println("Perfect intersection. x: " + ray.getRayPointX() + " y: " + ray.getRayPointY() + " z: " + ray.getRayPointZ());
             return true;
         }
         else if (distanceToC < sradius)
         {
-            System.out.println("Ray inside sphere. x: " + ray.getRayPointX() + " y: " + ray.getRayPointY() + " z: " + ray.getRayPointZ());
+            //System.out.println("Ray inside sphere. x: " + ray.getRayPointX() + " y: " + ray.getRayPointY() + " z: " + ray.getRayPointZ());
             return true;
         }
         else {System.out.println("Something is wrong");}

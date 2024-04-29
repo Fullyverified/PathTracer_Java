@@ -14,7 +14,7 @@ public class Main {
         sceneObjects.add(new Sphere(3, 0, 0, 1));
 
         // create camera object and initialise it
-        Camera cam = new Camera(0, 0, 0, 1, 0, 0, 0, 1, 0,10, 4,3,8);
+        Camera cam = new Camera(1, 0, 0, 1, 0, 0, 0, 1, 0,10, 4,3,8);
         // each cam. method calculates the various properties of the camera
         cam.directionVector();
         cam.upVector();
@@ -71,6 +71,7 @@ public class Main {
                                     rayIndex[i][j].setHitPointZ(rayIndex[i][j].getRayPointZ());
                                     rayIndex[i][j].setHit(1);
                                 }
+                                else {rayIndex[i][j].setHit(0);}
                                 r = r + 0.1;
                             }
                         }

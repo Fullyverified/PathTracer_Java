@@ -41,11 +41,21 @@ public class Camera {
 
     public void upVector()
     {
-        // calculate magnitude and normalised up vector
-        this.upMagnitude = Math.sqrt(this.upX*this.upX + this.upY*this.upY + this.upZ*this.upZ);
-        this.normUpX = (this.upX / this.upMagnitude);
-        this.normUpY = (this.upY / this.upMagnitude);
-        this.normUpZ = (this.upZ / this.upMagnitude);;
+        // in cases where the camera is looking straight up or down, the cross product will be NaN.
+        if ((this.dirY == 1 || this.dirY == -1) && this.dirX == 0 && this.dirZ == 0)
+        {
+        this.normUpX = 1;
+        this.normUpY = 0;
+        this.normUpZ = 0;
+        }
+        else
+        {
+            // calculate magnitude and normalised up vector
+            this.upMagnitude = Math.sqrt(this.upX * this.upX + this.upY * this.upY + this.upZ * this.upZ);
+            this.normUpX = (this.upX / this.upMagnitude);
+            this.normUpY = (this.upY / this.upMagnitude);
+            this.normUpZ = (this.upZ / this.upMagnitude);
+        }
     }
 
     public void rightVector()
