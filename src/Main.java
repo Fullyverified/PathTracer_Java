@@ -72,8 +72,7 @@ public class Main {
                                     rayIndex[i][j].setHitPointZ(rayIndex[i][j].getRayPointZ());
                                     rayIndex[i][j].setHit(1);
                                 }
-                                else {
-                                    rayIndex[i][j].setHit(0);}
+                                else {rayIndex[i][j].setHit(0);}
                                 r = r + 0.01;
                             }
                         }
@@ -89,11 +88,11 @@ public class Main {
             {
                 if (rayIndex[i][j].getHit() == 1)
                 {
-                    System.out.print("##");
+                    System.out.print("###");
                 }
                 else if (rayIndex[i][j].getHit() == 0)
                 {
-                    System.out.print("  ");
+                    System.out.print("   ");
                 }
             }
             System.out.println("|");
