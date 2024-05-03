@@ -1,4 +1,3 @@
-import java.awt.*;
 
 public class Sphere implements SceneObjects {
 
