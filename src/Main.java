@@ -4,17 +4,15 @@ import java.util.List;
 public class Main {
 
     public static double tscalar = 0;
-    public int width, height;
-
 
     public static void main(String[] args) {
         // create new sceneObjects ArrayList. initialise and store each object in it.
         List<Object> sceneObjects = new ArrayList<>();
         sceneObjects.add(new Sphere(6, 0, 0, 1));
-        sceneObjects.add(new Sphere(12, 2, 3, 1));
+        sceneObjects.add(new Sphere(12, 2, -3, 1.5));
 
         // create camera object and initialise it
-        Camera cam = new Camera(1, 0, 0, 1, 0, 0, 0, 1, 0,90, 4,3,60);
+        Camera cam = new Camera(0, 0, 0, 1, 0, 0, 0, 1, 0,70, 4,3,80);
         // each cam. method calculates the various properties of the camera
         cam.directionVector();
         cam.upVector();
@@ -53,25 +51,38 @@ public class Main {
                 // update vector normalisation
                 rayIndex[i][j].updateNormalisation();
 
+                // for each object that is in the sceneObjects collection
                 for (Object sceneObject : sceneObjects)
                 {
+                    // check if that object is a sphere
                     if (sceneObject instanceof Sphere)
                     {
+                        // check the discriminant of the ray for the sphere
                         if (((Sphere) sceneObject).intersectionDiscard(rayIndex[i][j]))
                         {
+                            // create local variable r (the rays step)
                             double r = 0;
+                            // while the ray is not intersecting the sphere and the ray has not marched 100 units
                             while (!((Sphere) sceneObject).intersectionCheck(rayIndex[i][j]) && r <= 100)
                             {
-                                ((Sphere) sceneObject).intersectionCheck(rayIndex[i][j]);
+                                // march the ray
                                 rayIndex[i][j].rayMarch(r);
+                                // check if the ray intersects the sphere
                                 if (((Sphere) sceneObject).intersectionCheck(rayIndex[i][j]))
                                 {
-
+                                    // get the position of the intersection
+                                    //  set ray hit to 1
                                     rayIndex[i][j].setHitPointX(rayIndex[i][j].getRayPointX());
                                     rayIndex[i][j].setHitPointY(rayIndex[i][j].getRayPointY());
                                     rayIndex[i][j].setHitPointZ(rayIndex[i][j].getRayPointZ());
                                     rayIndex[i][j].setHit(1);
                                 }
+                                // secondary bounces
+                                else if (rayIndex[i][j].getHit() == 1)
+                                {
+                                    // secondary bounces
+                                }
+                                // if hit = 0, march the ray continue the loop
                                 else {rayIndex[i][j].setHit(0);}
                                 r = r + 0.01;
                             }
