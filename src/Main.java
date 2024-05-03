@@ -19,9 +19,11 @@ public class Main {
         cam.rightVector();
         cam.imagePlane();
         // create a 2D array of rays with the size of resolution of the camera
-        Ray[][] rayIndex = new Ray[(int) cam.getResX()][(int) cam.getResY()];
+        Ray[][] primaryRay = new Ray[(int) cam.getResX()][(int) cam.getResY()];
+        // 2d array of rays for secondary bounces
+        Ray[][] secondRay = new Ray[(int) cam.getResX()][(int) cam.getResY()];
 
-        // iterate through each ray, left to right, top to bottom, for each scene object.
+        // iterate through primary each ray, left to right, top to bottom, for each scene object.
         for (int j = 0; j < cam.getResY(); j++)
         {
             //System.out.println("i: " + i);
@@ -29,27 +31,27 @@ public class Main {
             {
                 //System.out.println("i: " + i);
                 //System.out.println("j: " + j);
-                rayIndex[i][j] = new Ray(cam.getPosX(), cam.getPosY(), cam.getPosZ());
+                primaryRay[i][j] = new Ray(cam.getPosX(), cam.getPosY(), cam.getPosZ());
 
                 // update the rays index to the current pixel
-                rayIndex[i][j].setPixelX(i);
-                rayIndex[i][j].setPixelY(j);
+                primaryRay[i][j].setPixelX(i);
+                primaryRay[i][j].setPixelY(j);
 
                 // calculate pixel position on the plane
-                rayIndex[i][j].setPixelIndexX((((i + 0.5) / cam.getResX()) * 2) - 1);
-                rayIndex[i][j].setPixelIndexY(1 - (((j + 0.5) / cam.getResY()) * 2));
+                primaryRay[i][j].setPixelIndexX((((i + 0.5) / cam.getResX()) * 2) - 1);
+                primaryRay[i][j].setPixelIndexY(1 - (((j + 0.5) / cam.getResY()) * 2));
 
                 // calculate pixel position in the scene
-                rayIndex[i][j].setPixelPosX(rayIndex[i][j].getPixelIndexX() * cam.getCamWidth() / 2);
-                rayIndex[i][j].setPixelPosY(rayIndex[i][j].getPixelIndexY() * cam.getCamHeight() / 2);
+                primaryRay[i][j].setPixelPosX(primaryRay[i][j].getPixelIndexX() * cam.getCamWidth() / 2);
+                primaryRay[i][j].setPixelPosY(primaryRay[i][j].getPixelIndexY() * cam.getCamHeight() / 2);
 
-                // set the ray direction
+                // set the primary ray direction
                 // D = normCamD + rightvector * ScenePosX + upvector * ScenePosY
-                rayIndex[i][j].setDirX(cam.getNormDirX() + cam.getNormRightX() * rayIndex[i][j].getPixelPosX() + cam.getNormUpX() * rayIndex[i][j].getPixelPosY());
-                rayIndex[i][j].setDirY(cam.getNormDirY() + cam.getNormRightY() * rayIndex[i][j].getPixelPosX() + cam.getNormUpY() * rayIndex[i][j].getPixelPosY());
-                rayIndex[i][j].setDirZ(cam.getNormDirZ() + cam.getNormRightZ() * rayIndex[i][j].getPixelPosX() + cam.getNormUpZ() * rayIndex[i][j].getPixelPosY());
+                primaryRay[i][j].setDirX(cam.getNormDirX() + cam.getNormRightX() * primaryRay[i][j].getPixelPosX() + cam.getNormUpX() * primaryRay[i][j].getPixelPosY());
+                primaryRay[i][j].setDirY(cam.getNormDirY() + cam.getNormRightY() * primaryRay[i][j].getPixelPosX() + cam.getNormUpY() * primaryRay[i][j].getPixelPosY());
+                primaryRay[i][j].setDirZ(cam.getNormDirZ() + cam.getNormRightZ() * primaryRay[i][j].getPixelPosX() + cam.getNormUpZ() * primaryRay[i][j].getPixelPosY());
                 // update vector normalisation
-                rayIndex[i][j].updateNormalisation();
+                primaryRay[i][j].updateNormalisation();
 
                 // for each object that is in the sceneObjects collection
                 for (Object sceneObject : sceneObjects)
@@ -58,32 +60,33 @@ public class Main {
                     if (sceneObject instanceof Sphere)
                     {
                         // check the discriminant of the ray for the sphere
-                        if (((Sphere) sceneObject).intersectionDiscard(rayIndex[i][j]))
+                        if (((Sphere) sceneObject).intersectionDiscard(primaryRay[i][j]))
                         {
                             // create local variable r (the rays step)
                             double r = 0;
                             // while the ray is not intersecting the sphere and the ray has not marched 100 units
-                            while (!((Sphere) sceneObject).intersectionCheck(rayIndex[i][j]) && r <= 100)
+                            while (!((Sphere) sceneObject).intersectionCheck(primaryRay[i][j]) && r <= 100)
                             {
                                 // march the ray
-                                rayIndex[i][j].rayMarch(r);
+                                primaryRay[i][j].rayMarch(r);
                                 // check if the ray intersects the sphere
-                                if (((Sphere) sceneObject).intersectionCheck(rayIndex[i][j]))
+                                if (((Sphere) sceneObject).intersectionCheck(primaryRay[i][j]))
                                 {
                                     // get the position of the intersection
                                     //  set ray hit to 1
-                                    rayIndex[i][j].setHitPointX(rayIndex[i][j].getRayPointX());
-                                    rayIndex[i][j].setHitPointY(rayIndex[i][j].getRayPointY());
-                                    rayIndex[i][j].setHitPointZ(rayIndex[i][j].getRayPointZ());
-                                    rayIndex[i][j].setHit(1);
+                                    primaryRay[i][j].setHitPointX(primaryRay[i][j].getRayPointX());
+                                    primaryRay[i][j].setHitPointY(primaryRay[i][j].getRayPointY());
+                                    primaryRay[i][j].setHitPointZ(primaryRay[i][j].getRayPointZ());
+                                    primaryRay[i][j].setHit(1);
                                 }
                                 // secondary bounces
-                                else if (rayIndex[i][j].getHit() == 1)
+                                else if (primaryRay[i][j].getHit() == 1)
                                 {
                                     // secondary bounces
                                 }
                                 // if hit = 0, march the ray continue the loop
-                                else {rayIndex[i][j].setHit(0);}
+                                else {
+                                    primaryRay[i][j].setHit(0);}
                                 r = r + 0.01;
                             }
                         }
@@ -97,11 +100,11 @@ public class Main {
         {
             for (int i = 0; i < cam.getResX(); i++)
             {
-                if (rayIndex[i][j].getHit() == 1)
+                if (primaryRay[i][j].getHit() == 1)
                 {
                     System.out.print("###");
                 }
-                else if (rayIndex[i][j].getHit() == 0)
+                else if (primaryRay[i][j].getHit() == 0)
                 {
                     System.out.print("   ");
                 }
