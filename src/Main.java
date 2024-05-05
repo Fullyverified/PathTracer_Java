@@ -1,4 +1,3 @@
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -12,11 +11,11 @@ public class Main {
         // create new sceneObjects ArrayList. initialise and store each object in it.
         List<SceneObjects> sceneObjects = new ArrayList<>();
         sceneObjects.add(new Sphere(6, 0, 0, 1));
-        sceneObjects.add(new Sphere(12, 0, -5, 1));
-        sceneObjects.add(new PointLight(6, 0, 5, 1, 10));
+        sceneObjects.add(new Sphere(12, 0, -5, 1.25));
+        sceneObjects.add(new PointLight(6, 0.5, 5, 1, 10));
 
         // create camera object and initialise it
-        Camera cam = new Camera(0, 0, 0, 1, 0, 0, 0, 1, 0, 70, 4, 3, 70);
+        Camera cam = new Camera(0, 0, 0, 1, 0, 0, 0, 1, 0, 70, 4, 3, 100);
         // each cam. method calculates the various properties of the camera
         cam.directionVector();
         cam.upVector();
@@ -99,7 +98,7 @@ public class Main {
                 if (primaryRay[i][j].getHit() == 1) {
                     secondRay[i][j] = new Ray(primaryRay[i][j].getHitPointX(), primaryRay[i][j].getHitPointY(), primaryRay[i][j].getHitPointZ());
 
-                    for (int t = 0; t < 1000; t++) {
+                    for (int t = 0; t < 20000; t++) {
                         // give the second ray a random normalised direction
                         Random random = new Random();
                         double randomDir = random.nextDouble(2.0) - 1.0;
@@ -137,7 +136,7 @@ public class Main {
                         // create local variable r (the rays step)
                         double r = 0;
                         secondRay[i][j].setHit(0);
-                        while (r <= 100 && secondRay[i][j].getHit() == 0) {
+                        while (r <= 25 && secondRay[i][j].getHit() == 0) {
                             // march the ray
                             secondRay[i][j].rayMarch(r);
                             for (SceneObjects sceneObject2 : sceneObjects) {
@@ -154,7 +153,7 @@ public class Main {
                                         // get the ID of the collided pointlight
                                         secondRay[i][j].setCollidedObject(sceneObject2.getObjectID());
                                         if ((sceneObject2) instanceof PointLight) {
-                                            secondRay[i][j].addBrightness(1);
+                                            secondRay[i][j].addBrightness(0.1);
                                         } else if ((sceneObject2) instanceof Sphere) {
                                             secondRay[i][j].addBrightness(0);
                                         }
@@ -180,9 +179,11 @@ public class Main {
                 if (primaryRay[i][j].getHit() == 1) {
                     if (secondRay[i][j].getBrightness() > 0.5) {
                         System.out.print("###");
-                    } else if (secondRay[i][j].getBrightness() < 0.5) {
-                        System.out.print(";;;");
+                        }
+                    else if (secondRay[i][j].getBrightness() <= 0.5) {
+                        System.out.print(":::");
                     }
+
                 } else if (primaryRay[i][j].getHit() == 0) {
                     System.out.print("   ");
                 }
