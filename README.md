@@ -1,10 +1,11 @@
 I'm trying to make an Ascii Raytracer. Nothing that hasn't been done before :)
 
-Done:![spher erender](https://github.com/Fullyverified/ASCII_RayTracer/assets/138776324/553ab64d-12ce-4391-a3cf-c72657531b53)
+![spher erender](https://github.com/Fullyverified/ASCII_RayTracer/assets/138776324/553ab64d-12ce-4391-a3cf-c72657531b53)
 sphere1 (6, 0, 0) radius 1
 sphere 2 (12, 0, -5) radius 1.25
 Light (6, 0.5, 5) radius 1
 
+Done:
 1. Create ray and sphere objects.
 2. Give the ray a positon and a direction vector.
 3. Normalise the direction vector.
