@@ -118,7 +118,7 @@ public class Sphere implements SceneObjects {
 
 
     // get sphere ID
-    public int getSphereID()
+    public int getObjectID()
     {
         return this.sphereID;
     }

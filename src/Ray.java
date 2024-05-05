@@ -5,7 +5,7 @@ public class Ray {
     private double dirMagnitude;
     private double rayPointX, rayPointY, rayPointZ, tscalar;
     private double hitPointX, hitPointY, hitPointZ;
-    private int hit;
+    private int hit = 0;
     private double px, py, pixelIndexX, pixelIndexY, pixelPosX, pixelPosY;
     private double collidedObject;
     private double brightness = 0;
@@ -108,7 +108,7 @@ public class Ray {
     public void setCollidedObject(int obj) {this.collidedObject = obj;}
     //set brightness
     public void addBrightness(double brightness) {
-        this.brightness = 1;
+        this.brightness = this.brightness + brightness;
         //System.out.println(this.brightness);
     }
 

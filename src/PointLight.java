@@ -7,7 +7,7 @@ public class PointLight implements SceneObjects {
     private double sradius, brightness;
     private double a, b, c, discriminant;
     private double distanceToC, distanceToR;
-    private static int numPointLights = 0;
+    private static int numPointLights = 100;
     private int pointLightID = 0;
 
 
@@ -101,7 +101,7 @@ public class PointLight implements SceneObjects {
 
 
     // get sphere ID
-    public int getPointLightID()
+    public int getObjectID()
     {
         return this.pointLightID;
     }
