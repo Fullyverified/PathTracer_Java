@@ -7,6 +7,8 @@ public class Ray {
     private double hitPointX, hitPointY, hitPointZ;
     private int hit;
     private double px, py, pixelIndexX, pixelIndexY, pixelPosX, pixelPosY;
+    private double collidedObject;
+    private double brightness = 0;
 
 
     // constructor
@@ -73,6 +75,11 @@ public class Ray {
     public double getPixelPosX() {return this.pixelPosX;}
     public double getPixelPosY() {return this.pixelPosY;}
 
+    // get collidedObject
+    public double getCollidedObject() {return this.collidedObject;}
+
+    public double getBrightness() {return this.brightness;}
+
     // setter
     // pos
     public void setPosX(double posX) {this.oX = posX;}
@@ -97,6 +104,13 @@ public class Ray {
     public void setPixelPosX(double px) {this.pixelPosX = px;}
     public void setPixelPosY(double py) {this.pixelPosY = py;}
 
+    // collidedObjectID
+    public void setCollidedObject(int obj) {this.collidedObject = obj;}
+    //set brightness
+    public void addBrightness(double brightness) {
+        this.brightness = 1;
+        //System.out.println(this.brightness);
+    }
 
 
 

@@ -4,19 +4,24 @@ public class PointLight implements SceneObjects {
     private double centerx, centerOriginX;
     private double centery, centerOriginY;
     private double centerz, centerOriginZ;
-    private double sradius;
+    private double sradius, brightness;
     private double a, b, c, discriminant;
     private double distanceToC, distanceToR;
+    private static int numPointLights = 0;
+    private int pointLightID = 0;
 
 
     //Equation of a sphere: (x - cx)^2 + (y - cy)^2 + (z - cz)^2 = r^2
 
     //Constructor
-    public PointLight(double centerx, double centery, double centerz, double sradius) {
+    public PointLight(double centerx, double centery, double centerz, double sradius, double brightness) {
         this.centerx = centerx;
         this.centery = centery;
         this.centerz = centerz;
         this.sradius = sradius;
+        this.brightness = brightness;
+        this.pointLightID = numPointLights;
+        numPointLights++;
     }
 
     // p = o + td
@@ -92,6 +97,13 @@ public class PointLight implements SceneObjects {
         }
         else {System.out.println("Something is wrong");}
         return false;
+    }
+
+
+    // get sphere ID
+    public int getPointLightID()
+    {
+        return this.pointLightID;
     }
 
 

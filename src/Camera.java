@@ -1,6 +1,6 @@
 import java.lang.Math;
 
-public class Camera {
+public class Camera{
 
     private double posX, dirX, normDirX, upX, normUpX, rightX, normRightX;
     private double posY, dirY, normDirY, upY, normUpY, rightY, normRightY;
