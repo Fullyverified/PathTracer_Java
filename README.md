@@ -2,9 +2,7 @@ I'm trying to make an Ascii Pathtracer. Nothing that hasn't been done before :)
 
 ![spher erender](https://github.com/Fullyverified/ASCII_RayTracer/assets/138776324/553ab64d-12ce-4391-a3cf-c72657531b53)
 
-Sphere (6, 0, 0) radius 1
-sphere (12, 0, -5) radius 1.25
-Light (6, 0.5, 5) radius 1
+Sphere at 6, 0, 0 with radius 1. Second sphere at 12, 0, -5 with radius 1.25. Light 6, 0.5, 5 radius 1.
 
 Done:
 1. Create ray and sphere objects.
