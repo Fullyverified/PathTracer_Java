@@ -15,7 +15,7 @@ public class Main {
         sceneObjects.add(new PointLight(6, 0.5, 5, 1, 10));
 
         // create camera object and initialise it
-        Camera cam = new Camera(0, 0, 0, 1, 0, 0, 0, 1, 0, 70, 4, 3, 100);
+        Camera cam = new Camera(0, 0, 0, 1, 0, 0, 0, 1, 0, 70, 4, 3, 80);
         // each cam. method calculates the various properties of the camera
         cam.directionVector();
         cam.upVector();
@@ -97,7 +97,7 @@ public class Main {
                 // initialise second bounce ray
                 if (primaryRay[i][j].getHit() == 1) {
                     secondRay[i][j] = new Ray(primaryRay[i][j].getHitPointX(), primaryRay[i][j].getHitPointY(), primaryRay[i][j].getHitPointZ());
-
+                    // t is number of second rays to be cast per pixel
                     for (int t = 0; t < 20000; t++) {
                         // give the second ray a random normalised direction
                         Random random = new Random();
@@ -173,8 +173,9 @@ public class Main {
         }
 
         // iterate through each rays hit value and print the output
-        for (
-                int j = 0; j < cam.getResY(); j++) {
+        for (int i = 0; i < cam.getResX(); i++) {System.out.print("---");}
+        for (int j = 0; j < cam.getResY(); j++) {
+            System.out.print("|");
             for (int i = 0; i < cam.getResX(); i++) {
                 if (primaryRay[i][j].getHit() == 1) {
                     if (secondRay[i][j].getBrightness() > 0.5) {
@@ -190,6 +191,7 @@ public class Main {
             }
             System.out.println("|");
         }
+        for (int i = 0; i < cam.getResX(); i++) {System.out.print("---");}
     }
 }
 
