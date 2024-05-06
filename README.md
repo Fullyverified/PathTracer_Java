@@ -1,4 +1,4 @@
-I'm trying to make an Ascii Raytracer. Nothing that hasn't been done before :)
+I'm trying to make an Ascii Pathtracer. Nothing that hasn't been done before :)
 
 ![spher erender](https://github.com/Fullyverified/ASCII_RayTracer/assets/138776324/553ab64d-12ce-4391-a3cf-c72657531b53)
 sphere1 (6, 0, 0) radius 1
