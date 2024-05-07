@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class Main {
 
@@ -17,7 +16,7 @@ public class Main {
         Render render = new Render();
 
         // create camera object and initialise it
-        Camera cam = new Camera(0, 0, 0, 1, 0, 0, 0, 1, 0, 70, 4, 3, 80);
+        Camera cam = new Camera(0, 0, 0, 1, 0, 0, 0, 1, 0, 70, 4, 3, 50);
         // each cam. method calculates the various properties of the camera
         cam.directionVector();
         cam.upVector();
