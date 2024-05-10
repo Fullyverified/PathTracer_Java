@@ -30,9 +30,18 @@ public class Main {
         Ray[][] secondRay = new Ray[(int) cam.getResX()][(int) cam.getResY()];
 
 
-        render.computePrimaryRays(cam, primaryRay, sceneObjects);
 
-        render.computeNextBounce(20000, cam, primaryRay, secondRay, sceneObjects);
+        for (int j = 0; j < cam.getResY(); j++) {
+            //System.out.println("i: " + i);
+            for (int i = 0; i < cam.getResX(); i++) {
+
+                render.computePrimaryRays(cam, primaryRay, sceneObjects, i, j);
+                render.computeNextBounce(20000, cam, primaryRay, secondRay, sceneObjects, i, j);
+
+                }
+            }
+
+
 
 
         render.drawScreen(cam, primaryRay, secondRay);
