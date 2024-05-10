@@ -7,6 +7,7 @@ public class Render {
     public Render()
     {}
 
+    // ... ,,, ::: ;;; !!! ||| \\\ *** %%% $$$ ### @@@
     public void drawScreen(Camera cam, Ray[][] primaryRay, Ray[][] secondRay)
     {
         // iterate through each rays hit value and print the output
@@ -19,10 +20,10 @@ public class Render {
                         System.out.print("###");
                     }
                     else if (secondRay[i][j].getBrightness() >= 10 && secondRay[i][j].getBrightness() < 20) {
-                        System.out.print("&&&");
+                        System.out.print("***");
                     }
                     else if (secondRay[i][j].getBrightness() >= 5 && secondRay[i][j].getBrightness() < 10) {
-                        System.out.print("***");
+                        System.out.print("|||");
                     }
                     else if (secondRay[i][j].getBrightness() >= 0.5 && secondRay[i][j].getBrightness() < 5) {
                         System.out.print(";;;");
