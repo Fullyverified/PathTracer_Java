@@ -16,7 +16,7 @@ public class Main {
         Render render = new Render();
 
         // create camera object and initialise it
-        Camera cam = new Camera(0, 0, 0, 1, 0, 0, 0, 1, 0, 70, 4, 3, 150);
+        Camera cam = new Camera(0, 0, 0, 1, 0, 0, 0, 1, 0, 70, 4, 3, 125);
         // each cam. method calculates the various properties of the camera
         cam.directionVector();
         cam.upVector();
