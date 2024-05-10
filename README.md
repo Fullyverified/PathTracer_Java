@@ -1,6 +1,6 @@
 I'm trying to make an Ascii Pathtracer. Nothing that hasn't been done before :)
 
-![spher erender](https://github.com/Fullyverified/ASCII_RayTracer/assets/138776324/553ab64d-12ce-4391-a3cf-c72657531b53)
+![sphere render v5](https://github.com/Fullyverified/ASCII_PathTracer/assets/138776324/b26e0b26-7980-4926-b019-555dbdfc9e55)
 
 Sphere at 6, 0, 0 with radius 1. Second sphere at 12, 0, -5 with radius 1.25. Light 6, 0.5, 5 radius 1.
 
