@@ -26,10 +26,10 @@ TODO LIST OF THINGS TODO:
 1. Implement a correct monte carlo approximation
 2. Change the order of operations so that the first bounce, second bounce, third bounce etc is calculated for a pixel, then move onto the next pixel.
     Instead of doing for the first bounce for each pixel, then moving onto the second bounce etc.
-    This is to truly make each pixel an independent entity to enable mutli-threading in the future.
-3. Add more shapes, cubes, flat planes, and the aribtuary shapes.
+    This is to truly make each pixel an independent entity to enable multi-threading in the future.
+3. Add more shapes, such as cubes, flat planes, triangles, and hopefully shapes of arbitrary proportions.
 4. Add colour
-5. Try to make it run in real time and add controls so it can be game-ified (?)
+5. Try to make it run in real time and add controls, so it can be game-ified (?)
 6. Re-write it in C++ (in order to learn C++)
 7. Re-write it in Vulkan to make it run on the GPU (big maybe) 
 
