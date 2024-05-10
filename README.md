@@ -31,6 +31,6 @@ TODO LIST OF THINGS TODO:
 4. Add colour
 5. Try to make it run in real time and add controls so it can be game-ified (?)
 6. Re-write it in C++ (in order to learn C++)
-7. Re-write it in Vulkan to make it run on the GPU (big maybe)
+7. Re-write it in Vulkan to make it run on the GPU (big maybe) 
 
 Known Bugs:
