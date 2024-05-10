@@ -6,7 +6,7 @@ Sphere at 6, 0, 0 with radius 1. Second sphere at 12, 0, -5 with radius 1.25. Li
 
 The current method for calculating light is to simply sum up the light per pixel for each bounce.
 It does create shadows but its very approximate and frankly an inaccurate and inefficient way of doing it.
-I will try to implement a proper light transport solution soon.
+I will try to implement a proper light transport solution soon. 
 
 Done:
 1. Create ray and sphere objects.
