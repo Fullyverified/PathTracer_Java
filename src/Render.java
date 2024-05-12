@@ -4,31 +4,28 @@ import java.util.Random;
 
 public class Render {
 
-    public Render()
-    {}
+    public Render() {
+    }
 
     // ... ,,, ::: ;;; !!! ||| \\\ *** %%% $$$ ### @@@
-    public void drawScreen(Camera cam, Ray[][] primaryRay, Ray[][] secondRay)
-    {
+    public void drawScreen(Camera cam, Ray[][] primaryRay, Ray[][] secondRay) {
         // iterate through each rays hit value and print the output
-        for (int i = 0; i < cam.getResX(); i++) {System.out.print("---");}
+        for (int i = 0; i < cam.getResX(); i++) {
+            System.out.print("---");
+        }
         for (int j = 0; j < cam.getResY(); j++) {
             System.out.print("|");
             for (int i = 0; i < cam.getResX(); i++) {
                 if (primaryRay[i][j].getHit() == 1) {
-                    if (secondRay[i][j].getBrightness() >= 20) {
+                    if (secondRay[i][j].getLuminance() >= 20) {
                         System.out.print("###");
-                    }
-                    else if (secondRay[i][j].getBrightness() >= 10 && secondRay[i][j].getBrightness() < 20) {
+                    } else if (secondRay[i][j].getLuminance() >= 10 && secondRay[i][j].getLuminance() < 20) {
                         System.out.print("XXX");
-                    }
-                    else if (secondRay[i][j].getBrightness() >= 5 && secondRay[i][j].getBrightness() < 10) {
+                    } else if (secondRay[i][j].getLuminance() >= 5 && secondRay[i][j].getLuminance() < 10) {
                         System.out.print("***");
-                    }
-                    else if (secondRay[i][j].getBrightness() >= 0.5 && secondRay[i][j].getBrightness() < 5) {
+                    } else if (secondRay[i][j].getLuminance() >= 0.5 && secondRay[i][j].getLuminance() < 5) {
                         System.out.print(";;;");
-                    }
-                    else if (secondRay[i][j].getBrightness() < 0.5) {
+                    } else if (secondRay[i][j].getLuminance() < 0.5) {
                         System.out.print("...");
                     }
 
@@ -38,15 +35,17 @@ public class Render {
             }
             System.out.println("|");
         }
-        for (int i = 0; i < cam.getResX(); i++) {System.out.print("---");}
+        for (int i = 0; i < cam.getResX(); i++) {
+            System.out.print("---");
+        }
     }
 
     // prints the brightness value of each pixel
-    public void debugDrawScreen(Camera cam, Ray[][] primaryRay, Ray[][] secondRay)
-    {
+    public void debugDrawScreen(Camera cam, Ray[][] primaryRay, Ray[][] secondRay) {
         // iterate through each rays hit value and print the output
-        for (int i = 0; i < cam.getResX(); i++)
-        {System.out.print("------");}
+        for (int i = 0; i < cam.getResX(); i++) {
+            System.out.print("------");
+        }
         System.out.println(" ");
         for (int j = 0; j < cam.getResY(); j++) {
             System.out.print("|");
@@ -54,25 +53,23 @@ public class Render {
                 if (primaryRay[i][j].getHit() == 1) {
                     DecimalFormat df = new DecimalFormat("#.00");
 
-                    if (secondRay[i][j].getBrightness() >= 10)
-                    {
-                        System.out.print(df.format(secondRay[i][j].getBrightness()) + "|");
-                    }
-                    else if (secondRay[i][j].getBrightness() >= 1.0 && secondRay[i][j].getBrightness() < 10)
-                    {
-                        System.out.print("0" + df.format(secondRay[i][j].getBrightness()) + "|");
-                    }
-                    else if (secondRay[i][j].getBrightness() < 1)
-                    {
-                        System.out.print("00" + df.format(secondRay[i][j].getBrightness()) + "|");
+                    if (secondRay[i][j].getLuminance() >= 10) {
+                        System.out.print(df.format(secondRay[i][j].getLuminance()) + "|");
+                    } else if (secondRay[i][j].getLuminance() >= 1.0 && secondRay[i][j].getLuminance() < 10) {
+                        System.out.print("0" + df.format(secondRay[i][j].getLuminance()) + "|");
+                    } else if (secondRay[i][j].getLuminance() < 1) {
+                        System.out.print("00" + df.format(secondRay[i][j].getLuminance()) + "|");
                     }
 
+                } else {
+                    System.out.print("00.00|");
                 }
-                else {System.out.print("00.00|");}
             }
             System.out.println(" ");
         }
-        for (int i = 0; i < cam.getResX(); i++) {System.out.print("------");}
+        for (int i = 0; i < cam.getResX(); i++) {
+            System.out.print("------");
+        }
     }
 
 
@@ -135,18 +132,76 @@ public class Render {
 
     }
 
-    public void shadowRay(int numRaysPerPixel, Camera cam, Ray[][] primaryRay, Ray[][] secondRay, List<SceneObjects> sceneObjects) {
-
-
-
-    }
-
-    public void computeNextBounce(int numRaysPerPixel, Camera cam, Ray[][] primaryRay, Ray[][] secondRay, List<SceneObjects> sceneObjects, int i, int j) {
+    // optimization technique
+    // shadow ray creates the second ray object
+    // must be run in order to use computeNextBounce
+    public void computeShadowRay(Ray[][] primaryRay, Ray[][] secondRay, List<SceneObjects> sceneObjects, int i, int j) {
 
         // calculate second bounces
         // initialise second bounce ray
         if (primaryRay[i][j].getHit() == 1) {
             secondRay[i][j] = new Ray(primaryRay[i][j].getHitPointX(), primaryRay[i][j].getHitPointY(), primaryRay[i][j].getHitPointZ());
+            // t is number of second rays to be cast per pixel
+
+            for (SceneObjects sceneObject : sceneObjects) {
+
+                if (sceneObject instanceof PointLight) {
+                    // calculate the vector from the ray position to the spherical light
+                    // ray to light = point light - ray pos
+                    secondRay[i][j].setDirX(sceneObject.getPosX() - secondRay[i][j].getPosX());
+                    secondRay[i][j].setDirY(sceneObject.getPosY() - secondRay[i][j].getPosY());
+                    secondRay[i][j].setDirZ(sceneObject.getPosZ() - secondRay[i][j].getPosZ());
+
+                    secondRay[i][j].updateNormalisation();
+
+                    double r = 0;
+                    secondRay[i][j].setHit(0);
+                    while (r <= 25 && secondRay[i][j].getHit() == 0) {
+                        // march the ray
+                        secondRay[i][j].rayMarch(r);
+                        for (SceneObjects sceneObject2 : sceneObjects) {
+                            // check the discriminant of the ray for the sphere
+                            if (sceneObject2.intersectionDiscard(secondRay[i][j])) {
+                                // check if the ray intersects with an object
+                                if (sceneObject2.intersectionCheck(secondRay[i][j])) {
+                                    // get the position of the intersection
+                                    // set ray hit to 1
+                                    secondRay[i][j].setHitPointX(secondRay[i][j].getRayPointX());
+                                    secondRay[i][j].setHitPointY(secondRay[i][j].getRayPointY());
+                                    secondRay[i][j].setHitPointZ(secondRay[i][j].getRayPointZ());
+                                    secondRay[i][j].setHit(1);
+                                    // get the ID of the collided pointlight
+                                    secondRay[i][j].setCollidedObject(sceneObject2.getObjectID());
+                                    if ((sceneObject2) instanceof PointLight) {
+                                        secondRay[i][j].addLuminance(1);
+                                    } else if ((sceneObject2) instanceof Sphere) {
+                                        secondRay[i][j].addLuminance(0);
+                                    }
+                                }
+                                // if hit = 0, march the ray continue the loop
+                                else {
+                                    secondRay[i][j].setHit(0);
+                                    secondRay[i][j].addLuminance(0);
+                                }
+                            }
+                            r = r + 0.01;
+                        }
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
+    public void computeNextBounce(int numRaysPerPixel, Ray[][] primaryRay, Ray[][] secondRay, List<SceneObjects> sceneObjects, int i, int j) {
+
+        // calculate second bounces
+        // initialise second bounce ray
+        if (primaryRay[i][j].getHit() == 1) {
+            //secondRay[i][j] = new Ray(primaryRay[i][j].getHitPointX(), primaryRay[i][j].getHitPointY(), primaryRay[i][j].getHitPointZ());
             // t is number of second rays to be cast per pixel
             for (int t = 0; t < numRaysPerPixel; t++) {
                 // give the second ray a random normalised direction
@@ -203,15 +258,15 @@ public class Render {
                                 // get the ID of the collided pointlight
                                 secondRay[i][j].setCollidedObject(sceneObject2.getObjectID());
                                 if ((sceneObject2) instanceof PointLight) {
-                                    secondRay[i][j].addBrightness(0.1);
+                                    secondRay[i][j].addLuminance(0.1);
                                 } else if ((sceneObject2) instanceof Sphere) {
-                                    secondRay[i][j].addBrightness(0);
+                                    secondRay[i][j].addLuminance(0);
                                 }
                             }
                             // if hit = 0, march the ray continue the loop
                             else {
                                 secondRay[i][j].setHit(0);
-                                secondRay[i][j].addBrightness(0);
+                                secondRay[i][j].addLuminance(0);
                             }
                         }
                         r = r + 0.01;

@@ -32,11 +32,11 @@ public class Main {
 
 
         for (int j = 0; j < cam.getResY(); j++) {
-            //System.out.println("i: " + i);
             for (int i = 0; i < cam.getResX(); i++) {
 
                 render.computePrimaryRays(cam, primaryRay, sceneObjects, i, j);
-                render.computeNextBounce(20000, cam, primaryRay, secondRay, sceneObjects, i, j);
+                render.computeShadowRay(primaryRay, secondRay, sceneObjects, i, j);
+                render.computeNextBounce(20000, primaryRay, secondRay, sceneObjects, i, j);
 
                 }
             }

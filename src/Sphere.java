@@ -123,4 +123,11 @@ public class Sphere implements SceneObjects {
         return this.sphereID;
     }
 
+    public double getPosX()
+    {return this.centerx;}
+    public double getPosY()
+    {return this.centery;}
+    public double getPosZ()
+    {return this.centerz;}
+
 }

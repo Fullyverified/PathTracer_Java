@@ -106,5 +106,11 @@ public class PointLight implements SceneObjects {
         return this.pointLightID;
     }
 
+    public double getPosX()
+    {return this.centerx;}
+    public double getPosY()
+    {return this.centery;}
+    public double getPosZ()
+    {return this.centerz;}
 
 }
