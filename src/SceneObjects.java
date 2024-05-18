@@ -7,6 +7,7 @@ public interface SceneObjects {
     public double getPosX();
     public double getPosY();
     public double getPosZ();
+    public double getLuminance();
 
 }
 

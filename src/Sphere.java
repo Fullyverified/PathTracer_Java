@@ -10,7 +10,7 @@ public class Sphere implements SceneObjects {
     private static int numSpheres = 0;
     private int sphereID = 0;
     private double normalx, normaly, normalz;
-
+    private double luminance = 0;
 
     //Equation of a sphere: (x - cx)^2 + (y - cy)^2 + (z - cz)^2 = r^2
 
@@ -130,4 +130,7 @@ public class Sphere implements SceneObjects {
     public double getPosZ()
     {return this.centerz;}
 
+
+    public double getLuminance()
+    {return this.luminance;}
 }

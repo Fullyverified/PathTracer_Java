@@ -4,7 +4,7 @@ public class PointLight implements SceneObjects {
     private double centerx, centerOriginX;
     private double centery, centerOriginY;
     private double centerz, centerOriginZ;
-    private double sradius, brightness;
+    private double sradius, luminance;
     private double a, b, c, discriminant;
     private double distanceToC, distanceToR;
     private static int numPointLights = 100;
@@ -14,12 +14,12 @@ public class PointLight implements SceneObjects {
     //Equation of a sphere: (x - cx)^2 + (y - cy)^2 + (z - cz)^2 = r^2
 
     //Constructor
-    public PointLight(double centerx, double centery, double centerz, double sradius, double brightness) {
+    public PointLight(double centerx, double centery, double centerz, double sradius, double luminance) {
         this.centerx = centerx;
         this.centery = centery;
         this.centerz = centerz;
         this.sradius = sradius;
-        this.brightness = brightness;
+        this.luminance = luminance;
         this.pointLightID = numPointLights;
         numPointLights++;
     }
@@ -105,6 +105,9 @@ public class PointLight implements SceneObjects {
     {
         return this.pointLightID;
     }
+
+    public double getLuminance() {return this.luminance;}
+    public void setLuminance(double luminance) {this.luminance = luminance;}
 
     public double getPosX()
     {return this.centerx;}

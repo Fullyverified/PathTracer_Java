@@ -30,7 +30,6 @@ public class Main {
         Ray[][] secondRay = new Ray[(int) cam.getResX()][(int) cam.getResY()];
 
 
-
         for (int j = 0; j < cam.getResY(); j++) {
             for (int i = 0; i < cam.getResX(); i++) {
 
@@ -40,8 +39,6 @@ public class Main {
 
                 }
             }
-
-
 
 
         render.drawScreen(cam, primaryRay, secondRay);
