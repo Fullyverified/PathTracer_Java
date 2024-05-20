@@ -8,6 +8,10 @@ public interface SceneObjects {
     public double getPosY();
     public double getPosZ();
     public double getLuminance();
+    public void surfaceToNormal(double x, double y, double z);
+    public double getNormalX();
+    public double getNormalY();
+    public double getNormalZ();
 
 }
 

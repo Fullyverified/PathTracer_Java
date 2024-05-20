@@ -35,8 +35,9 @@ public class Main {
 
                 render.computePrimaryRays(cam, primaryRay, sceneObjects, i, j);
                 render.computeShadowRay(primaryRay, secondRay, sceneObjects, i, j);
-                render.computeNextBounce(20000, primaryRay, secondRay, sceneObjects, i, j);
-
+                render.computeDirectIllumination(secondRay, i, j);
+                render.computeFinalItensity(primaryRay, secondRay, i, j);
+                //render.computeNextBounce(20000, primaryRay, secondRay, sceneObjects, i, j);
                 }
             }
 

@@ -17,15 +17,15 @@ public class Render {
             System.out.print("|");
             for (int i = 0; i < cam.getResX(); i++) {
                 if (primaryRay[i][j].getHit() == 1) {
-                    if (primaryRay[i][j].getLuminance() >= 20) {
+                    if (primaryRay[i][j].getIntensity() >= 20) {
                         System.out.print("###");
-                    } else if (primaryRay[i][j].getLuminance() >= 10 && primaryRay[i][j].getLuminance() < 20) {
+                    } else if (primaryRay[i][j].getIntensity() >= 10 && primaryRay[i][j].getIntensity() < 20) {
                         System.out.print("XXX");
-                    } else if (primaryRay[i][j].getLuminance() >= 5 && primaryRay[i][j].getLuminance() < 10) {
+                    } else if (primaryRay[i][j].getIntensity() >= 5 && primaryRay[i][j].getIntensity() < 10) {
                         System.out.print("***");
-                    } else if (primaryRay[i][j].getLuminance() >= 0.5 && primaryRay[i][j].getLuminance() < 5) {
+                    } else if (primaryRay[i][j].getIntensity() >= 0.5 && primaryRay[i][j].getIntensity() < 5) {
                         System.out.print(";;;");
-                    } else if (primaryRay[i][j].getLuminance() < 0.5 && primaryRay[i][j].getLuminance() > 0) {
+                    } else if (primaryRay[i][j].getIntensity() < 0.5 && primaryRay[i][j].getIntensity() > 0) {
                         System.out.print("...");
                     } else {
                         System.out.print("   ");
@@ -83,10 +83,27 @@ public class Render {
 
         for (int l = 0; l < luminanceArray.length; l++)
         {
-            ray.setIntensity()luminanceArray[i][0]
-
+            double dotProduct = ray[i][j].getDirX() * luminanceArray[l][2] + ray[i][j].getDirY() * luminanceArray[l][3] + ray[i][j].getDirZ() * luminanceArray[l][4];
+            if (dotProduct > 0) {
+                ray[i][j].addIntensity((luminanceArray[l][0] * BRDF * dotProduct) / luminanceArray[l][1] * luminanceArray[l][1]);
+            }
+            else
+            {
+                ray[i][j].addIntensity(0);
+            }
         }
 
+    }
+
+    public void computeFinalItensity(Ray[][] firstRay, Ray[][] secondRay, int resX, int resY) {
+
+        for (int j = 0; j < resY; j++)
+        {
+            for (int i = 0; i < resX; i++)
+            {
+                firstRay[i][j].addIntensity(secondRay[i][j].getIntensity());
+            }
+        }
     }
 
     // Lindrect = (intensity * BRDF * max(0, normal * randomDirection)) / probability density function
@@ -140,7 +157,7 @@ public class Render {
                         // get the ID of the collided sphere
                         primaryRay[i][j].setCollidedObject(sceneObject1.getObjectID());
                         // add the light intensity value to the corresponding rays array
-                        primaryRay[i][i].setLuminance(sceneObject1.getLuminance(), sceneObject1.getObjectID(), 1);
+                        primaryRay[i][i].setLuminance(sceneObject1.getLuminance(), r, sceneObject1.getNormalX(), sceneObject1.getNormalZ(), sceneObject1.getNormalY());
                     }
                     // if hit = 0, march the ray continue the loop
                     else {
@@ -192,10 +209,12 @@ public class Render {
                                     // get the ID of the collided pointlight
                                     secondRay[i][j].setCollidedObject(sceneObject2.getObjectID());
                                     if ((sceneObject2) instanceof PointLight) {
-                                        secondRay[i][j].setLuminance(0.1, sceneObject2.getObjectID(), 0);
+                                        // store the luminance and distance to the object in an array belonging to the ray
+                                        sceneObject2.surfaceToNormal(secondRay[i][j].getHitPointX(), secondRay[i][j].getHitPointY(), secondRay[i][j].getHitPointZ());
+                                        secondRay[i][j].setLuminance(sceneObject2.getLuminance(), r, sceneObject2.getNormalX(), sceneObject2.getNormalZ(), sceneObject2.getNormalY());
+
                                     } else if ((sceneObject2) instanceof Sphere) {
-                                        // functionally does nothing for now
-                                        secondRay[i][j].setLuminance(0, sceneObject2.getObjectID(), 0);
+                                        secondRay[i][j].setLuminance(sceneObject2.getLuminance(), r, sceneObject2.getNormalX(), sceneObject2.getNormalZ(), sceneObject2.getNormalY());
                                     }
                                 }
                                 // if hit = 0, march the ray continue the loop
@@ -277,15 +296,15 @@ public class Render {
                                 // get the ID of the collided pointlight
                                 secondRay[i][j].setCollidedObject(sceneObject2.getObjectID());
                                 if ((sceneObject2) instanceof PointLight) {
-                                    secondRay[i][j].setLuminance(0.1);
+                                    secondRay[i][j].setLuminance(sceneObject2.getLuminance(), r, sceneObject2.getNormalX(), sceneObject2.getNormalZ(), sceneObject2.getNormalY());
                                 } else if ((sceneObject2) instanceof Sphere) {
-                                    secondRay[i][j].setLuminance(0);
+                                    secondRay[i][j].setLuminance(sceneObject2.getLuminance(), r, sceneObject2.getNormalX(), sceneObject2.getNormalZ(), sceneObject2.getNormalY());
                                 }
                             }
                             // if hit = 0, march the ray continue the loop
                             else {
                                 secondRay[i][j].setHit(0);
-                                secondRay[i][j].setLuminance(0);
+                                secondRay[i][j].setLuminance(sceneObject2.getLuminance(), r, sceneObject2.getNormalX(), sceneObject2.getNormalZ(), sceneObject2.getNormalY());
                             }
                         }
                         r = r + 0.01;

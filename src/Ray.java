@@ -5,10 +5,10 @@ public class Ray {
     private double dirMagnitude;
     private double rayPointX, rayPointY, rayPointZ, tscalar;
     private double hitPointX, hitPointY, hitPointZ;
-    private int hit = 0;
-    private double px, py, pixelIndexX, pixelIndexY, pixelPosX, pixelPosY;
+    private int hit = 0, arrayPos = 0, px, py;
+    private double pixelIndexX, pixelIndexY, pixelPosX, pixelPosY;
     private double collidedObject;
-    private double[][] luminance = new double[2][50];
+    private double[][] luminance;
     private double intensity;
 
 
@@ -110,11 +110,16 @@ public class Ray {
     // collidedObjectID
     public void setCollidedObject(int obj) {this.collidedObject = obj;}
     //set brightness and intensity
-    public void setLuminance(double luminance, int i, int j) {
-        this.luminance[i][j] = luminance;
+    public void setLuminance(double luminance, double distance, double normalX, double normalY, double normalZ) {
+        this.luminance[arrayPos][0] = luminance;
+        this.luminance[arrayPos][1] = distance;
+        this.luminance[arrayPos][2] = normalX;
+        this.luminance[arrayPos][3] = normalZ;
+        this.luminance[arrayPos][4] = normalY;
+        arrayPos++;
     }
-    public void setIntensity(double intensity) {
-        this.intensity = intensity;
+    public void addIntensity(double intensity) {
+        this.intensity = this.intensity + intensity;
     }
 
 }

@@ -9,6 +9,7 @@ public class PointLight implements SceneObjects {
     private double distanceToC, distanceToR;
     private static int numPointLights = 100;
     private int pointLightID = 0;
+    private double normalx, normaly, normalz;
 
 
     //Equation of a sphere: (x - cx)^2 + (y - cy)^2 + (z - cz)^2 = r^2
@@ -99,6 +100,17 @@ public class PointLight implements SceneObjects {
         return false;
     }
 
+    // calculate the normal of the sphere and a point
+    public void surfaceToNormal (double posX, double posY, double posZ)
+    {
+        normalx = posX - this.centerx;
+        normaly = posY - this.centerx;
+        normalz = posZ - this.centerz;
+        double magnitude = Math.sqrt((normalx*normalx) + (normaly*normaly) + (normalz * normalz));
+        this.normalx = normalx / magnitude;
+        this.normaly = normaly / magnitude;
+        this.normalz = normalz / magnitude;
+    }
 
     // get sphere ID
     public int getObjectID()
@@ -115,5 +127,10 @@ public class PointLight implements SceneObjects {
     {return this.centery;}
     public double getPosZ()
     {return this.centerz;}
+
+    // get each the normalised normal
+    public double getNormalX() {return this.normalx;}
+    public double getNormalY() {return this.normaly;}
+    public double getNormalZ() {return this.normalz;}
 
 }
