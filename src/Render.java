@@ -17,18 +17,16 @@ public class Render {
             System.out.print("|");
             for (int i = 0; i < cam.getResX(); i++) {
                 if (primaryRay[i][j].getHit() == 1) {
-                    if (primaryRay[i][j].getIntensity() >= 20) {
+                    if (secondRay[i][j].getLuminance() >= 20) {
                         System.out.print("###");
-                    } else if (primaryRay[i][j].getIntensity() >= 10 && primaryRay[i][j].getIntensity() < 20) {
+                    } else if (secondRay[i][j].getLuminance() >= 10 && secondRay[i][j].getLuminance() < 20) {
                         System.out.print("XXX");
-                    } else if (primaryRay[i][j].getIntensity() >= 5 && primaryRay[i][j].getIntensity() < 10) {
+                    } else if (secondRay[i][j].getLuminance() >= 5 && secondRay[i][j].getLuminance() < 10) {
                         System.out.print("***");
-                    } else if (primaryRay[i][j].getIntensity() >= 0.5 && primaryRay[i][j].getIntensity() < 5) {
+                    } else if (secondRay[i][j].getLuminance() >= 0.5 && secondRay[i][j].getLuminance() < 5) {
                         System.out.print(";;;");
-                    } else if (primaryRay[i][j].getIntensity() < 0.5 && primaryRay[i][j].getIntensity() > 0) {
+                    } else if (secondRay[i][j].getLuminance() < 0.5) {
                         System.out.print("...");
-                    } else {
-                        System.out.print("   ");
                     }
 
                 } else if (primaryRay[i][j].getHit() == 0) {
@@ -42,7 +40,7 @@ public class Render {
         }
     }
 
-    /*// prints the brightness value of each pixel
+    // prints the brightness value of each pixel
     public void debugDrawScreen(Camera cam, Ray[][] primaryRay, Ray[][] secondRay) {
         // iterate through each rays hit value and print the output
         for (int i = 0; i < cam.getResX(); i++) {
@@ -72,45 +70,8 @@ public class Render {
         for (int i = 0; i < cam.getResX(); i++) {
             System.out.print("------");
         }
-    }*/
-
-    // computeLuminance
-    // Ldirect = (intensity * BRDF * max(0, normal * direction)) / distance^2
-    public void computeDirectIllumination(Ray[][] ray, int i, int j) {
-        double BRDF = 1; // constant for now
-        double[][] luminanceArray = ray[i][j].getLuminance();
-        double intensity;
-
-        for (int l = 0; l < luminanceArray.length; l++)
-        {
-            double dotProduct = ray[i][j].getDirX() * luminanceArray[l][2] + ray[i][j].getDirY() * luminanceArray[l][3] + ray[i][j].getDirZ() * luminanceArray[l][4];
-            if (dotProduct > 0) {
-                ray[i][j].addIntensity((luminanceArray[l][0] * BRDF * dotProduct) / luminanceArray[l][1] * luminanceArray[l][1]);
-            }
-            else
-            {
-                ray[i][j].addIntensity(0);
-            }
-        }
-
     }
 
-    public void computeFinalItensity(Ray[][] firstRay, Ray[][] secondRay, int resX, int resY) {
-
-        for (int j = 0; j < resY; j++)
-        {
-            for (int i = 0; i < resX; i++)
-            {
-                firstRay[i][j].addIntensity(secondRay[i][j].getIntensity());
-            }
-        }
-    }
-
-    // Lindrect = (intensity * BRDF * max(0, normal * randomDirection)) / probability density function
-    public void computeIndirectIllumination() {
-
-
-    }
 
     public void computePrimaryRays(Camera cam, Ray[][] primaryRay, List<SceneObjects> sceneObjects, int i, int j) {
         primaryRay[i][j] = new Ray(cam.getPosX(), cam.getPosY(), cam.getPosZ());
@@ -143,30 +104,32 @@ public class Render {
             primaryRay[i][j].rayMarch(r);
 
             // for each object that is in the sceneObjects collection
-            for (SceneObjects sceneObject1 : sceneObjects) {
-                // check the discriminant of the ray for the sphere
-                if (sceneObject1.intersectionDiscard(primaryRay[i][j])) {
-                    // check if the ray intersects the sphere
-                    if (sceneObject1.intersectionCheck(primaryRay[i][j])) {
-                        // get the position of the intersection
-                        primaryRay[i][j].setHitPointX(primaryRay[i][j].getRayPointX());
-                        primaryRay[i][j].setHitPointY(primaryRay[i][j].getRayPointY());
-                        primaryRay[i][j].setHitPointZ(primaryRay[i][j].getRayPointZ());
-                        // set ray hit to 1
-                        primaryRay[i][j].setHit(1);
-                        // get the ID of the collided sphere
-                        primaryRay[i][j].setCollidedObject(sceneObject1.getObjectID());
-                        // add the light intensity value to the corresponding rays array
-                        primaryRay[i][i].setLuminance(sceneObject1.getLuminance(), r, sceneObject1.getNormalX(), sceneObject1.getNormalZ(), sceneObject1.getNormalY());
-                    }
-                    // if hit = 0, march the ray continue the loop
-                    else {
-                        primaryRay[i][j].setHit(0);
+            for (Object sceneObject : sceneObjects) {
+                // check if that object is a sphere
+                if (sceneObject instanceof Sphere) {
+                    // check the discriminant of the ray for the sphere
+                    if (((Sphere) sceneObject).intersectionDiscard(primaryRay[i][j])) {
+                        // check if the ray intersects the sphere
+                        if (((Sphere) sceneObject).intersectionCheck(primaryRay[i][j])) {
+                            // get the position of the intersection
+                            // set ray hit to 1
+                            primaryRay[i][j].setHitPointX(primaryRay[i][j].getRayPointX());
+                            primaryRay[i][j].setHitPointY(primaryRay[i][j].getRayPointY());
+                            primaryRay[i][j].setHitPointZ(primaryRay[i][j].getRayPointZ());
+                            primaryRay[i][j].setHit(1);
+                            // get the ID of the collided sphere
+                            primaryRay[i][j].setCollidedObject(((Sphere) sceneObject).getObjectID());
+                        }
+                        // if hit = 0, march the ray continue the loop
+                        else {
+                            primaryRay[i][j].setHit(0);
+                        }
                     }
                 }
             }
             r = r + 0.01;
         }
+
     }
 
     // optimization technique
@@ -178,6 +141,7 @@ public class Render {
         // initialise second bounce ray
         if (primaryRay[i][j].getHit() == 1) {
             secondRay[i][j] = new Ray(primaryRay[i][j].getHitPointX(), primaryRay[i][j].getHitPointY(), primaryRay[i][j].getHitPointZ());
+            // t is number of second rays to be cast per pixel
 
             for (SceneObjects sceneObject : sceneObjects) {
 
@@ -209,17 +173,15 @@ public class Render {
                                     // get the ID of the collided pointlight
                                     secondRay[i][j].setCollidedObject(sceneObject2.getObjectID());
                                     if ((sceneObject2) instanceof PointLight) {
-                                        // store the luminance and distance to the object in an array belonging to the ray
-                                        sceneObject2.surfaceToNormal(secondRay[i][j].getHitPointX(), secondRay[i][j].getHitPointY(), secondRay[i][j].getHitPointZ());
-                                        secondRay[i][j].setLuminance(sceneObject2.getLuminance(), r, sceneObject2.getNormalX(), sceneObject2.getNormalZ(), sceneObject2.getNormalY());
-
+                                        secondRay[i][j].addLuminance(1);
                                     } else if ((sceneObject2) instanceof Sphere) {
-                                        secondRay[i][j].setLuminance(sceneObject2.getLuminance(), r, sceneObject2.getNormalX(), sceneObject2.getNormalZ(), sceneObject2.getNormalY());
+                                        secondRay[i][j].addLuminance(0);
                                     }
                                 }
                                 // if hit = 0, march the ray continue the loop
                                 else {
                                     secondRay[i][j].setHit(0);
+                                    secondRay[i][j].addLuminance(0);
                                 }
                             }
                             r = r + 0.01;
@@ -239,7 +201,7 @@ public class Render {
         // calculate second bounces
         // initialise second bounce ray
         if (primaryRay[i][j].getHit() == 1) {
-            //secondRay[i][j] = new Ray(primaryRay[i][j].getHitPointX(), primaryRay[i][j].getHitPointY(), primaryRay[i][j].getHitPointZ());
+            secondRay[i][j] = new Ray(primaryRay[i][j].getHitPointX(), primaryRay[i][j].getHitPointY(), primaryRay[i][j].getHitPointZ());
             // t is number of second rays to be cast per pixel
             for (int t = 0; t < numRaysPerPixel; t++) {
                 // give the second ray a random normalised direction
@@ -296,15 +258,15 @@ public class Render {
                                 // get the ID of the collided pointlight
                                 secondRay[i][j].setCollidedObject(sceneObject2.getObjectID());
                                 if ((sceneObject2) instanceof PointLight) {
-                                    secondRay[i][j].setLuminance(sceneObject2.getLuminance(), r, sceneObject2.getNormalX(), sceneObject2.getNormalZ(), sceneObject2.getNormalY());
+                                    secondRay[i][j].addLuminance(0.1);
                                 } else if ((sceneObject2) instanceof Sphere) {
-                                    secondRay[i][j].setLuminance(sceneObject2.getLuminance(), r, sceneObject2.getNormalX(), sceneObject2.getNormalZ(), sceneObject2.getNormalY());
+                                    secondRay[i][j].addLuminance(0);
                                 }
                             }
                             // if hit = 0, march the ray continue the loop
                             else {
                                 secondRay[i][j].setHit(0);
-                                secondRay[i][j].setLuminance(sceneObject2.getLuminance(), r, sceneObject2.getNormalX(), sceneObject2.getNormalZ(), sceneObject2.getNormalY());
+                                secondRay[i][j].addLuminance(0);
                             }
                         }
                         r = r + 0.01;

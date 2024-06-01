@@ -29,21 +29,18 @@ public class Main {
         // 2d array of rays for secondary bounces
         Ray[][] secondRay = new Ray[(int) cam.getResX()][(int) cam.getResY()];
 
-
         for (int j = 0; j < cam.getResY(); j++) {
             for (int i = 0; i < cam.getResX(); i++) {
 
                 render.computePrimaryRays(cam, primaryRay, sceneObjects, i, j);
-                render.computeShadowRay(primaryRay, secondRay, sceneObjects, i, j);
-                render.computeDirectIllumination(secondRay, i, j);
-                render.computeFinalItensity(primaryRay, secondRay, i, j);
-                //render.computeNextBounce(20000, primaryRay, secondRay, sceneObjects, i, j);
-                }
+                //render.computeShadowRay(primaryRay, secondRay, sceneObjects, i, j);
+                render.computeNextBounce(20000, primaryRay, secondRay, sceneObjects, i, j);
+
             }
+        }
 
 
         render.drawScreen(cam, primaryRay, secondRay);
-        //render.debugDrawScreen(cam,primaryRay,secondRay);
     }
 }
 
