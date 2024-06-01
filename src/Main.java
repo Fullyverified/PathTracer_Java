@@ -4,6 +4,7 @@ import java.util.List;
 public class Main {
 
     public static double tscalar = 0;
+    public static int totalRays = 20000;
 
     public static void main(String[] args) {
 
@@ -26,15 +27,23 @@ public class Main {
 
         // create a 2D array of rays with the size of resolution of the camera
         Ray[][] primaryRay = new Ray[(int) cam.getResX()][(int) cam.getResY()];
-        // 2d array of rays for secondary bounces
+        // 2d array of rays for nth bounces
         Ray[][] secondRay = new Ray[(int) cam.getResX()][(int) cam.getResY()];
+        Ray[][] thirdRay = new Ray[(int) cam.getResX()][(int) cam.getResY()];
+        Ray[][] fourthRay = new Ray[(int) cam.getResX()][(int) cam.getResY()];
+        Ray[][] fifthRay = new Ray[(int) cam.getResX()][(int) cam.getResY()];
+
 
         for (int j = 0; j < cam.getResY(); j++) {
             for (int i = 0; i < cam.getResX(); i++) {
 
+
                 render.computePrimaryRays(cam, primaryRay, sceneObjects, i, j);
-                //render.computeShadowRay(primaryRay, secondRay, sceneObjects, i, j);
-                render.computeNextBounce(20000, primaryRay, secondRay, sceneObjects, i, j);
+
+                for (int numRays = 0; numRays < totalRays; numRays++) {
+                    render.computeNextBounce(primaryRay, secondRay, sceneObjects, i, j);
+                }
+
 
             }
         }
