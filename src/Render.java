@@ -17,13 +17,13 @@ public class Render {
             System.out.print("|");
             for (int i = 0; i < cam.getResX(); i++) {
                 if (primaryRay[i][j].getHit() == 1) {
-                    if (secondRay[i][j].getLightAmplitude() >= 20) {
+                    if (primaryRay[i][j].getLightAmplitude() >= 20) {
                         System.out.print("###");
-                    } else if (primaryRay[i][j].getLightAmplitude() >= 10 && secondRay[i][j].getLightAmplitude() < 20) {
+                    } else if (primaryRay[i][j].getLightAmplitude() >= 10 && primaryRay[i][j].getLightAmplitude() < 20) {
                         System.out.print("XXX");
-                    } else if (primaryRay[i][j].getLightAmplitude() >= 5 && secondRay[i][j].getLightAmplitude() < 10) {
+                    } else if (primaryRay[i][j].getLightAmplitude() >= 5 && primaryRay[i][j].getLightAmplitude() < 10) {
                         System.out.print("***");
-                    } else if (primaryRay[i][j].getLightAmplitude() >= 0.5 && secondRay[i][j].getLightAmplitude() < 5) {
+                    } else if (primaryRay[i][j].getLightAmplitude() >= 0.5 && primaryRay[i][j].getLightAmplitude() < 5) {
                         System.out.print(";;;");
                     } else if (primaryRay[i][j].getLightAmplitude() < 0.5) {
                         System.out.print("...");
@@ -198,82 +198,102 @@ public class Render {
 
     public void computeNextBounce(Ray[][] previousRay, Ray[][] nthRay, List<SceneObjects> sceneObjects, int i, int j) {
 
-        // calculate second bounces
-        // initialise second bounce ray
+        // calculate next bounce
         if (previousRay[i][j].getHit() == 1) {
+            // initialise new ray
             nthRay[i][j] = new Ray(previousRay[i][j].getHitPointX(), previousRay[i][j].getHitPointY(), previousRay[i][j].getHitPointZ());
 
-            // give the second ray a random normalised direction
-            Random random = new Random();
-            double randomDir = random.nextDouble(2.0) - 1.0;
-            nthRay[i][j].setDirX(randomDir);
-            randomDir = random.nextDouble(2.0) - 1.0;
-            nthRay[i][j].setDirY(randomDir);
-            randomDir = random.nextDouble(2.0) - 1.0;
-            nthRay[i][j].setDirZ(randomDir);
+            // compute a random direction
+            randomDirection(previousRay, nthRay, sceneObjects, i, j);
 
-            // normalise the random direction
-            nthRay[i][j].updateNormalisation();
+            // compute the march of the ray, and intersections tests
+            computeBounce(previousRay, nthRay, sceneObjects, i, j);
+        }
+    }
 
-            for (SceneObjects sceneObject1 : sceneObjects) {
-                // check if object ID is identical to the one we intersected with
-                if (sceneObject1.getObjectID() == previousRay[i][j].getCollidedObject()) {
-                    // calculate the normal from the surface of the sphere at the point of intersection
-                    ((Sphere) sceneObject1).surfaceToNormal(previousRay[i][j].getHitPointX(), previousRay[i][j].getHitPointY(), previousRay[i][j].getHitPointZ());
 
-                    // dot product of normal and randomly generated direction
-                    double dotproduct = (((Sphere) sceneObject1).getNormalX() * nthRay[i][j].getDirX() + ((Sphere) sceneObject1).getNormalY() * nthRay[i][j].getDirY() + ((Sphere) sceneObject1).getNormalZ() * nthRay[i][j].getDirZ());
+    public void computeBounce(Ray[][] previousRay, Ray[][] nthRay, List<SceneObjects> sceneObjects, int i, int j)
+    {
+        // create local variable r (the rays step)
+        double r = 0;
+        nthRay[i][j].setHit(0);
+        while (r <= 25 && nthRay[i][j].getHit() == 0) {
+            // march the ray
+            nthRay[i][j].rayMarch(r);
+            for (SceneObjects sceneObject2 : sceneObjects) {
+                // check the discriminant of the ray for the sphere
+                if (sceneObject2.intersectionDiscard(nthRay[i][j])) {
+                    // check if the ray intersects with an object
+                    if (sceneObject2.intersectionCheck(nthRay[i][j])) {
+                        // get the position of the intersection
+                        // set ray hit to 1
+                        nthRay[i][j].setHitPointX(nthRay[i][j].getRayPointX());
+                        nthRay[i][j].setHitPointY(nthRay[i][j].getRayPointY());
+                        nthRay[i][j].setHitPointZ(nthRay[i][j].getRayPointZ());
+                        nthRay[i][j].setHit(1);
+                        // get the ID of the collided pointlight
+                        nthRay[i][j].setCollidedObject(sceneObject2.getObjectID());
+                        if ((sceneObject2) instanceof PointLight) {
+                            // add brightness to the pixel, brightness / distance^2
+                            previousRay[i][j].addLightAmplitude(sceneObject2.getLuminance() / r * r);
+                            nthRay[i][j].setNeedsBounce(false);
 
-                    while (dotproduct < 0) {
-                        randomDir = random.nextDouble(2.0) - 1.0;
-                        nthRay[i][j].setDirX(randomDir);
-                        randomDir = random.nextDouble(2.0) - 1.0;
-                        nthRay[i][j].setDirY(randomDir);
-                        randomDir = random.nextDouble(2.0) - 1.0;
-                        nthRay[i][j].setDirZ(randomDir);
-                        // normalise the random direction
-                        nthRay[i][j].updateNormalisation();
-                        dotproduct = (((Sphere) sceneObject1).getNormalX() * nthRay[i][j].getDirX() + ((Sphere) sceneObject1).getNormalY() * nthRay[i][j].getDirY() + ((Sphere) sceneObject1).getNormalZ() * nthRay[i][j].getDirZ());
+                        } else {
+                            // need to calculate the brightness of the point here
+                            // aka the next bounce
+                            nthRay[i][j].setNeedsBounce(true);
+
+                        }
+                    }
+                    // if hit = 0, march the ray continue the loop
+                    else {
+                        nthRay[i][j].setHit(0);
+                        nthRay[i][j].addLightAmplitude(0);
+                        nthRay[i][j].setNeedsBounce(false);
                     }
                 }
+                r = r + 0.01;
             }
-            // create local variable r (the rays step)
-            double r = 0;
-            nthRay[i][j].setHit(0);
-            while (r <= 25 && nthRay[i][j].getHit() == 0) {
-                // march the ray
-                nthRay[i][j].rayMarch(r);
-                for (SceneObjects sceneObject2 : sceneObjects) {
-                    // check the discriminant of the ray for the sphere
-                    if (sceneObject2.intersectionDiscard(nthRay[i][j])) {
-                        // check if the ray intersects with an object
-                        if (sceneObject2.intersectionCheck(nthRay[i][j])) {
-                            // get the position of the intersection
-                            // set ray hit to 1
-                            nthRay[i][j].setHitPointX(nthRay[i][j].getRayPointX());
-                            nthRay[i][j].setHitPointY(nthRay[i][j].getRayPointY());
-                            nthRay[i][j].setHitPointZ(nthRay[i][j].getRayPointZ());
-                            nthRay[i][j].setHit(1);
-                            // get the ID of the collided pointlight
-                            nthRay[i][j].setCollidedObject(sceneObject2.getObjectID());
-                            if ((sceneObject2) instanceof PointLight) {
-                                // add brightness to the pixel, brightness / distance^2
-                                previousRay[i][j].addLightAmplitude(sceneObject2.getLuminance() / r * r);
+        }
+    }
 
-                            } else if ((sceneObject2) instanceof Sphere) {
-                                nthRay[i][j].addLightAmplitude(0);
-                            }
-                        }
-                        // if hit = 0, march the ray continue the loop
-                        else {
-                            nthRay[i][j].setHit(0);
-                            nthRay[i][j].addLightAmplitude(0);
-                        }
-                    }
-                    r = r + 0.01;
+
+    // calculate a random direction
+    public void randomDirection(Ray[][] previousRay, Ray[][] currentRay, List<SceneObjects> sceneObjects, int i, int j)
+    {
+        Random random = new Random();
+        double randomDir = random.nextDouble(2.0) - 1.0;
+        currentRay[i][j].setDirX(randomDir);
+        randomDir = random.nextDouble(2.0) - 1.0;
+        currentRay[i][j].setDirY(randomDir);
+        randomDir = random.nextDouble(2.0) - 1.0;
+        currentRay[i][j].setDirZ(randomDir);
+        // normalise the random direction
+        currentRay[i][j].updateNormalisation();
+
+        for (SceneObjects sceneObject1 : sceneObjects) {
+            // check if object ID is identical to the one we intersected with
+            if (sceneObject1.getObjectID() == previousRay[i][j].getCollidedObject()) {
+                // calculate the normal from the surface of the sphere at the point of intersection
+                ((Sphere) sceneObject1).surfaceToNormal(previousRay[i][j].getHitPointX(), previousRay[i][j].getHitPointY(), previousRay[i][j].getHitPointZ());
+
+                // dot product of normal and randomly generated direction
+                double dotproduct = (((Sphere) sceneObject1).getNormalX() * currentRay[i][j].getDirX() + ((Sphere) sceneObject1).getNormalY() * currentRay[i][j].getDirY() + ((Sphere) sceneObject1).getNormalZ() * currentRay[i][j].getDirZ());
+                // keep generating random directions until the dot product is 0
+                while (dotproduct < 0) {
+                    randomDir = random.nextDouble(2.0) - 1.0;
+                    currentRay[i][j].setDirX(randomDir);
+                    randomDir = random.nextDouble(2.0) - 1.0;
+                    currentRay[i][j].setDirY(randomDir);
+                    randomDir = random.nextDouble(2.0) - 1.0;
+                    currentRay[i][j].setDirZ(randomDir);
+                    // normalise the random direction
+                    currentRay[i][j].updateNormalisation();
+                    dotproduct = (((Sphere) sceneObject1).getNormalX() * currentRay[i][j].getDirX() + ((Sphere) sceneObject1).getNormalY() * currentRay[i][j].getDirY() + ((Sphere) sceneObject1).getNormalZ() * currentRay[i][j].getDirZ());
                 }
             }
         }
+
     }
 
 }
