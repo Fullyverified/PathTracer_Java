@@ -196,12 +196,12 @@ public class Render {
 
     }
 
-    public void computeNextBounce(Ray[][] primaryRay, Ray[][] nthRay, List<SceneObjects> sceneObjects, int i, int j) {
+    public void computeNextBounce(Ray[][] previousRay, Ray[][] nthRay, List<SceneObjects> sceneObjects, int i, int j) {
 
         // calculate second bounces
         // initialise second bounce ray
-        if (primaryRay[i][j].getHit() == 1) {
-            nthRay[i][j] = new Ray(primaryRay[i][j].getHitPointX(), primaryRay[i][j].getHitPointY(), primaryRay[i][j].getHitPointZ());
+        if (previousRay[i][j].getHit() == 1) {
+            nthRay[i][j] = new Ray(previousRay[i][j].getHitPointX(), previousRay[i][j].getHitPointY(), previousRay[i][j].getHitPointZ());
 
             // give the second ray a random normalised direction
             Random random = new Random();
@@ -217,9 +217,9 @@ public class Render {
 
             for (SceneObjects sceneObject1 : sceneObjects) {
                 // check if object ID is identical to the one we intersected with
-                if (sceneObject1.getObjectID() == primaryRay[i][j].getCollidedObject()) {
+                if (sceneObject1.getObjectID() == previousRay[i][j].getCollidedObject()) {
                     // calculate the normal from the surface of the sphere at the point of intersection
-                    ((Sphere) sceneObject1).surfaceToNormal(primaryRay[i][j].getHitPointX(), primaryRay[i][j].getHitPointY(), primaryRay[i][j].getHitPointZ());
+                    ((Sphere) sceneObject1).surfaceToNormal(previousRay[i][j].getHitPointX(), previousRay[i][j].getHitPointY(), previousRay[i][j].getHitPointZ());
 
                     // dot product of normal and randomly generated direction
                     double dotproduct = (((Sphere) sceneObject1).getNormalX() * nthRay[i][j].getDirX() + ((Sphere) sceneObject1).getNormalY() * nthRay[i][j].getDirY() + ((Sphere) sceneObject1).getNormalZ() * nthRay[i][j].getDirZ());
@@ -258,7 +258,7 @@ public class Render {
                             nthRay[i][j].setCollidedObject(sceneObject2.getObjectID());
                             if ((sceneObject2) instanceof PointLight) {
                                 // add brightness to the pixel, brightness / distance^2
-                                primaryRay[i][j].addLightAmplitude(sceneObject2.getLuminance() / r * r);
+                                previousRay[i][j].addLightAmplitude(sceneObject2.getLuminance() / r * r);
 
                             } else if ((sceneObject2) instanceof Sphere) {
                                 nthRay[i][j].addLightAmplitude(0);

@@ -17,7 +17,7 @@ public class Main {
         Render render = new Render();
 
         // create camera object and initialise it
-        Camera cam = new Camera(0, 0, 0, 1, 0, 0, 0, 1, 0, 70, 4, 3, 125);
+        Camera cam = new Camera(0, 0, 0, 1, 0, 0, 0, 1, 0, 70, 4, 3, 80);
         // each cam. method calculates the various properties of the camera
         cam.directionVector();
         cam.upVector();
@@ -40,6 +40,7 @@ public class Main {
 
                 render.computePrimaryRays(cam, primaryRay, sceneObjects, i, j);
 
+                // loops through secondary rays
                 for (int numRays = 0; numRays < totalRays; numRays++) {
                     render.computeNextBounce(primaryRay, secondRay, sceneObjects, i, j);
                 }
