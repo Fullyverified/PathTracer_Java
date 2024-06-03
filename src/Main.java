@@ -4,7 +4,7 @@ import java.util.List;
 public class Main {
 
     public static double tscalar = 0;
-    public static int totalRays = 20000;
+    public static int totalRays = 500;
 
     public static void main(String[] args) {
 
@@ -12,7 +12,7 @@ public class Main {
         List<SceneObjects> sceneObjects = new ArrayList<>();
         sceneObjects.add(new Sphere(6, 0, 0, 1));
         sceneObjects.add(new Sphere(12, 0, -5, 1.25));
-        sceneObjects.add(new PointLight(6, 0.5, 5, 1, 10));
+        sceneObjects.add(new PointLight(6, 0.5, 5, 1, 20));
 
         Render render = new Render();
 
@@ -29,20 +29,17 @@ public class Main {
         Ray[][] primaryRay = new Ray[(int) cam.getResX()][(int) cam.getResY()];
         // 2d array of rays for nth bounces
         Ray[][] secondRay = new Ray[(int) cam.getResX()][(int) cam.getResY()];
-        Ray[][] thirdRay = new Ray[(int) cam.getResX()][(int) cam.getResY()];
-        Ray[][] fourthRay = new Ray[(int) cam.getResX()][(int) cam.getResY()];
-        Ray[][] fifthRay = new Ray[(int) cam.getResX()][(int) cam.getResY()];
 
 
         for (int j = 0; j < cam.getResY(); j++) {
             for (int i = 0; i < cam.getResX(); i++) {
 
-
-                render.computePrimaryRays(cam, primaryRay, sceneObjects, i, j);
+                render.computePrimaryRay(cam, primaryRay, sceneObjects, i, j);
 
                 // loops through secondary rays
                 for (int numRays = 0; numRays < totalRays; numRays++) {
                     render.computeNextBounce(primaryRay, secondRay, sceneObjects, i, j);
+                    //System.out.println("i: " + i + " j: " + j + " numRays: " + numRays);
                 }
 
 

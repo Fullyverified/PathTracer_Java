@@ -10,8 +10,6 @@ public class Ray {
     private double collidedObject;
     private double lightAmplitude = 0;
     private double[][] luminanceMatrix;
-    private boolean needsBounce = false;
-
 
     // constructor
     public Ray(double oX, double oY, double oZ)
@@ -80,7 +78,6 @@ public class Ray {
     // get collidedObject
     public double getCollidedObject() {return this.collidedObject;}
     public double getLightAmplitude() {return this.lightAmplitude;}
-    public boolean getNeedsBounce() {return this.needsBounce;}
 
     // setter
     // pos
@@ -113,8 +110,6 @@ public class Ray {
         this.lightAmplitude = this.lightAmplitude + luminance;
         //System.out.println(this.brightness);
     }
-    // set new ray condition
-    public void setNeedsBounce(boolean value) {this.needsBounce = value;}
 
 
 
