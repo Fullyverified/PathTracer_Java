@@ -72,6 +72,18 @@ public class Render {
         }
     }
 
+    public void computeNextBounce(Ray[][] primaryRay, Ray[][] nthRay, List<SceneObjects> sceneObjects, int i, int j) {
+
+        // initialise new ray
+        nthRay[i][j] = new Ray(primaryRay[i][j].getHitPointX(), primaryRay[i][j].getHitPointY(), primaryRay[i][j].getHitPointZ());
+
+        // compute a random direction
+        randomDirection(primaryRay, nthRay, sceneObjects, i, j);
+
+        // compute the march of the ray, and intersections tests
+        marchIntersectionLogic(primaryRay, nthRay, sceneObjects, i, j);
+
+    }
 
     public void computePrimaryRay(Camera cam, Ray[][] primaryRay, List<SceneObjects> sceneObjects, int i, int j) {
 
@@ -194,20 +206,6 @@ public class Render {
 
     }
 
-    public void computeNextBounce(Ray[][] primaryRay, Ray[][] nthRay, List<SceneObjects> sceneObjects, int i, int j) {
-
-        // initialise new ray
-        nthRay[i][j] = new Ray(primaryRay[i][j].getHitPointX(), primaryRay[i][j].getHitPointY(), primaryRay[i][j].getHitPointZ());
-
-        // compute a random direction
-        randomDirection(primaryRay, nthRay, sceneObjects, i, j);
-
-        // compute the march of the ray, and intersections tests
-        marchIntersectionLogic(primaryRay, nthRay, sceneObjects, i, j);
-
-    }
-
-
     public void marchIntersectionLogic(Ray[][] previousRay, Ray[][] nthRay, List<SceneObjects> sceneObjects, int i, int j) {
         // create local variable r (the rays step)
         double r = 0;
@@ -323,7 +321,6 @@ public class Render {
                 }
             }
         }
-
     }
 
     // calculate a random direction
