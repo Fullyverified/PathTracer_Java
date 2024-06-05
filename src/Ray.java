@@ -3,9 +3,9 @@ public class Ray {
     private double oY, dirY, normDirY;
     private double oZ, dirZ, normDirZ;
     private double dirMagnitude;
-    private double rayPosX;
-    private double rayPosY;
-    private double rayPosZ;
+    private double posX;
+    private double posY;
+    private double posZ;
     private double hitPointX, hitPointY, hitPointZ, tscalar;
     private boolean hit = false;
     private double px, py, pixelIndexX, pixelIndexY, pixelPosX, pixelPosY;
@@ -43,9 +43,9 @@ public class Ray {
     public double getOriginY() {return this.oY;}
     public double getOriginZ() {return this.oZ;}
     // pos
-    public double getPosX() {return this.rayPosX;}
-    public double getPosY() {return this.rayPosY;}
-    public double getPosZ() {return this.rayPosZ;}
+    public double getPosX() {return this.posX;}
+    public double getPosY() {return this.posY;}
+    public double getPosZ() {return this.posZ;}
     // direction
     public double getDirX() {return this.dirX;}
     public double getDirY() {return this.dirY;}
@@ -77,9 +77,9 @@ public class Ray {
 
     // setter
     // pos
-    public void setPosX(double posX) {this.oX = posX;}
-    public void setPosY(double posY) {this.oY = posY;}
-    public void setPosZ(double posZ) {this.oZ = posZ;}
+    public void setPosX(double posX) {this.posX = posX;}
+    public void setPosY(double posY) {this.posY = posY;}
+    public void setPosZ(double posZ) {this.posZ = posZ;}
 
     // direction
     public void setDirX(double dirX) {this.dirX = dirX;}

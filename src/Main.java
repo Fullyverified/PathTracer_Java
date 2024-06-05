@@ -12,7 +12,7 @@ public class Main {
 
 
         sceneObjects.add(new Sphere(6, 0, 0, 1));
-        sceneObjects.add(new Sphere(12, -1,-5, 1.25));
+        //sceneObjects.add(new Sphere(12, -1,-5, 1.25));
         sceneObjects.add(new PointLight(6, 0, 5, 1, 300));
 
         Camera cam = new Camera(0, 0, 0, 1, 0, 0, 0, 1, 0, 70, 4, 3, 60);
@@ -22,7 +22,7 @@ public class Main {
         cam.imagePlane();
 
         Render render = new Render();
-        render.computePixels(sceneObjects, cam,5000,1);
+        render.computePixels(sceneObjects, cam,100,5);
     }
 }
 
