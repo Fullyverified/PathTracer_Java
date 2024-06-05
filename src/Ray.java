@@ -3,13 +3,15 @@ public class Ray {
     private double oY, dirY, normDirY;
     private double oZ, dirZ, normDirZ;
     private double dirMagnitude;
-    private double rayPointX, rayPointY, rayPointZ, tscalar;
-    private double hitPointX, hitPointY, hitPointZ;
-    private int hit = 0;
+    private double rayPosX;
+    private double rayPosY;
+    private double rayPosZ;
+    private double hitPointX, hitPointY, hitPointZ, tscalar;
+    private boolean hit = false;
     private double px, py, pixelIndexX, pixelIndexY, pixelPosX, pixelPosY;
-    private double collidedObject;
+    private int collidedObject;
     private double lightAmplitude = 0;
-    private double[][] luminanceMatrix;
+    private double[][] luminanceArray;
 
     // constructor
     public Ray(double oX, double oY, double oZ)
@@ -34,21 +36,16 @@ public class Ray {
     // t tscalar (amount to march the ray by)
     // d direction vector
 
-    //March the ray to the next step (tscalar)
-    public void rayMarch(double tscalar)
-    {
-        this.tscalar = tscalar;
-        this.rayPointX = this.oX + (tscalar * normDirX);
-        this.rayPointY = this.oY + (tscalar * normDirY);
-        this.rayPointZ = this.oZ + (tscalar * normDirZ);
-        //System.out.println("x: " + rayPointX + ", y: " + rayPointY + ", z: " + rayPointZ);
-    }
 
     // getter
+    // origin
+    public double getOriginX() {return this.oX;}
+    public double getOriginY() {return this.oY;}
+    public double getOriginZ() {return this.oZ;}
     // pos
-    public double getPosX() {return this.oX;}
-    public double getPosY() {return this.oY;}
-    public double getPosZ() {return this.oZ;}
+    public double getPosX() {return this.rayPosX;}
+    public double getPosY() {return this.rayPosY;}
+    public double getPosZ() {return this.rayPosZ;}
     // direction
     public double getDirX() {return this.dirX;}
     public double getDirY() {return this.dirY;}
@@ -58,16 +55,13 @@ public class Ray {
     public double getNormDirY() {return this.normDirY;}
     public double getNormDirZ() {return this.normDirZ;}
     public double getDirMagnitude() {return this.dirMagnitude;}
-    // current ray point
-    public double getRayPointX() {return this.rayPointX;}
-    public double getRayPointY() {return this.rayPointY;}
-    public double getRayPointZ() {return this.rayPointZ;}
+
     // final intersection point
     public double getHitPointX() {return this.hitPointX;}
     public double getHitPointY() {return this.hitPointY;}
     public double getHitPointZ() {return this.hitPointZ;}
     // hit true or false
-    public int getHit() {return this.hit;}
+    public boolean getHit() {return this.hit;}
     // get pixel index
     public double getPixelIndexX() {return this.pixelIndexX;}
     public double getPixelIndexY() {return this.pixelIndexY;}
@@ -76,14 +70,17 @@ public class Ray {
     public double getPixelPosY() {return this.pixelPosY;}
 
     // get collidedObject
-    public double getCollidedObject() {return this.collidedObject;}
+    public int getCollidedObject() {return this.collidedObject;}
     public double getLightAmplitude() {return this.lightAmplitude;}
+
+    public double[][] getLuminanceArray() {return this.luminanceArray;}
 
     // setter
     // pos
     public void setPosX(double posX) {this.oX = posX;}
     public void setPosY(double posY) {this.oY = posY;}
     public void setPosZ(double posZ) {this.oZ = posZ;}
+
     // direction
     public void setDirX(double dirX) {this.dirX = dirX;}
     public void setDirY(double dirY) {this.dirY = dirY;}
@@ -92,7 +89,7 @@ public class Ray {
     public void setHitPointX(double pointX) {this.hitPointX = pointX;}
     public void setHitPointY(double pointY) {this.hitPointY = pointY;}
     public void setHitPointZ(double pointZ) {this.hitPointZ = pointZ;}
-    public void setHit(int hit){this.hit = hit;}
+    public void setHit(boolean hit){this.hit = hit;}
     // set current pixel
     public void setPixelX(int px) {this.px = px;}
     public void setPixelY(int py) {this.py = py;}
@@ -108,7 +105,6 @@ public class Ray {
     //set brightness
     public void addLightAmplitude(double luminance) {
         this.lightAmplitude = this.lightAmplitude + luminance;
-        //System.out.println(this.brightness);
     }
 
 

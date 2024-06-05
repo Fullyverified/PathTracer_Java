@@ -32,7 +32,7 @@ public class PointLight implements SceneObjects {
     // d direction vector
 
     // initial check to see if the ray will or will not hit an object (for performance)
-    public boolean intersectionDiscard(Ray ray) {
+    public boolean objectCulling(Ray ray) {
         // calculate the vector from the spheres center to the origin of the ray
         // oc = o - c
         centerOriginX = ray.getPosX() - this.centerx;
@@ -77,7 +77,7 @@ public class PointLight implements SceneObjects {
     public boolean intersectionCheck(Ray ray)
     {
         // distance of the ray to the center of the sphere
-        this.distanceToC = Math.sqrt(Math.pow((ray.getRayPointX() - this.centerx),2) + Math.pow((ray.getRayPointY() - this.centery),2) + Math.pow((ray.getRayPointZ() - this.centerz),2));
+        this.distanceToC = Math.sqrt(Math.pow((ray.getPosX() - this.centerx),2) + Math.pow((ray.getPosY() - this.centery),2) + Math.pow((ray.getPosZ() - this.centerz),2));
         this.distanceToR = this.distanceToC - this.sradius;
 
         // check if we have hit the sphere yet
@@ -103,13 +103,9 @@ public class PointLight implements SceneObjects {
     // calculate the normal of the sphere and a point
     public void surfaceToNormal (double posX, double posY, double posZ)
     {
-        normalx = posX - this.centerx;
-        normaly = posY - this.centerx;
-        normalz = posZ - this.centerz;
-        double magnitude = Math.sqrt((normalx*normalx) + (normaly*normaly) + (normalz * normalz));
-        this.normalx = normalx / magnitude;
-        this.normaly = normaly / magnitude;
-        this.normalz = normalz / magnitude;
+        this.normalx = (posX - this.centerx) / this.sradius;
+        this.normaly = (posY - this.centerx) / this.sradius;
+        this.normalz = (posZ - this.centerz) / this.sradius;
     }
 
     // get sphere ID

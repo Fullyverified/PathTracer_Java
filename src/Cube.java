@@ -6,6 +6,7 @@ public class Cube implements SceneObjects {
     private double minZ, maxZ;
     private double tminX, tminY, tminZ;
     private double tmaxX, tmaxY, tmaxZ;
+    private double tNear = 0, tFar = 0;
     private static int numCubes = 0;
     private int cubeID = 0;
     private double normalx, normaly, normalz;
@@ -27,50 +28,111 @@ public class Cube implements SceneObjects {
 
     public void computeMinMax(Ray ray)
     {
+
+        // (cubecorner - ray origin) / ray direction
+        // if the direction is negative they may need to be flipped
+
         double tmp;
-        tminX = (minX - ray.getPosX()) / ray.getDirX();
-        tmaxX = (maxX - ray.getPosX()) / ray.getDirX();
+        this.tminX = (minX - ray.getPosX()) / ray.getDirX();
+        this.tmaxX = (maxX - ray.getPosX()) / ray.getDirX();
         if (tminX > tmaxX)
         {
-            tmp = tmaxX;
-            tmaxX = tminX;
-            tminX = tmp;
+            tmp = this.tmaxX;
+            this.tmaxX = tminX;
+            this.tminX = tmp;
         }
 
-        tminY = (minY - ray.getPosY()) / ray.getDirY();
-        tmaxY = (maxY - ray.getPosX()) / ray.getDirY();
+        this.tminY = (minY - ray.getPosY()) / ray.getDirY();
+        this.tmaxY = (maxY - ray.getPosY()) / ray.getDirY();
         if (tminY > tmaxY)
         {
-            tmp = tmaxY;
-            tmaxY = tminY;
-            tminY = tmp;
+            tmp = this.tmaxY;
+            this.tmaxY = tminY;
+            this.tminY = tmp;
         }
 
-        tminZ = (minZ - ray.getPosZ()) / ray.getDirZ();
-        tmaxZ = (maxZ - ray.getPosX()) / ray.getDirZ();
-        if (tminX > tmaxX)
+        this.tminZ = (minZ - ray.getPosZ()) / ray.getDirZ();
+        this.tmaxZ = (maxZ - ray.getPosZ()) / ray.getDirZ();
+        if (tminZ > tmaxZ)
         {
-            tmp = tmaxX;
-            tmaxX = tminX;
-            tminX = tmp;
+            tmp = tmaxZ;
+            this.tmaxZ = tminZ;
+            this.tminZ = tmp;
         }
     }
 
     // initial check to see if the ray will or will not hit the cube (for performance)
-    public boolean intersectionDiscard(Ray ray)
+    public boolean objectCulling(Ray ray)
     {
         computeMinMax(ray);
 
+        this.tNear = Double.NEGATIVE_INFINITY;
+        this.tFar = Double.POSITIVE_INFINITY;
 
+        // find the biggest Min
+        double[] minArray = {tminX, tminY, tminZ};
+        for (double i : minArray) {
+            if (i > tNear) {
+                this.tNear = i;
+            }
+        }
 
-        return false;
+        // find the smallest Max
+        double[] maxArray = {tmaxX, tmaxY, tmaxZ};
+        for (double i : maxArray) {
+            if (i < tFar) {
+                tFar = i;
+            }
+        }
+
+        if (this.tNear <= this.tFar)
+        {
+            // the ray is on a path to intersect
+            //System.out.println("Object culling: true");
+            return true;
+        }
+        else {
+            // the ray will not intersect
+            //System.out.println("Object culling: false");
+            return true;
+        }
     }
 
     // check if the ray is intersecting the cube
     public boolean intersectionCheck(Ray ray)
     {
+        computeMinMax(ray);
 
-        return false;
+        tNear = Double.NEGATIVE_INFINITY;
+        tFar = Double.POSITIVE_INFINITY;
+
+        // find the biggest Min
+        double[] minArray = {tminX, tminY, tminZ};
+        for (double v : minArray) {
+            if (v > tNear) {
+                tNear = v;
+            }
+        }
+
+        // find the smallest Max
+        double[] maxArray = {tmaxX, tmaxY, tmaxZ};
+        for (int i = 0; i < maxArray.length; i++)
+        {
+            if (maxArray[i] < tFar)
+            {tFar = minArray[i];}
+        }
+
+        if (tNear <= tFar && tFar > 0)
+        {
+            // the ray is intersecting
+            //System.out.println("Intersection check: true");
+            return true;
+        }
+        else {
+            // the ray will not intersect
+            //System.out.println("Intersection check: false");
+            return false;
+        }
     }
 
     // calculate the normal of the sphere and a point

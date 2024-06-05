@@ -31,7 +31,7 @@ public class Plane implements SceneObjects {
     // d direction vector
 
     // initial check to see if the ray will or will not hit an object (for performance)
-    public boolean intersectionDiscard(Ray ray) {
+    public boolean objectCulling(Ray ray) {
         // calculate the vector from the spheres center to the origin of the ray
         // oc = o - c
         centerOriginX = ray.getPosX() - this.centerx;
@@ -76,7 +76,7 @@ public class Plane implements SceneObjects {
     public boolean intersectionCheck(Ray ray)
     {
         // distance of the ray to the center of the sphere
-        this.distanceToC = Math.sqrt(Math.pow((ray.getRayPointX() - this.centerx),2) + Math.pow((ray.getRayPointY() - this.centery),2) + Math.pow((ray.getRayPointZ() - this.centerz),2));
+        this.distanceToC = Math.sqrt(Math.pow((ray.getPosX() - this.centerx),2) + Math.pow((ray.getPosY() - this.centery),2) + Math.pow((ray.getPosZ() - this.centerz),2));
         this.distanceToR = this.distanceToC - this.sradius;
 
         // check if we have hit the sphere yet
