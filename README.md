@@ -26,6 +26,7 @@ Done:
 13. Change the order of operations so that the first bounce, second bounce, third bounce etc is calculated for a pixel, then move onto the next pixel.
     Instead of doing for the first bounce for each pixel, then moving onto the second bounce etc.
     This is to truly make each pixel an independent entity to enable multi-threading in the future.
+14. Completely reorganised the render thread. Method now works for an arbitrary number of bounces. 
 
 TODO LIST OF THINGS TODO:
 1. Implement a correct monte carlo approximation
@@ -36,3 +37,4 @@ TODO LIST OF THINGS TODO:
 6. Re-write it in Vulkan to make it run on the GPU (big maybe) 
 
 Known Bugs:
+Dot product is always coming out as 0, meaning that no brightness gets added for extra bounces :(
