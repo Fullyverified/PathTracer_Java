@@ -170,11 +170,13 @@ public class Render {
 
     public void marchIntersectionLogic(Ray[][] primaryRay, Ray[][] nthRay, List<SceneObjects> sceneObjects, int i, int j, int numRays, int numBounces) {
 
-        // create luminanceArray
-        double[][] luminanceArray = new double[3][numBounces+1];
+
 
         // loop from the primary hitpoint - how many rays
         for (int v = 0; v < numRays; v++) {
+
+            // create luminanceArray
+            double[][] luminanceArray = new double[3][numBounces+1];
 
             // initialise the ray
             nthRay[i][j] = new Ray(primaryRay[i][j].getHitPointX(), primaryRay[i][j].getHitPointY(), primaryRay[i][j].getHitPointZ());
@@ -224,6 +226,8 @@ public class Render {
 
                             double dotProduct = visibleObjects.get(o).getNormalX() * objectDirX + visibleObjects.get(o).getNormalY() * objectDirY + visibleObjects.get(o).getNormalZ() * objectDirZ;
 
+                            System.out.println("dotproduct = " + dotProduct);
+
                             if (dotProduct < 0) {
                                 dotProduct = 0;
                             }
@@ -244,31 +248,32 @@ public class Render {
                     distance += 0.01;
                 }
             }
+
+            // add up luminance values for each bounce
+            double brightness = 0;
+            double currentBrightness;
+            double dotProduct;
+            double distance;
+            // sum up brightness
+            for (int l = numBounces - 1; l >= 0; l--)
+            {
+                // 0 = dotproduct, 1 = brightness, 2 = distance
+                //dotProduct = nthRay[i][j].getLuminanceArray()[0][l];
+                dotProduct = luminanceArray[0][l];
+                System.out.println("dot product1: " + dotProduct);
+
+                //currentBrightness = nthRay[i][j].getLuminanceArray()[1][l];
+                currentBrightness = luminanceArray[1][l];
+
+                //distance = nthRay[i][j].getLuminanceArray()[2][l];
+                distance = luminanceArray[2][l];
+
+                brightness = (brightness + currentBrightness) * dotProduct;
+            }
+            System.out.println("brightess: " + brightness);
+            primaryRay[i][j].addLightAmplitude(brightness);
+
         }
-
-        // add up luminance values for each bounce
-        double brightness = 0;
-        double currentBrightness;
-        double dotProduct;
-        double distance;
-        // sum up brightness
-        for (int l = numBounces - 1; l >= 0; l--)
-        {
-            // 0 = dotproduct, 1 = brightness, 2 = distance
-            //dotProduct = nthRay[i][j].getLuminanceArray()[0][l];
-            dotProduct = luminanceArray[0][l];
-            System.out.println("dot product: " + dotProduct);
-
-            //currentBrightness = nthRay[i][j].getLuminanceArray()[1][l];
-            currentBrightness = luminanceArray[1][l];
-
-            //distance = nthRay[i][j].getLuminanceArray()[2][l];
-            distance = luminanceArray[2][l];
-
-            brightness = (brightness + currentBrightness) * dotProduct;
-        }
-        System.out.println("brightess: " + brightness);
-        primaryRay[i][j].addLightAmplitude(brightness);
 
     }
 
