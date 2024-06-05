@@ -171,7 +171,7 @@ public class Render {
     public void marchIntersectionLogic(Ray[][] primaryRay, Ray[][] nthRay, List<SceneObjects> sceneObjects, int i, int j, int numRays, int numBounces) {
 
         // create luminanceArray
-        double[][] luminanceArray = new double[3][numBounces];
+        double[][] luminanceArray = new double[3][numBounces+1];
 
         // loop from the primary hitpoint - how many rays
         for (int v = 0; v < numRays; v++) {
@@ -231,13 +231,14 @@ public class Render {
 
                             luminanceArray[0][num] = dotProduct;
                             luminanceArray[1][num] = visibleObjects.get(o).getLuminance();
-                            System.out.println("brightness : " + visibleObjects.get(o).getLuminance());
+                            //System.out.println("brightness : " + visibleObjects.get(o).getLuminance());
                             luminanceArray[2][num] = distance;
 
                         }
                         // if hit = 0, march the ray continue the loop
                         else {
                             nthRay[i][j].setHit(false);
+                            num = numBounces;
                         }
                     }
                     distance += 0.01;
@@ -256,6 +257,7 @@ public class Render {
             // 0 = dotproduct, 1 = brightness, 2 = distance
             //dotProduct = nthRay[i][j].getLuminanceArray()[0][l];
             dotProduct = luminanceArray[0][l];
+            System.out.println("dot product: " + dotProduct);
 
             //currentBrightness = nthRay[i][j].getLuminanceArray()[1][l];
             currentBrightness = luminanceArray[1][l];
@@ -265,7 +267,7 @@ public class Render {
 
             brightness = (brightness + currentBrightness) * dotProduct;
         }
-        //System.out.println("brightess: " + brightness);
+        System.out.println("brightess: " + brightness);
         primaryRay[i][j].addLightAmplitude(brightness);
 
     }
@@ -292,7 +294,7 @@ public class Render {
                 // dot product of normal and randomly generated direction
                 double dotproduct = sceneObject1.getNormalX() * currentRay.getDirX() + sceneObject1.getNormalY() * currentRay.getDirY() + sceneObject1.getNormalZ() * currentRay.getDirZ();
                 // keep generating random directions until the dot product is 0
-                while (dotproduct < 0) {
+                while (dotproduct > 0) {
                     randomDir = random.nextDouble(2.0) - 1.0;
                     currentRay.setDirX(randomDir);
 
