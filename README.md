@@ -1,6 +1,7 @@
 I'm trying to make an Ascii Pathtracer. Nothing that hasn't been done before :)
 
-*DOES NOT COMPILE AT THE MOMENT*
+*HUGE ISSUE WITH RAY CASTING*
+*CAUSES MASSIVE SLOW DOWN*
 
 ![sphere render v5](https://github.com/Fullyverified/ASCII_PathTracer/assets/138776324/b26e0b26-7980-4926-b019-555dbdfc9e55)
 
