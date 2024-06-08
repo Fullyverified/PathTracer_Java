@@ -35,6 +35,12 @@ public class Ray {
     // o ray origin
     // t tscalar (amount to march the ray by)
     // d direction vector
+    public void marchRay(double distance)
+    {
+        this.posX = oX + (distance * normDirX);
+        this.posY = oY + (distance * normDirY);
+        this.posZ = oZ + (distance * normDirZ);
+    }
 
 
     // getter
@@ -80,6 +86,10 @@ public class Ray {
     public void setPosX(double posX) {this.posX = posX;}
     public void setPosY(double posY) {this.posY = posY;}
     public void setPosZ(double posZ) {this.posZ = posZ;}
+
+    public void setOriginX(double oX) {this.oX = oX;}
+    public void setOriginY(double oY) {this.oY = oY;}
+    public void setOriginZ(double oZ) {this.oZ = oZ;}
 
     // direction
     public void setDirX(double dirX) {this.dirX = dirX;}

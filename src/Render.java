@@ -7,7 +7,9 @@ public class Render {
 
     public List<SceneObjects> visibleObjects = new ArrayList<>();
 
-    public long counter = 0;
+    public long whilecounter = 0;
+    public long hitcounter = 0;
+    public long misscounter = 0;
 
     public Render() {
     }
@@ -101,7 +103,9 @@ public class Render {
         }
         System.out.println();
         drawScreen(cam, primaryRay);
-        System.out.println("counter: " + counter);
+        System.out.println("whilecounter: " + whilecounter);
+        System.out.println("hitcounter: " + hitcounter);
+        System.out.println("misscounter: " + misscounter);
 
     }
 
@@ -184,6 +188,9 @@ public class Render {
             // initialise the ray
             nthRay[i][j] = new Ray(primaryRay[i][j].getHitPointX(), primaryRay[i][j].getHitPointY(), primaryRay[i][j].getHitPointZ());
             nthRay[i][j].setCollidedObject(primaryRay[i][j].getCollidedObject());
+            nthRay[i][j].setOriginX(primaryRay[i][j].getPosX());
+            nthRay[i][j].setOriginY(primaryRay[i][j].getPosY());
+            nthRay[i][j].setOriginZ(primaryRay[i][j].getPosZ());
 
 
             // loop from the rays own hitpoint - how many bounces into the scene
@@ -201,80 +208,106 @@ public class Render {
                 }
 
                 double distance = 0;
-                counter++;
-                // loop the march and intersection test
+                nthRay[i][j].setHit(false);
+                // march ray and check intersections
                 while (distance <= 25 && nthRay[i][j].getHit() == false) {
+                    whilecounter++;
                     // march the ray
-                    nthRay[i][j].setPosX(nthRay[i][j].getOriginX() + (distance * nthRay[i][j].getNormDirX()));
-                    nthRay[i][j].setPosY(nthRay[i][j].getOriginY() + (distance * nthRay[i][j].getNormDirY()));
-                    nthRay[i][j].setPosZ(nthRay[i][j].getOriginZ() + (distance * nthRay[i][j].getNormDirZ()));
+                    nthRay[i][j].marchRay(distance);
                     // CHECK INTERSECTIONS
-                    for (int o = 0; o < visibleObjects.size(); o++) {
-                        if (visibleObjects.get(o).intersectionCheck(nthRay[i][j])) {
-                            nthRay[i][j].setHit(true);
-                            nthRay[i][j].setCollidedObject(visibleObjects.get(o).getObjectID());
+                    for (SceneObjects sceneObject2 : sceneObjects) {
+                        // check the discriminant of the ray for the sphere
+                        if (sceneObject2.objectCulling(nthRay[i][j])) {
+                            // check if the ray intersects with an object
+                            if (sceneObject2.intersectionCheck(nthRay[i][j])) {
+                                // get the position of the intersection
+                                // set ray hit to 1
 
-                            /*// find the dot product of the object normal and the angle of incident
-                            visibleObjects.get(o).surfaceToNormal(nthRay[i][j].getPosX(), nthRay[i][j].getPosY(), nthRay[i][j].getPosZ());
+                                nthRay[i][j].setOriginX(nthRay[i][j].getPosX());
+                                nthRay[i][j].setOriginY(nthRay[i][j].getPosY());
+                                nthRay[i][j].setOriginZ(nthRay[i][j].getPosZ());
 
-                            double objectDirX = visibleObjects.get(o).getPosX() - nthRay[i][j].getPosX();
-                            double objectDirY = visibleObjects.get(o).getPosY() - nthRay[i][j].getPosY();
-                            double objectDirZ = visibleObjects.get(o).getPosZ() - nthRay[i][j].getPosZ();
+                                // find the dot product of the object normal and the angle of incident
+                                sceneObject2.surfaceToNormal(nthRay[i][j].getPosX(), nthRay[i][j].getPosY(), nthRay[i][j].getPosZ());
 
-                            double length = Math.sqrt(objectDirX * objectDirX + objectDirY * objectDirY + objectDirZ * objectDirZ);
+                                BRDFLighting(nthRay[i][j], sceneObject2, distance, num, luminanceArray);
 
-                            objectDirX = objectDirX / length;
-                            objectDirY = objectDirY / length;
-                            objectDirZ = objectDirZ / length;
-
-                            double dotProduct = visibleObjects.get(o).getNormalX() * objectDirX + visibleObjects.get(o).getNormalY() * objectDirY + visibleObjects.get(o).getNormalZ() * objectDirZ;
-
-                            //System.out.println("dotproduct = " + dotProduct);
-
-                            if (dotProduct < 0) {
-                                dotProduct = 0;
+                                nthRay[i][j].setHitPointX(nthRay[i][j].getPosX());
+                                nthRay[i][j].setHitPointY(nthRay[i][j].getPosY());
+                                nthRay[i][j].setHitPointZ(nthRay[i][j].getPosZ());
+                                nthRay[i][j].setHit(true);
+                                hitcounter++;
+                                // get the ID of the collided pointlight
+                                nthRay[i][j].setCollidedObject(sceneObject2.getObjectID());
+                                if ((sceneObject2) instanceof PointLight) {
+                                    primaryRay[i][j].addLightAmplitude(0.1);
+                                } else if ((sceneObject2) instanceof Sphere) {
+                                    primaryRay[i][j].addLightAmplitude(0);
+                                }
                             }
-                            // data structure to store the properties of the event
-
-                            luminanceArray[0][num] = dotProduct;
-                            luminanceArray[1][num] = visibleObjects.get(o).getLuminance();
-                            //System.out.println("brightness : " + visibleObjects.get(o).getLuminance());
-                            luminanceArray[2][num] = distance;*/
+                            // if hit = 0, march the ray continue the loop
+                            else {
+                                nthRay[i][j].setHit(true);
+                                nthRay[i][j].addLightAmplitude(0);
+                                misscounter++;
+                            }
                         }
-                        // if hit = 0, march the ray continue the loop
-                        else {
-                            nthRay[i][j].setHit(false);
-                        }
+                        distance = distance + 0.01;
                     }
-                    distance += 0.01;
                 }
+                // add up luminance values for each bounce
+                double brightness = 0;
+                double currentBrightness;
+                double dotProduct;
+                // sum up brightness
+                /*for (int l = numBounces - 1; l >= 0; l--) {
+                    // 0 = dotproduct, 1 = brightness, 2 = distance
+                    dotProduct = nthRay[i][j].getLuminanceArray()[0][l];
+                    luminanceArray[0][l] = dotProduct;
+                    //System.out.println("dot product1: " + dotProduct);
+
+                    //currentBrightness = nthRay[i][j].getLuminanceArray()[1][l];
+                    currentBrightness = luminanceArray[1][l];
+
+                    //distance = nthRay[i][j].getLuminanceArray()[2][l];
+                    distance = luminanceArray[2][l];
+
+                    brightness = (brightness + currentBrightness) * dotProduct;
+                }
+                //System.out.println("brightess: " + brightness);
+                primaryRay[i][j].addLightAmplitude(brightness);*/
             }
-
-           /* // add up luminance values for each bounce
-            double brightness = 0;
-            double currentBrightness;
-            double dotProduct;
-            double distance;
-            // sum up brightness
-            for (int l = numBounces - 1; l >= 0; l--) {
-                // 0 = dotproduct, 1 = brightness, 2 = distance
-                //dotProduct = nthRay[i][j].getLuminanceArray()[0][l];
-                dotProduct = luminanceArray[0][l];
-                //System.out.println("dot product1: " + dotProduct);
-
-                //currentBrightness = nthRay[i][j].getLuminanceArray()[1][l];
-                currentBrightness = luminanceArray[1][l];
-
-                //distance = nthRay[i][j].getLuminanceArray()[2][l];
-                distance = luminanceArray[2][l];
-
-                brightness = (brightness + currentBrightness) * dotProduct;
-            }
-            //System.out.println("brightess: " + brightness);
-            primaryRay[i][j].addLightAmplitude(brightness);*/
-
         }
     }
+
+    // find normal and calculate lighting
+
+    public void BRDFLighting(Ray currentRay, SceneObjects sceneObject2, double distance, int depth, double[][] luminanceArray)
+    {
+        double objectDirX = sceneObject2.getPosX() - currentRay.getPosX();
+        double objectDirY = sceneObject2.getPosY() - currentRay.getPosY();
+        double objectDirZ = sceneObject2.getPosZ() - currentRay.getPosZ();
+
+        double length = Math.sqrt(objectDirX * objectDirX + objectDirY * objectDirY + objectDirZ * objectDirZ);
+
+        objectDirX = objectDirX / length;
+        objectDirY = objectDirY / length;
+        objectDirZ = objectDirZ / length;
+
+        double dotProduct = sceneObject2.getNormalX() * objectDirX + sceneObject2.getNormalY() * objectDirY + sceneObject2.getNormalZ() * objectDirZ;
+
+        //System.out.println("dotproduct = " + dotProduct);
+
+        if (dotProduct < 0) {
+            dotProduct = 0;
+        }
+        // data structure to store the properties of the event
+
+        luminanceArray[0][depth] = dotProduct;
+        luminanceArray[1][depth] = sceneObject2.getLuminance();
+        luminanceArray[2][depth] = distance;
+    }
+
 
 
     // calculate a random direction

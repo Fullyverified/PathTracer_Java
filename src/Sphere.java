@@ -102,9 +102,16 @@ public class Sphere implements SceneObjects {
     // calculate the normal of the sphere and a point
     public void surfaceToNormal (double posX, double posY, double posZ)
     {
-        this.normalx = (posX - this.centerx) / this.sradius;
+        /*this.normalx = (posX - this.centerx) / this.sradius;
         this.normaly = (posY - this.centerx) / this.sradius;
-        this.normalz = (posZ - this.centerz) / this.sradius;
+        this.normalz = (posZ - this.centerz) / this.sradius;*/
+        normalx = posX - this.centerx;
+        normaly = posY - this.centerx;
+        normalz = posZ - this.centerz;
+        double magnitude = Math.sqrt((normalx*normalx) + (normaly*normaly) + (normalz * normalz));
+        this.normalx = normalx / magnitude;
+        this.normaly = normaly / magnitude;
+        this.normalz = normalz / magnitude;
     }
 
     // get each the normalised normal
