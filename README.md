@@ -1,7 +1,8 @@
 I'm trying to make an Ascii Pathtracer. Nothing that hasn't been done before :)
 
-*HUGE ISSUE WITH RAY CASTING*
-*CAUSES MASSIVE SLOW DOWN*
+*Fixed long-standing issue with normal calculation. Y direction was using the x position :(*
+*Major flaw found in second bounce method... removed for now*
+*Gonna prioritise more shapes first*
 
 ![sphere render v5](https://github.com/Fullyverified/ASCII_PathTracer/assets/138776324/b26e0b26-7980-4926-b019-555dbdfc9e55)
 
