@@ -43,6 +43,7 @@ public class PointLight implements SceneObjects {
         // calculate values of a, b, c for the quadratic equation
         // a = the dot product of normx, normy, normz - should always equal 1
         this.a = (ray.getNormDirX() * ray.getNormDirX()) + (ray.getNormDirY() * ray.getNormDirY() + (ray.getNormDirZ() * ray.getNormDirZ()));
+        this.a = 1;
         // b = 2 * (the dot product of the centerorigin vector by the direction vector)
         this.b = 2 * ((centerOriginX * ray.getNormDirX()) + (centerOriginY * ray.getNormDirY()) + (centerOriginZ * ray.getNormDirZ()));
         // c = the dot product of centerorigin by itself, - the radius^2 of the sphere
@@ -83,17 +84,17 @@ public class PointLight implements SceneObjects {
         // check if we have hit the sphere yet
         if (distanceToC > sradius)
         {
-            //System.out.println("Not intersected yet. x: " + ray.getRayPointX() + " y: " + ray.getRayPointY() + " z: " + ray.getRayPointZ());
+            //System.out.println("Not intersected yet. x: " + ray.getPosX() + " y: " + ray.getPosY() + " z: " + ray.getPosZ());
             return false;
         }
         else if (distanceToC == sradius)
         {
-            //System.out.println("Perfect intersection. x: " + ray.getRayPointX() + " y: " + ray.getRayPointY() + " z: " + ray.getRayPointZ());
+            //System.out.println("Perfect intersection. x: " + ray.getPosX() + " y: " + ray.getPosY() + " z: " + ray.getPosZ());
             return true;
         }
         else if (distanceToC < sradius)
         {
-            //System.out.println("Ray inside sphere. x: " + ray.getRayPointX() + " y: " + ray.getRayPointY() + " z: " + ray.getRayPointZ());
+            //System.out.println("Ray inside sphere. x: " + ray.getPosX() + " y: " + ray.getPosY() + " z: " + ray.getPosZ());
             return true;
         }
         else {System.out.println("Something is wrong");}
@@ -101,11 +102,15 @@ public class PointLight implements SceneObjects {
     }
 
     // calculate the normal of the sphere and a point
-    public void surfaceToNormal (double posX, double posY, double posZ)
+    public void calculateNormal (double posX, double posY, double posZ)
     {
-        this.normalx = (posX - this.centerx) / this.sradius;
-        this.normaly = (posY - this.centerx) / this.sradius;
-        this.normalz = (posZ - this.centerz) / this.sradius;
+        normalx = posX - this.centerx;
+        normaly = posY - this.centery;
+        normalz = posZ - this.centerz;
+        double magnitude = Math.sqrt((normalx*normalx) + (normaly*normaly) + (normalz * normalz));
+        this.normalx = normalx / magnitude;
+        this.normaly = normaly / magnitude;
+        this.normalz = normalz / magnitude;
     }
 
     // get sphere ID

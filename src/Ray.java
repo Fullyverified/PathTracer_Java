@@ -86,19 +86,26 @@ public class Ray {
     public void setPosX(double posX) {this.posX = posX;}
     public void setPosY(double posY) {this.posY = posY;}
     public void setPosZ(double posZ) {this.posZ = posZ;}
+    public void setPos(double posX, double posY, double posZ) {this.posX = posX; this.posY = posY; this.posZ = posZ;}
 
     public void setOriginX(double oX) {this.oX = oX;}
     public void setOriginY(double oY) {this.oY = oY;}
     public void setOriginZ(double oZ) {this.oZ = oZ;}
+    public void setOrigin(double oX, double oY, double oZ) {this.oX = oX; this.oY = oY; this.oZ = oZ;}
 
     // direction
     public void setDirX(double dirX) {this.dirX = dirX;}
     public void setDirY(double dirY) {this.dirY = dirY;}
     public void setDirZ(double dirZ) {this.dirZ = dirZ;}
+    public void setDirection(double dirX, double dirY, double dirZ) {this.dirX = dirX; this.dirY = dirY; this.dirZ = dirZ;}
+
+
     // hitpoint
     public void setHitPointX(double pointX) {this.hitPointX = pointX;}
     public void setHitPointY(double pointY) {this.hitPointY = pointY;}
     public void setHitPointZ(double pointZ) {this.hitPointZ = pointZ;}
+    public void setHitPoint(double pointX, double pointY, double pointZ) {this.hitPointX = pointX; this.hitPointY = pointY; this.hitPointZ = pointZ;}
+
     public void setHit(boolean hit){this.hit = hit;}
     // set current pixel
     public void setPixelX(int px) {this.px = px;}
@@ -116,7 +123,5 @@ public class Ray {
     public void addLightAmplitude(double luminance) {
         this.lightAmplitude = this.lightAmplitude + luminance;
     }
-
-
 
 }

@@ -12,7 +12,7 @@ public class Camera{
     public static void main(String[] args) {}
 
     // constructor
-    public Camera(double posX, double posY, double posZ, double dirX, double dirY, double dirZ, double upX, double upY, double upZ, double fOV, double aspectX, double aspectY, double resX)
+    public Camera(double resX, double posX, double posY, double posZ, double dirX, double dirY, double dirZ, double upX, double upY, double upZ, double fOV, double aspectX, double aspectY)
     {
         this.posX = posX;
         this.posY = posY;

@@ -136,7 +136,7 @@ public class Cube implements SceneObjects {
     }
 
     // calculate the normal of the sphere and a point
-    public void surfaceToNormal (double posX, double posY, double posZ)
+    public void calculateNormal (double posX, double posY, double posZ)
     {
         normalx = posX - this.minX;
         normaly = posY - this.minY;

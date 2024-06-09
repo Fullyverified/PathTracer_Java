@@ -9,18 +9,17 @@ public class Main {
 
         List<SceneObjects> sceneObjects = new ArrayList<>();
         sceneObjects.add(new Sphere(6, 0, 0, 1));
-        sceneObjects.add(new Sphere(12, -1,-5, 1.25));
-        sceneObjects.add(new PointLight(6, 0.5, 5, 1, 300));
+        sceneObjects.add(new Sphere(12, 0,-5, 1.25));
+        sceneObjects.add(new PointLight(6, 2, 5, 1, 300));
 
-        Camera cam = new Camera(0, 0, 0, 1, 0, 0, 0, 1, 0, 70, 4, 3, 60);
+        Camera cam = new Camera(100, 0, 0, 0, 1, 0, 0, 0, 1, 0, 70, 4, 3);
         cam.directionVector();
         cam.upVector();
         cam.rightVector();
         cam.imagePlane();
 
         Render render = new Render();
-        render.computePixels(sceneObjects, cam,20000,1);
-    }
+        render.computePixels(sceneObjects, cam,10000,1);}
 }
 
 
