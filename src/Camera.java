@@ -44,12 +44,12 @@ public class Camera{
     public void upVector()
     {
         // in cases where the camera is looking straight up or down, the cross product will be NaN.
-        if ((this.dirY == 1 || this.dirY == -1) && this.dirX == 0 && this.dirZ == 0)
-        {
+        if ((this.dirY == 1 || this.dirY == -1) && this.dirX == 0 && this.dirZ == 0) {
         this.normUpX = 1;
         this.normUpY = 0;
         this.normUpZ = 0;
         }
+
         else
         {
             // calculate magnitude and normalised up vector
@@ -132,8 +132,8 @@ public class Camera{
 
     // up vector (rotation)
     public void setUpX(double upX) {this.upX = upX;}
-    public void setUpY(double upY) {this.upX = upY;}
-    public void setUpZ(double upZ) {this.upX = upZ;}
+    public void setUpY(double upY) {this.upY = upY;}
+    public void setUpZ(double upZ) {this.upZ = upZ;}
 
     // fov and aspect ratio
     public void setFOV(int fOV) {this.fOV = fOV;}

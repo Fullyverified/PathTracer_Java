@@ -9,6 +9,7 @@ public class Render {
     public long hitcounter = 0;
     public long misscounter = 0;
     public int counter = 0;
+    List<SceneObjects> visibleObjects = new ArrayList<>();
 
     public Render() {
     }
@@ -27,17 +28,17 @@ public class Render {
                 if (primaryRay[i][j].getHit()) {
                     if (primaryRay[i][j].getLightAmplitude() >= 20) {
                         System.out.print("###");
-                    } else if (primaryRay[i][j].getLightAmplitude() >= 10 && primaryRay[i][j].getLightAmplitude() < 20) {
+                    } else if (primaryRay[i][j].getLightAmplitude() >= 15 && primaryRay[i][j].getLightAmplitude() < 20) {
                         System.out.print("XXX");
-                    } else if (primaryRay[i][j].getLightAmplitude() >= 5 && primaryRay[i][j].getLightAmplitude() < 10) {
+                    } else if (primaryRay[i][j].getLightAmplitude() >= 6 && primaryRay[i][j].getLightAmplitude() < 15) {
                         System.out.print("***");
-                    } else if (primaryRay[i][j].getLightAmplitude() >= 0.5 && primaryRay[i][j].getLightAmplitude() < 5) {
+                    } else if (primaryRay[i][j].getLightAmplitude() >= 0.4 && primaryRay[i][j].getLightAmplitude() < 6) {
                         System.out.print(";;;");
-                    } else if (/*primaryRay[i][j].getLightAmplitude() > 0 && */primaryRay[i][j].getLightAmplitude() < 0.5) {
+                    } else if (primaryRay[i][j].getLightAmplitude() > 0 && primaryRay[i][j].getLightAmplitude() < 0.4) {
                         System.out.print("...");
-                    } /*else if (primaryRay[i][j].getLightAmplitude() == 0) {
-                        System.out.print("   ");
-                    }*/
+                    } else if (primaryRay[i][j].getLightAmplitude() == 0) {
+                        System.out.print("...");
+                    }
                 } else if (!primaryRay[i][j].getHit()) {
                     System.out.print("   ");
                 }
@@ -93,8 +94,8 @@ public class Render {
         }
         System.out.println("-|");
 
-        for (int j = 0; j < cam.getResY(); j++) {
-            System.out.print("||||");
+        for (int j = 0; j < cam.getResX(); j++) {
+            System.out.print("___");
             for (int i = 0; i < cam.getResX(); i++) {
                 computePrimaryRay(cam, primaryRay, sceneObjects, i, j);
                 if (primaryRay[i][j].getHit()) {
@@ -134,14 +135,21 @@ public class Render {
         // while the ray is not intersecting an object and the ray has not marched 100 units
         // create local variable r (the rays step)
 
+        visibleObjects.clear();
+        for (SceneObjects sceneObject1 : sceneObjects) {
+            if (sceneObject1.objectCulling(primaryRay[i][j])) {
+                visibleObjects.add(sceneObject1);
+            }
+        }
+
         double distance = 0;
         while (distance <= 50 && primaryRay[i][j].getHit() == false) {
             // march the ray
             primaryRay[i][j].marchRay(distance);
 
             // for each object that is hasn't been culled
-            for (SceneObjects sceneObject1 : sceneObjects) {
-                if (sceneObject1.objectCulling(primaryRay[i][j])) {
+            for (SceneObjects sceneObject1 : visibleObjects) {
+                //if (sceneObject1.objectCulling(primaryRay[i][j])) {
                     // check if the ray intersects the object
                     if (sceneObject1.intersectionCheck(primaryRay[i][j])) {
                         // get the position of the intersection
@@ -153,14 +161,13 @@ public class Render {
                         primaryRay[i][j].addLightAmplitude(sceneObject1.getLuminance());
                     }
                     // hit is already false otherwise
-                }
+                //}
             }
             distance = distance + 0.01;
         }
     }
 
     public void marchIntersectionLogic(Ray[][] primaryRay, Ray[][] nthRay, List<SceneObjects> sceneObjects, int i, int j, int numRays, int numBounces) {
-
 
         // create luminanceArray
         double[][] luminanceArray = new double[3][numBounces + 1];
@@ -176,6 +183,13 @@ public class Render {
 
             // give the ray a random direction
             randomDirection(nthRay[i][j], sceneObjects);
+
+            visibleObjects.clear();
+            for (SceneObjects sceneObject1 : sceneObjects) {
+                if (sceneObject1.objectCulling(nthRay[i][j])) {
+                    visibleObjects.add(sceneObject1);
+                }
+            }
 
             nthRay[i][j].setHit(false);
             double distance = 0;
@@ -199,7 +213,7 @@ public class Render {
                             // get the ID of the collided pointlight
                             nthRay[i][j].setCollidedObject(sceneObject2.getObjectID());
 
-                            if ((sceneObject2) instanceof PointLight) {
+                            if ((sceneObject2) instanceof SphereLight) {
                                 primaryRay[i][j].addLightAmplitude(0.1);
                             } else if ((sceneObject2) instanceof Sphere) {
                                 primaryRay[i][j].addLightAmplitude(0);
@@ -273,7 +287,6 @@ public class Render {
             if (sceneObject1.getObjectID() == nthRay.getCollidedObject()) {
                 // calculate the normal from the surface of the sphere at the point of intersection
                 sceneObject1.calculateNormal(nthRay.getHitPointX(), nthRay.getHitPointY(), nthRay.getHitPointZ());
-
                 while (dotproduct < 0) {
                     randomDir = random.nextDouble(2.0) - 1.0;
                     nthRay.setDirX(randomDir);

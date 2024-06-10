@@ -8,11 +8,13 @@ public class Main {
     public static void main(String[] args) {
 
         List<SceneObjects> sceneObjects = new ArrayList<>();
-        sceneObjects.add(new Sphere(6, 0, 0, 1));
-        sceneObjects.add(new Sphere(12, 0,-5, 1.25));
-        sceneObjects.add(new PointLight(6, 2, 5, 1, 300));
+        sceneObjects.add(new Sphere(5, 1,-1, 1));
+        sceneObjects.add(new Sphere(10, 0,-5, 1.25));
+        //sceneObjects.add(new AABCube(8,-1,1,2,2,2));
 
-        Camera cam = new Camera(100, 0, 0, 0, 1, 0, 0, 0, 1, 0, 70, 4, 3);
+        sceneObjects.add(new SphereLight(3, 0.5, 2, 0.5,300));
+
+        Camera cam = new Camera(50, 0, 0, 0, 1, 0, 0, 0, 1, 0, 70, 1, 1);
         cam.directionVector();
         cam.upVector();
         cam.rightVector();

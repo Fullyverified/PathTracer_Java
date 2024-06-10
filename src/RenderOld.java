@@ -1,5 +1,4 @@
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -221,7 +220,7 @@ public class RenderOld {
                             // get the ID of the collided pointlight
                             nthRay[i][j].setCollidedObject(sceneObject2.getObjectID());
 
-                            if ((sceneObject2) instanceof PointLight) {
+                            if ((sceneObject2) instanceof SphereLight) {
                                 primaryRay[i][j].addLightAmplitude(0.1);
                             } else if ((sceneObject2) instanceof Sphere) {
                                 primaryRay[i][j].addLightAmplitude(0);
@@ -270,7 +269,7 @@ public class RenderOld {
                             hitcounter++;
                             // get the ID of the collided pointlight
                             secondRay[i][j].setCollidedObject(sceneObject2.getObjectID());
-                            if ((sceneObject2) instanceof PointLight) {
+                            if ((sceneObject2) instanceof SphereLight) {
                                 primaryRay[i][j].addLightAmplitude(0.1);
                             } else if ((sceneObject2) instanceof Sphere) {
                                 primaryRay[i][j].addLightAmplitude(0);

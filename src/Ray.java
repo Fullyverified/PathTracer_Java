@@ -19,6 +19,9 @@ public class Ray {
         this.oX = oX;
         this.oY = oY;
         this.oZ = oZ;
+        this.posX = oX;
+        this.posY = oY;
+        this.posZ = oZ;
     }
 
     // update magnitude and normalised directions vectors

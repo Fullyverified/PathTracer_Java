@@ -1,5 +1,5 @@
 
-public class PointLight implements SceneObjects {
+public class SphereLight implements SceneObjects {
 
     private double centerx, centerOriginX;
     private double centery, centerOriginY;
@@ -15,7 +15,7 @@ public class PointLight implements SceneObjects {
     //Equation of a sphere: (x - cx)^2 + (y - cy)^2 + (z - cz)^2 = r^2
 
     //Constructor
-    public PointLight(double centerx, double centery, double centerz, double sradius, double luminance) {
+    public SphereLight(double centerx, double centery, double centerz, double sradius, double luminance) {
         this.centerx = centerx;
         this.centery = centery;
         this.centerz = centerz;
@@ -38,12 +38,11 @@ public class PointLight implements SceneObjects {
         centerOriginX = ray.getPosX() - this.centerx;
         centerOriginY = ray.getPosY() - this.centery;
         centerOriginZ = ray.getPosZ() - this.centerz;
-        // oc = (vectorx, vectory, vectorz)
 
         // calculate values of a, b, c for the quadratic equation
         // a = the dot product of normx, normy, normz - should always equal 1
         this.a = (ray.getNormDirX() * ray.getNormDirX()) + (ray.getNormDirY() * ray.getNormDirY() + (ray.getNormDirZ() * ray.getNormDirZ()));
-        this.a = 1;
+        //this.a = 1;
         // b = 2 * (the dot product of the centerorigin vector by the direction vector)
         this.b = 2 * ((centerOriginX * ray.getNormDirX()) + (centerOriginY * ray.getNormDirY()) + (centerOriginZ * ray.getNormDirZ()));
         // c = the dot product of centerorigin by itself, - the radius^2 of the sphere
