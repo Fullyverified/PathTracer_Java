@@ -1,9 +1,5 @@
 I'm trying to make an Ascii Pathtracer. Nothing that hasn't been done before :)
 
-*Fixed long-standing issue with normal calculation. Y direction was using the x position :(*
-*Major flaw found in second bounce method... removed for now*
-*Gonna prioritise more shapes first*
-
 ![sphere render v5](https://github.com/Fullyverified/ASCII_PathTracer/assets/138776324/b26e0b26-7980-4926-b019-555dbdfc9e55)
 
 Sphere at 6, 0, 0 with radius 1. Second sphere at 12, 0, -5 with radius 1.25. Light 6, 0.5, 5 radius 1.
@@ -39,4 +35,6 @@ TODO LIST OF THINGS TODO:
 6. Re-write it in Vulkan to make it run on the GPU (big maybe) 
 
 Known Bugs:
-Dot product is always coming out as 0, meaning that no brightness gets added for extra bounces :(
+*Fixed long-standing issue with normal calculation. Y direction was using the x position :(*
+*Major flaw found in second bounce method... removed for now*
+*Gonna prioritise more shapes first*
