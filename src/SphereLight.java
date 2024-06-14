@@ -106,6 +106,9 @@ public class SphereLight implements SceneObjects {
         normalx = posX - this.centerx;
         normaly = posY - this.centery;
         normalz = posZ - this.centerz;
+        /*normalx = this.centerx - posX;
+        normaly = this.centery - posY;
+        normalz = this.centerz - posZ;*/
         double magnitude = Math.sqrt((normalx*normalx) + (normaly*normaly) + (normalz * normalz));
         this.normalx = normalx / magnitude;
         this.normaly = normaly / magnitude;

@@ -45,6 +45,14 @@ public class Ray {
         this.posZ = oZ + (distance * normDirZ);
     }
 
+    // used to march the ray slightly after giving it a random direction
+    public void updateOrigin(double distance)
+    {
+        this.oX = oX + (distance * normDirX);
+        this.oY = oY + (distance * normDirY);
+        this.oZ = oZ + (distance * normDirZ);
+    }
+
 
     // getter
     // origin

@@ -102,7 +102,10 @@ public class RenderOld {
         }
         System.out.println();
         drawScreen(cam, primaryRay);
-
+        System.out.println();
+        System.out.println("whilecounter: " + whilecounter);
+        System.out.println("hitcounter: + " + hitcounter);
+        System.out.println("misscounter: + " + misscounter);
     }
 
     public void computePixelsOld(List<SceneObjects> sceneObjects, Camera cam, int numRays, int numBounces) {
@@ -202,6 +205,7 @@ public class RenderOld {
             double distance = 0;
             // march ray and check intersections
             while (distance <= 25 && nthRay[i][j].getHit() == false) {
+                whilecounter++;
                 // march the ray
                 nthRay[i][j].marchRay(distance);
                 // CHECK INTERSECTIONS
@@ -219,7 +223,7 @@ public class RenderOld {
                             //BRDFLighting(nthRay[i][j], sceneObject2, distance, num, luminanceArray);
                             // get the ID of the collided pointlight
                             nthRay[i][j].setCollidedObject(sceneObject2.getObjectID());
-
+                            hitcounter++;
                             if ((sceneObject2) instanceof SphereLight) {
                                 primaryRay[i][j].addLightAmplitude(0.1);
                             } else if ((sceneObject2) instanceof Sphere) {
@@ -230,6 +234,7 @@ public class RenderOld {
                         else {
                             nthRay[i][j].setHit(false);
                             nthRay[i][j].addLightAmplitude(0);
+                            misscounter++;
                         }
                     }
                 }

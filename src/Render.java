@@ -21,7 +21,7 @@ public class Render {
         // iterate through each rays hit value and print the output
         System.out.print("|");
         for (int i = 0; i < cam.getResX(); i++) {
-            System.out.print("---");
+            System.out.print("-|-");
         }
         System.out.println("|");
         for (int j = 0; j < cam.getResY(); j++) {
@@ -91,12 +91,12 @@ public class Render {
         Ray[][] nthRay = new Ray[(int) cam.getResX()][(int) cam.getResY()];
 
         System.out.print("|-");
-        for (int l = 0; l < cam.getResX(); l++) {
+        for (int l = 0; l < cam.getResY(); l++) {
             System.out.print("---");
         }
         System.out.println("-|");
-
-        for (int j = 0; j < cam.getResX(); j++) {
+        System.out.print("|_");
+        for (int j = 0; j < cam.getResY(); j++) {
             System.out.print("___");
             for (int i = 0; i < cam.getResX(); i++) {
                 computePrimaryRay(cam, primaryRay, sceneObjects, i, j);
@@ -105,9 +105,13 @@ public class Render {
                 }
             }
         }
-        System.out.println();
+        System.out.println("_|");
         drawScreen(cam, primaryRay);
-
+        System.out.println();
+        System.out.println("whilecounter: " + whilecounter);
+        System.out.println("hitcounter: + " + hitcounter);
+        System.out.println("misscounter: + " + misscounter);
+        System.out.println("counter: " + counter);
     }
 
     public void computePrimaryRay(Camera cam, Ray[][] primaryRay, List<SceneObjects> sceneObjects, int i, int j) {
@@ -178,11 +182,8 @@ public class Render {
 
         // create luminanceArray
         double[][] luminanceArray = new double[3][numBounces + 1];
-
         // initialise the ray
         nthRay[i][j] = new Ray(primaryRay[i][j].getHitPointX(), primaryRay[i][j].getHitPointY(), primaryRay[i][j].getHitPointZ());
-
-
         // BOUNCES PER RAY
         for (int num = 0; num < numRays; num++) {
             // initialise ray pos
@@ -192,10 +193,9 @@ public class Render {
             randomDirection(nthRay[i][j], sceneObjects);
 
             // add a non culled objects to a list
-            nthRay[i][j].marchRay(0);
             visibleObjects.clear();
             for (SceneObjects sceneObject1 : sceneObjects) {
-                if (sceneObject1.objectCulling(nthRay[i][j]) /*&& sceneObject1.getObjectID() != primaryRay[i][j].getCollidedObject()*/) {
+                if (sceneObject1.objectCulling(nthRay[i][j])) {
                     visibleObjects.add(sceneObject1);
                 }
             }
@@ -204,29 +204,41 @@ public class Render {
             double distance = 0;
             // march ray and check intersections
             while (distance <= 25 && nthRay[i][j].getHit() == false) {
+                whilecounter++;
                 // march the ray
                 nthRay[i][j].marchRay(distance);
                 // CHECK INTERSECTIONS for non-culled objects
                 for (SceneObjects sceneObject1 : visibleObjects) {
                     // check if the ray intersects with an object
                     if (sceneObject1.intersectionCheck(nthRay[i][j])) {
-                        nthRay[i][j].setHit(true);
-                        nthRay[i][j].setHitPoint(nthRay[i][j].getPosX(), nthRay[i][j].getPosY(), nthRay[i][j].getPosZ());
-                        // get the ID of the collided pointlight
-                        nthRay[i][j].setCollidedObject(sceneObject1.getObjectID());
 
-                        if (sceneObject1.getLuminance() != 0) {
-                            primaryRay[i][j].addLightAmplitude(LambertCosineLaw(primaryRay[i][j], sceneObject1));
-                        } else {
-                            primaryRay[i][j].addLightAmplitude(0);
+                        //System.out.println("Ray[" + i + "][" + j + "][" + sceneObject1.getObjectID() + "]");
+                        // delete self intersections
+                        if (sceneObject1.getObjectID() == primaryRay[i][j].getCollidedObject()) {
+                            nthRay[i][j].setHit(false);
+                            // end loop
+                            distance = 99999;
+                            counter++;
+                        } else if (sceneObject1.getObjectID() != primaryRay[i][j].getCollidedObject()) {
+                            nthRay[i][j].setHit(true);
+                            nthRay[i][j].setHitPoint(nthRay[i][j].getPosX(), nthRay[i][j].getPosY(), nthRay[i][j].getPosZ());
+                            // get the ID of the collided pointlight
+                            nthRay[i][j].setCollidedObject(sceneObject1.getObjectID());
+                            hitcounter++;
+                            // add brightness
+                            if (sceneObject1.getLuminance() != 0) {
+                                primaryRay[i][j].addLightAmplitude(LambertCosineLaw2(nthRay[i][j], sceneObject1, 1.0/numRays));
+                                //primaryRay[i][j].addLightAmplitude(1.0 / numRays);
+
+                            }
                         }
                     }
                     // if hit = 0, march the ray continue the loop
                     else {
                         nthRay[i][j].setHit(false);
-                        nthRay[i][j].addLightAmplitude(0);
+                        //nthRay[i][j].addLightAmplitude(0);
+                        misscounter++;
                     }
-
                 }
                 distance = distance + 0.01;
             }
@@ -242,10 +254,17 @@ public class Render {
         double brightness = sceneObject.getLuminance() * costheta;
         brightness = Math.abs(brightness);
 
-        /*System.out.println("luminance: " + sceneObject.getLuminance());
-        System.out.println("dotproduct: " + costheta);
-        System.out.println("total: " + total);
-        System.out.println("_________");*/
+        return brightness;
+    }
+
+    public double LambertCosineLaw2(Ray currentRay, SceneObjects sceneObject, double brightness) {
+        sceneObject.calculateNormal(currentRay.getPosX(), currentRay.getPosY(), currentRay.getPosZ());
+        currentRay.updateNormalisation();
+
+        // dot product of sphere normal and ray direction
+        double costheta = sceneObject.getNormalX() * currentRay.getNormDirX() + sceneObject.getNormalY() * currentRay.getNormDirY() + sceneObject.getNormalZ() * currentRay.getNormDirZ();
+        brightness = Math.abs(brightness);
+
         return brightness;
     }
 
@@ -305,7 +324,8 @@ public class Render {
             if (sceneObject1.getObjectID() == nthRay.getCollidedObject()) {
                 // calculate the normal from the surface of the sphere at the point of intersection
                 sceneObject1.calculateNormal(nthRay.getHitPointX(), nthRay.getHitPointY(), nthRay.getHitPointZ());
-                while (dotproduct < 0 /*|| sceneObject1.intersectionCheck(nthRay)*/) {
+
+                while (dotproduct < 0) {
                     randomDir = random.nextDouble(2.0) - 1.0;
                     nthRay.setDirX(randomDir);
                     randomDir = random.nextDouble(2.0) - 1.0;
@@ -314,22 +334,13 @@ public class Render {
                     nthRay.setDirZ(randomDir);
                     // normalise the random direction
                     nthRay.updateNormalisation();
-                    dotproduct = (sceneObject1.getNormalX() * nthRay.getDirX()) + (sceneObject1.getNormalY() * nthRay.getDirY()) + (sceneObject1.getNormalZ() * nthRay.getDirZ());
+                    dotproduct = sceneObject1.getNormalX() * nthRay.getDirX() + sceneObject1.getNormalY() * nthRay.getDirY() + sceneObject1.getNormalZ() * nthRay.getDirZ();
                 }
-                /*if (count < 4) {
-                    System.out.println("raydirx: " + nthRay.getNormDirX());
-                    System.out.println("raydiry: " + nthRay.getNormDirY());
-                    System.out.println("raydirz: " + nthRay.getNormDirZ());
-                    System.out.println("objnormalx: " + sceneObject1.getNormalX());
-                    System.out.println("objnormaly: " + sceneObject1.getNormalY());
-                    System.out.println("objnormalz: " + sceneObject1.getNormalZ());
-                    System.out.println("-----------------------------");
-                    count++;
-                }*/
             }
         }
-
-
+        // March the ray slightly to move it off of the object it collided with.
+        nthRay.updateOrigin(0.2);
+        nthRay.marchRay(0);
     }
 
 

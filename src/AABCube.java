@@ -9,7 +9,7 @@ public class AABCube implements SceneObjects {
     private double tminX, tminY, tminZ;
     private double tmaxX, tmaxY, tmaxZ;
     private double tNear = 0, tFar = 0;
-    private static int numCubes = 0;
+    private static int numCubes = 200;
     private int cubeID = 0;
     private double normalx, normaly, normalz;
     private double luminance = 0;
