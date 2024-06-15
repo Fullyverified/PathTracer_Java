@@ -1,10 +1,9 @@
 I'm trying to make an Ascii Pathtracer. Nothing that hasn't been done before :)
 
-![sphere render v5](https://github.com/Fullyverified/ASCII_PathTracer/assets/138776324/b26e0b26-7980-4926-b019-555dbdfc9e55)
+![image](https://github.com/Fullyverified/ASCII_PathTracer/assets/138776324/16e03837-aced-4de1-9a79-d79761d5805e)
 
-Sphere at 6, 0, 0 with radius 1. Second sphere at 12, 0, -5 with radius 1.25. Light 6, 0.5, 5 radius 1.
 
-The current method for calculating light is to simply sum up the light per pixel for each bounce.
+The current method for calculating light is to simply sum up the light per pixel for each bounce and divide it by the number of rays.
 It does create shadows but its very approximate and frankly an inaccurate and inefficient way of doing it.
 I will try to implement a proper light transport solution soon. 
 
@@ -37,4 +36,4 @@ TODO LIST OF THINGS TODO:
 Known Bugs:
 *Fixed long-standing issue with normal calculation. Y direction was using the x position :(*
 *Major flaw found in second bounce method... removed for now*
-*Gonna prioritise more shapes first*
+*Finally fixed a problem regarding new the random direction given to new rays not facing away from the center of the sphere. This seriously took me like a week to fix and Im not even sure why it wor̵̠͚̫̜̯̠͕̀̊̀̔̎͐̄̀̇̚k̵̡̮͖̇̇͆s̷͎̤̺͖̍̋ ̷͙̩̹̟̦́́͛͊̉̎̈́ñ̴̩̻͑̏̉ơ̵̳̖͉̠̙̩̤̙͒͐̄̃w̵͖̌ ̶̛̦̤̺͙͕̗͉̅͘͜i̸̮̙̺̱̲͗̃m̸̠͍̋̊̽̍̉͋ ̶̜̦̣͕͓̹̦̞͊̄̅̆͛̋ĝ̴̙͉̪͎̓́̆̆̔̽͆͝ò̴̢̖̭̯̤͖͖̦̥͙̏̒͐̌̚ĩ̵̛̜̭͔̘̤̊̃̍́́̚͠ņ̷̗̩̻̼̃̒g̷͚̲̤͉̠͒̆̂͐̃͗̃̉̕ ̴͉̔̊̈́̏̆̓͋̓ͅċ̴̢̨̛͇̣͇͕͉͉̪̑̀̌̕͝͝r̵̢̻͆́͐͊̊͘a̵̳͙̱͕̝͙̙̦̺͗̽͝z̵̬̥͕̫͕͔̤͌͆̎̇͌̃̀͝͝y̵̤̜̜̺̖̳̐͜ ̶̛̺̗̣̝̈́͆̆̍̈́̎͜͠͠h̶̦̖̮̭̣̖̼͚̑̌͜ͅë̴̟̘̯́̊͜͠l̷͚̫̒̽͆̍͠p̵͓̙͍̟̞̟͓̤̘͛͌̕̕͠
