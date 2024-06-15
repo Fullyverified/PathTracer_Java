@@ -1,5 +1,5 @@
 
-public class Plane implements SceneObjects {
+public class Plane {
 
     private double centerx, centerOriginX;
     private double centery, centerOriginY;
@@ -41,9 +41,9 @@ public class Plane implements SceneObjects {
 
         // calculate values of a, b, c for the quadratic equation
         // a = the dot product of normx, normy, normz - should always equal 1
-        this.a = (ray.getNormDirX() * ray.getNormDirX()) + (ray.getNormDirY() * ray.getNormDirY() + (ray.getNormDirZ() * ray.getNormDirZ()));
+        this.a = (ray.getDirX() * ray.getDirX()) + (ray.getDirY() * ray.getDirY() + (ray.getDirZ() * ray.getDirZ()));
         // b = 2 * (the dot product of the centerorigin vector by the direction vector)
-        this.b = 2 * ((centerOriginX * ray.getNormDirX()) + (centerOriginY * ray.getNormDirY()) + (centerOriginZ * ray.getNormDirZ()));
+        this.b = 2 * ((centerOriginX * ray.getDirX()) + (centerOriginY * ray.getDirY()) + (centerOriginZ * ray.getDirZ()));
         // c = the dot product of centerorigin by itself, - the radius^2 of the sphere
         this.c = ((centerOriginX * centerOriginX) + (centerOriginY * centerOriginY) + (centerOriginZ * centerOriginZ) - (this.sradius * this.sradius));
 
@@ -109,6 +109,10 @@ public class Plane implements SceneObjects {
         this.normalx = normalx / magnitude;
         this.normaly = normaly / magnitude;
         this.normalz = normalz / magnitude;
+    }
+
+    public void randomDirection(Ray nthRay) {
+
     }
 
     // get each the normalised normal

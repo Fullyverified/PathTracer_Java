@@ -1,3 +1,4 @@
+import java.util.Random;
 
 public class Sphere implements SceneObjects {
 
@@ -5,7 +6,7 @@ public class Sphere implements SceneObjects {
     private double centery, centerOriginY;
     private double centerz, centerOriginZ;
     private double sradius;
-    private double a, b, c, discriminant;
+    private double a, b, c, discriminant, sqrtDiscriminant;
     private double distanceToC, distanceToR;
     private static int numSpheres = 0;
     private int sphereID = 0;
@@ -40,11 +41,11 @@ public class Sphere implements SceneObjects {
 
         // calculate values of a, b, c for the quadratic equation
         // a = the dot product of normx, normy, normz - should always equal 1
-        this.a = (ray.getNormDirX() * ray.getNormDirX()) + (ray.getNormDirY() * ray.getNormDirY() + (ray.getNormDirZ() * ray.getNormDirZ()));
+        this.a = (ray.getDirX() * ray.getDirX()) + (ray.getDirY() * ray.getDirY() + (ray.getDirZ() * ray.getDirZ()));
         //this.a = 1;
 
         // b = 2 * (the dot product of the centerorigin vector by the direction vector)
-        this.b = 2 * ((centerOriginX * ray.getNormDirX()) + (centerOriginY * ray.getNormDirY()) + (centerOriginZ * ray.getNormDirZ()));
+        this.b = 2 * ((centerOriginX * ray.getDirX()) + (centerOriginY * ray.getDirY()) + (centerOriginZ * ray.getDirZ()));
         // c = the dot product of centerorigin by itself, - the radius^2 of the sphere
         this.c = ((centerOriginX * centerOriginX) + (centerOriginY * centerOriginY) + (centerOriginZ * centerOriginZ) - (this.sradius * this.sradius));
 
@@ -56,16 +57,19 @@ public class Sphere implements SceneObjects {
             //System.out.println("No intersection. x: ");
             //System.out.println("----------------------------------------");
             return false;
-        } else if (this.discriminant == 0) {
-            //System.out.println("Exactly one intersection");
-            //System.out.println("----------------------------------------");
-            return true;
-        } else if (this.discriminant > 0) {
-            //System.out.println("The ray intersects at two points");
-            //System.out.println("----------------------------------------");
-            return true;
+        } else {
+
+            sqrtDiscriminant = Math.sqrt(discriminant);
+            double sqrt1 = (-b - sqrtDiscriminant) / (2 * a);
+            double sqrt2 = (-b + sqrtDiscriminant) / (2 * a);
+
+            if (sqrt1 >= 0 || sqrt2 >= 0) {
+                return true;
+            }
+            else {
+                return false;
+            }
         }
-        return false;
     }
 
     // check the distance between the current ray and the sphere
@@ -97,14 +101,38 @@ public class Sphere implements SceneObjects {
         normalx = posX - this.centerx;
         normaly = posY - this.centery;
         normalz = posZ - this.centerz;
-        /*normalx = this.centerx - posX;
-        normaly = this.centery - posY;
-        normalz = this.centerz - posZ;*/
         double magnitude = Math.sqrt((normalx * normalx) + (normaly * normaly) + (normalz * normalz));
-        this.normalx = normalx / magnitude;
-        this.normaly = normaly / magnitude;
-        this.normalz = normalz / magnitude;
+        if (magnitude != 0) {
+            this.normalx = normalx / magnitude;
+            this.normaly = normaly / magnitude;
+            this.normalz = normalz / magnitude;
+        }
     }
+
+    public void randomDirection(Ray nthRay) {
+        double dotproduct = -1;
+        Random random = new Random();
+
+        nthRay.marchRay(0);
+        calculateNormal(nthRay.getHitPointX(), nthRay.getHitPointY(), nthRay.getHitPointZ());
+
+        while (dotproduct <= 0){
+            // Generate a random direction uniformly on a sphere
+            double theta = Math.acos(2 * random.nextDouble() - 1); // polar angle
+            double phi = 2 * Math.PI * random.nextDouble(); // azimuthal angle
+
+            nthRay.setDirX(Math.sin(theta) * Math.cos(phi));
+            nthRay.setDirY(Math.sin(theta) * Math.sin(phi));
+            nthRay.setDirZ(Math.cos(theta));
+
+            // Normalize the random direction
+            nthRay.updateNormalisation();
+
+            // Calculate the dot product
+            dotproduct = this.normalx * nthRay.getDirX() + this.normaly * nthRay.getDirY() + this.normalz * nthRay.getDirZ();
+        }
+    }
+
 
     // get each the normalised normal
     public double getNormalX() {
@@ -118,7 +146,6 @@ public class Sphere implements SceneObjects {
     public double getNormalZ() {
         return this.normalz;
     }
-
 
     // get sphere ID
     public int getObjectID() {

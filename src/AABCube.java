@@ -1,5 +1,5 @@
 
-public class AABCube implements SceneObjects {
+public class AABCube {
 
     private double minX, maxX;
     private double minY, maxY;
@@ -184,6 +184,9 @@ public class AABCube implements SceneObjects {
         }
     }
 
+    public void randomDirection(Ray nthRay){
+
+    }
 
     // get each the normalised normal
     public double getNormalX() {

@@ -1,7 +1,7 @@
 public class Ray {
-    private double oX, dirX, normDirX;
-    private double oY, dirY, normDirY;
-    private double oZ, dirZ, normDirZ;
+    private double oX, dirX;
+    private double oY, dirY;
+    private double oZ, dirZ;
     private double dirMagnitude;
     private double posX;
     private double posY;
@@ -12,6 +12,7 @@ public class Ray {
     private int collidedObject;
     private double lightAmplitude = 0;
     private double[][] luminanceArray;
+    private SceneObjects hitObject;
 
     // constructor
     public Ray(double oX, double oY, double oZ)
@@ -28,9 +29,9 @@ public class Ray {
     public void updateNormalisation()
     {
         this.dirMagnitude = Math.sqrt(this.dirX*this.dirX + this.dirY*this.dirY + this.dirZ*this.dirZ);
-        this.normDirX = (this.dirX / this.dirMagnitude);
-        this.normDirY = (this.dirY / this.dirMagnitude);
-        this.normDirZ = (this.dirZ / this.dirMagnitude);
+        this.dirX = (this.dirX / this.dirMagnitude);
+        this.dirY = (this.dirY / this.dirMagnitude);
+        this.dirZ = (this.dirZ / this.dirMagnitude);
     }
 
     // p = o + td
@@ -40,17 +41,20 @@ public class Ray {
     // d direction vector
     public void marchRay(double distance)
     {
-        this.posX = oX + (distance * normDirX);
-        this.posY = oY + (distance * normDirY);
-        this.posZ = oZ + (distance * normDirZ);
+        this.posX = oX + (distance * dirX);
+        this.posY = oY + (distance * dirY);
+        this.posZ = oZ + (distance * dirZ);
     }
 
     // used to march the ray slightly after giving it a random direction
     public void updateOrigin(double distance)
     {
-        this.oX = oX + (distance * normDirX);
-        this.oY = oY + (distance * normDirY);
-        this.oZ = oZ + (distance * normDirZ);
+        this.oX = oX + (distance * dirX);
+        this.oY = oY + (distance * dirY);
+        this.oZ = oZ + (distance * dirZ);
+        this.posX = oX;
+        this.posY = oY;
+        this.posZ = oZ;
     }
 
 
@@ -59,18 +63,16 @@ public class Ray {
     public double getOriginX() {return this.oX;}
     public double getOriginY() {return this.oY;}
     public double getOriginZ() {return this.oZ;}
+    public String getOrigin() {return this.oX + ", " + this.oY + ", " + this.oZ;}
     // pos
     public double getPosX() {return this.posX;}
     public double getPosY() {return this.posY;}
     public double getPosZ() {return this.posZ;}
+    public String getPosition() {return this.posX + ", " + this.posY + ", " + this.posZ;}
     // direction
     public double getDirX() {return this.dirX;}
     public double getDirY() {return this.dirY;}
     public double getDirZ() {return this.dirZ;}
-    // normalised direction
-    public double getNormDirX() {return this.normDirX;}
-    public double getNormDirY() {return this.normDirY;}
-    public double getNormDirZ() {return this.normDirZ;}
     public double getDirMagnitude() {return this.dirMagnitude;}
 
     // final intersection point
@@ -87,6 +89,8 @@ public class Ray {
     public double getPixelPosY() {return this.pixelPosY;}
 
     // get collidedObject
+    public SceneObjects getHitObject() {return this.hitObject;}
+
     public int getCollidedObject() {return this.collidedObject;}
     public double getLightAmplitude() {return this.lightAmplitude;}
 
@@ -110,7 +114,6 @@ public class Ray {
     public void setDirZ(double dirZ) {this.dirZ = dirZ;}
     public void setDirection(double dirX, double dirY, double dirZ) {this.dirX = dirX; this.dirY = dirY; this.dirZ = dirZ;}
 
-
     // hitpoint
     public void setHitPointX(double pointX) {this.hitPointX = pointX;}
     public void setHitPointY(double pointY) {this.hitPointY = pointY;}
@@ -129,6 +132,8 @@ public class Ray {
     public void setPixelPosY(double py) {this.pixelPosY = py;}
 
     // collidedObjectID
+
+    public void setHitObject(SceneObjects hitObject) {this.hitObject = hitObject;}
     public void setCollidedObject(int obj) {this.collidedObject = obj;}
     //set brightness
     public void addLightAmplitude(double luminance) {
