@@ -9,23 +9,17 @@ public class Main {
 
         List<SceneObjects> sceneObjectsList = new ArrayList<>();
 
+        sceneObjectsList.add(new Sphere(8, 6.5, 0, 1));
 
+        sceneObjectsList.add(new Sphere(8, 4, -2.5, 1));
+        sceneObjectsList.add(new Sphere(8, 4, 2.5, 1));
 
-        sceneObjectsList.add(new Sphere(9, 2.25, 0, 1));
-        sceneObjectsList.add(new Sphere(9, -2.25, 0, 1));
+        sceneObjectsList.add(new Sphere(8, 6.5, -2.5, 1));
+        sceneObjectsList.add(new Sphere(8, 6.5, 2.5, 1));
 
-        sceneObjectsList.add(new Sphere(9, 0, -2.25, 1));
-        sceneObjectsList.add(new Sphere(9, 0, 2.25, 1));
+        sceneObjectsList.add(new SphereLight(8, 4,0, 1,500));
 
-        sceneObjectsList.add(new Sphere(9, 2.25, -2.25, 1));
-        sceneObjectsList.add(new Sphere(9, 2.25, 2.25, 1));
-
-        sceneObjectsList.add(new Sphere(9, -2.25, -2.25, 1));
-        sceneObjectsList.add(new Sphere(9, -2.25, 2.25, 1));
-
-        sceneObjectsList.add(new SphereLight(9, 0,0, 1,500));
-
-        Camera cam = new Camera(100, -1, 0, 0, 1, 0, 0, 0, 1, 0, 50, 4, 3);
+        Camera cam = new Camera(80, 0, 5, 0, 1, 0, 0, 0, 1, 0, 55, 16, 9);
 
         cam.directionVector();
         cam.upVector();
@@ -33,6 +27,6 @@ public class Main {
         cam.imagePlane();
 
         Render render = new Render();
-        render.computePixels(sceneObjectsList, cam,2000,1);
+        render.computePixels(sceneObjectsList, cam,1000,5);
     }
 }

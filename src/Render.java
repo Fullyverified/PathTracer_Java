@@ -178,58 +178,58 @@ public class Render {
 
     public void marchIntersectionLogic(Ray[][] primaryRay, Ray[][] nthRay, List<SceneObjects> sceneObjectsList, int i, int j, int numRays, int numBounces) {
         nthRay[i][j] = new Ray(primaryRay[i][j].getHitPointX(), primaryRay[i][j].getHitPointY(), primaryRay[i][j].getHitPointZ());
-
         // BOUNCES PER RAY
-        for (int num = 0; num < numRays; num++) {
+        for (int currentRay = 1; currentRay < numRays; currentRay++) {
             // initialise ray pos
             nthRay[i][j].setOrigin(primaryRay[i][j].getHitPointX(), primaryRay[i][j].getHitPointY(), primaryRay[i][j].getHitPointZ());
             // give the ray a random direction
             nthRay[i][j].marchRay(0);
             nthRay[i][j].setHitPoint(primaryRay[i][j].getHitPointX(), primaryRay[i][j].getHitPointY(), primaryRay[i][j].getHitPointZ());
+            nthRay[i][j].setHitObject(primaryRay[i][j].getHitObject());
 
-            primaryRay[i][j].getHitObject().randomDirection(nthRay[i][j]);
-            // march the ray a tiny amount to move it off the sphere
-            nthRay[i][j].updateOrigin(0.15);
-
-
-            // add a non culled objects to a list
-            visibleObjects.clear();
-            for (SceneObjects sceneObject1 : sceneObjectsList) {
-                if (sceneObject1.objectCulling(nthRay[i][j])) {
-                    visibleObjects.add(sceneObject1);
-                }
-            }
+            for (int currentBounce = 1; currentBounce < numBounces; currentBounce++) {
 
 
-            nthRay[i][j].setHit(false);
-            double distance = 0;
-            // march ray and check intersections
-            while (distance <= 25 && !nthRay[i][j].getHit()) {
-                whilecounter++;
-                // march the ray
-                nthRay[i][j].marchRay(distance);
-                // CHECK INTERSECTIONS for non-culled objects
-                for (SceneObjects sceneObject1 : visibleObjects) {
-                    // check if the ray intersects with an object
-                    if (sceneObject1.intersectionCheck(nthRay[i][j])) {
+                nthRay[i][j].getHitObject().randomDirection(nthRay[i][j]);
+                // march the ray a tiny amount to move it off the sphere
+                nthRay[i][j].updateOrigin(0.15);
 
-                        nthRay[i][j].setHit(true);
-                        nthRay[i][j].setHitPoint(nthRay[i][j].getPosX(), nthRay[i][j].getPosY(), nthRay[i][j].getPosZ());
-                        nthRay[i][j].setHitObject(sceneObject1);
-
-                        hitcounter++;
-                        // add brightness
-                        //if (sceneObject1.getLuminance() != 0) {
-                            primaryRay[i][j].addLightAmplitude(LambertCosineLaw2(nthRay[i][j], sceneObject1, sceneObject1.getLuminance() / numRays));
-                        //}
-                    }
-                    // if hit = 0, march the ray continue the loop
-                    else {
-                        misscounter++;
+                // add a non culled objects to a list
+                visibleObjects.clear();
+                for (SceneObjects sceneObject1 : sceneObjectsList) {
+                    if (sceneObject1.objectCulling(nthRay[i][j])) {
+                        visibleObjects.add(sceneObject1);
                     }
                 }
-                distance += 0.1;
+
+                nthRay[i][j].setHit(false);
+                double distance = 0;
+                // march ray and check intersections
+                while (distance <= 25 && !nthRay[i][j].getHit()) {
+                    whilecounter++;
+                    // march the ray
+                    nthRay[i][j].marchRay(distance);
+                    // CHECK INTERSECTIONS for non-culled objects
+                    for (SceneObjects sceneObject1 : visibleObjects) {
+                        // check if the ray intersects with an object
+                        if (sceneObject1.intersectionCheck(nthRay[i][j])) {
+                            nthRay[i][j].setHit(true);
+                            nthRay[i][j].setHitPoint(nthRay[i][j].getPosX(), nthRay[i][j].getPosY(), nthRay[i][j].getPosZ());
+                            nthRay[i][j].setOrigin(nthRay[i][j].getHitPointX(), nthRay[i][j].getHitPointY(), nthRay[i][j].getHitPointZ());
+                            nthRay[i][j].setHitObject(sceneObject1);
+                            hitcounter++;
+                            primaryRay[i][j].addLightAmplitude(LambertCosineLaw2(nthRay[i][j], sceneObject1, (sceneObject1.getLuminance() / numRays) / currentBounce));
+                        }
+                        // if hit = 0, march the ray continue the loop
+                        else {
+                            misscounter++;
+                        }
+                    }
+                    distance += 0.1;
+                }
+
             }
+
         }
     }
 

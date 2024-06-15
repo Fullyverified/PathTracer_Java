@@ -91,10 +91,11 @@ public class Ray {
     // get collidedObject
     public SceneObjects getHitObject() {return this.hitObject;}
 
-    public int getCollidedObject() {return this.collidedObject;}
     public double getLightAmplitude() {return this.lightAmplitude;}
 
     public double[][] getLuminanceArray() {return this.luminanceArray;}
+
+    public int getHitObjectID(){return this.collidedObject;}
 
     // setter
     // pos
@@ -134,7 +135,7 @@ public class Ray {
     // collidedObjectID
 
     public void setHitObject(SceneObjects hitObject) {this.hitObject = hitObject;}
-    public void setCollidedObject(int obj) {this.collidedObject = obj;}
+    public void setHitObjectID(int obj) {this.collidedObject = obj;}
     //set brightness
     public void addLightAmplitude(double luminance) {
         this.lightAmplitude = this.lightAmplitude + luminance;

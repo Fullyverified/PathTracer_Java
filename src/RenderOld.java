@@ -173,7 +173,7 @@ public class RenderOld {
                         // set ray hit to 1
                         primaryRay[i][j].setHit(true);
                         // get the ID of the collided sphere
-                        primaryRay[i][j].setCollidedObject(sceneObject1.getObjectID());
+                        primaryRay[i][j].setHitObjectID(sceneObject1.getObjectID());
                         primaryRay[i][j].addLightAmplitude(sceneObject1.getLuminance());
                     }
                     // hit is already false otherwise
@@ -191,7 +191,7 @@ public class RenderOld {
 
         // initialise the ray
         nthRay[i][j] = new Ray(primaryRay[i][j].getHitPointX(), primaryRay[i][j].getHitPointY(), primaryRay[i][j].getHitPointZ());
-        nthRay[i][j].setCollidedObject(primaryRay[i][j].getCollidedObject());
+        nthRay[i][j].setHitObjectID(primaryRay[i][j].getHitObjectID());
         nthRay[i][j].setOrigin(primaryRay[i][j].getPosX(), primaryRay[i][j].getPosY(), primaryRay[i][j].getPosZ());
 
         // BOUNCES PER RAY
@@ -222,7 +222,7 @@ public class RenderOld {
                             // calculate lighting
                             //BRDFLighting(nthRay[i][j], sceneObject2, distance, num, luminanceArray);
                             // get the ID of the collided pointlight
-                            nthRay[i][j].setCollidedObject(sceneObject2.getObjectID());
+                            nthRay[i][j].setHitObjectID(sceneObject2.getObjectID());
                             hitcounter++;
                             if ((sceneObject2) instanceof SphereLight) {
                                 primaryRay[i][j].addLightAmplitude(0.1);
@@ -273,7 +273,7 @@ public class RenderOld {
                             secondRay[i][j].setHit(true);
                             hitcounter++;
                             // get the ID of the collided pointlight
-                            secondRay[i][j].setCollidedObject(sceneObject2.getObjectID());
+                            secondRay[i][j].setHitObjectID(sceneObject2.getObjectID());
                             if ((sceneObject2) instanceof SphereLight) {
                                 primaryRay[i][j].addLightAmplitude(0.1);
                             } else if ((sceneObject2) instanceof Sphere) {
@@ -348,7 +348,7 @@ public class RenderOld {
         Random random = new Random();
         for (SceneObjects sceneObject1 : sceneObjects) {
             // check if object ID is identical to the one we intersected with
-            if (sceneObject1.getObjectID() == nthRay.getCollidedObject()) {
+            if (sceneObject1.getObjectID() == nthRay.getHitObjectID()) {
                 // calculate the normal from the surface of the sphere at the point of intersection
                 sceneObject1.calculateNormal(nthRay.getHitPointX(), nthRay.getHitPointY(), nthRay.getHitPointZ());
 
