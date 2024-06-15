@@ -187,8 +187,7 @@ public class Render {
             nthRay[i][j].setHitPoint(primaryRay[i][j].getHitPointX(), primaryRay[i][j].getHitPointY(), primaryRay[i][j].getHitPointZ());
             nthRay[i][j].setHitObject(primaryRay[i][j].getHitObject());
 
-            for (int currentBounce = 1; currentBounce < numBounces; currentBounce++) {
-
+            for (int currentBounce = 1; currentBounce < numBounces+1; currentBounce++) {
 
                 nthRay[i][j].getHitObject().randomDirection(nthRay[i][j]);
                 // march the ray a tiny amount to move it off the sphere

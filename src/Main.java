@@ -27,6 +27,6 @@ public class Main {
         cam.imagePlane();
 
         Render render = new Render();
-        render.computePixels(sceneObjectsList, cam,1000,5);
+        render.computePixels(sceneObjectsList, cam,1000,2);
     }
 }
