@@ -1,11 +1,14 @@
 I'm trying to make an Ascii Pathtracer. Nothing that hasn't been done before :)
+Global Illuminiation is here!
 
 ![image](https://github.com/Fullyverified/ASCII_PathTracer/assets/138776324/16e03837-aced-4de1-9a79-d79761d5805e)
+One bounce.
 
+![image](https://github.com/Fullyverified/ASCII_PathTracer/assets/138776324/547c1091-78af-43cc-9874-ba77062e2316)
+Five bonuces. Areas not directly visible to the light begin to fill in.
 
-The current method for calculating light is to simply sum up the light per pixel for each bounce and divide it by the number of rays.
-It does create shadows but its very approximate and frankly an inaccurate and inefficient way of doing it.
-I will try to implement a proper light transport solution soon. 
+Current formula is:
+Brightness / numberRays / currentBounce
 
 Done:
 1. Create ray and sphere objects.
