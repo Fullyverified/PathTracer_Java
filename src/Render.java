@@ -43,7 +43,7 @@ public class Render {
                     } else if (primaryRay[i][j].getLightAmplitude() > 0 && primaryRay[i][j].getLightAmplitude() < 0.4) {
                         System.out.print("...");
                     } else if (primaryRay[i][j].getLightAmplitude() == 0) {
-                        System.out.print("   ");
+                        System.out.print("...");
                     }
                 } else if (!primaryRay[i][j].getHit()) {
                     System.out.print("   ");
@@ -165,9 +165,7 @@ public class Render {
                     primaryRay[i][j].setHitObject(sceneObject1);
                     // add light amplitude
                     if (sceneObject1.getLuminance() != 0) {
-                        primaryRay[i][j].addLightAmplitude(LambertCosineLaw(primaryRay[i][j], sceneObject1));
-                    } else {
-                        primaryRay[i][j].addLightAmplitude(0);
+                        primaryRay[i][j].addLightAmplitude(LambertCosineLaw(primaryRay[i][j], sceneObject1, sceneObject1.getLuminance()));
                     }
                 }
                 // hit is already false otherwise
@@ -187,9 +185,14 @@ public class Render {
             nthRay[i][j].setHitPoint(primaryRay[i][j].getHitPointX(), primaryRay[i][j].getHitPointY(), primaryRay[i][j].getHitPointZ());
             nthRay[i][j].setHitObject(primaryRay[i][j].getHitObject());
 
-            for (int currentBounce = 1; currentBounce < numBounces+1; currentBounce++) {
+            for (int currentBounce = 0; currentBounce < numBounces; currentBounce++) {
 
+                if (currentBounce == 0) {
                 nthRay[i][j].getHitObject().randomDirection(nthRay[i][j]);
+                } else {
+                    nthRay[i][j].getHitObject().reflectionBounce(nthRay[i][j]);
+                }
+
                 // march the ray a tiny amount to move it off the sphere
                 nthRay[i][j].updateOrigin(0.15);
 
@@ -217,11 +220,12 @@ public class Render {
                             nthRay[i][j].setOrigin(nthRay[i][j].getHitPointX(), nthRay[i][j].getHitPointY(), nthRay[i][j].getHitPointZ());
                             nthRay[i][j].setHitObject(sceneObject1);
                             hitcounter++;
-                            primaryRay[i][j].addLightAmplitude(LambertCosineLaw2(nthRay[i][j], sceneObject1, (sceneObject1.getLuminance() / numRays) / currentBounce));
+                            primaryRay[i][j].addLightAmplitude(LambertCosineLaw(nthRay[i][j], sceneObject1, (sceneObject1.getLuminance() / numRays) / (currentBounce + 1)));
                         }
                         // if hit = 0, march the ray continue the loop
                         else {
                             misscounter++;
+                            primaryRay[i][j].addLightAmplitude(0);
                         }
                     }
                     distance += 0.1;
@@ -232,25 +236,8 @@ public class Render {
         }
     }
 
-    public double LambertCosineLaw(Ray currentRay, SceneObjects sceneObject) {
-        sceneObject.calculateNormal(currentRay.getPosX(), currentRay.getPosY(), currentRay.getPosZ());
-        currentRay.updateNormalisation();
-
-        // dot product of sphere normal and ray direction
-        double costheta = sceneObject.getNormalX() * currentRay.getDirX() + sceneObject.getNormalY() * currentRay.getDirY() + sceneObject.getNormalZ() * currentRay.getDirZ();
-        double brightness = sceneObject.getLuminance() * costheta;
-        brightness = Math.abs(brightness);
-
-        if (costheta < 0) {
-            return brightness;
-        } else {
-            return 0;
-        }
-        //return brightness;
-    }
-
-    public double LambertCosineLaw2(Ray currentRay, SceneObjects sceneObject, double brightness) {
-        sceneObject.calculateNormal(currentRay.getPosX(), currentRay.getPosY(), currentRay.getPosZ());
+    public double LambertCosineLaw(Ray currentRay, SceneObjects sceneObject, double brightness) {
+        sceneObject.calculateNormal(currentRay);
         currentRay.updateNormalisation();
 
         // dot product of sphere normal and ray direction
@@ -267,7 +254,7 @@ public class Render {
 
     // find normal and calculate lighting
     public void BRDFLighting(Ray currentRay, SceneObjects sceneObject, double distance, int depth, double[][] luminanceArray) {
-        sceneObject.calculateNormal(currentRay.getPosX(), currentRay.getPosY(), currentRay.getPosZ());
+        sceneObject.calculateNormal(currentRay);
         double objectDirX = sceneObject.getPosX() - currentRay.getPosX();
         double objectDirY = sceneObject.getPosY() - currentRay.getPosY();
         double objectDirZ = sceneObject.getPosZ() - currentRay.getPosZ();
@@ -292,7 +279,7 @@ public class Render {
         luminanceArray[2][depth] = distance;
     }
 
-    public void sumBrightness(Ray[][] primaryRay, Ray[][] nthRay, int numBounces, double distance, double[][] luminanceArray, int i, int j) {
+    public void sumBrightness(Ray[][] primaryRay, Ray[][] nthRay, int numBounces, double[][] luminanceArray, int i, int j) {
         double dotProduct, currentBrightness, brightness = 0;
         for (int l = numBounces - 1; l >= 0; l--) {
             // 0 = dotproduct, 1 = brightness, 2 = distance
@@ -304,7 +291,7 @@ public class Render {
             currentBrightness = luminanceArray[1][l];
 
             //distance = nthRay[i][j].getLuminanceArray()[2][l];
-            distance = luminanceArray[2][l];
+            //distance = luminanceArray[2][l];
 
             brightness = (brightness + currentBrightness) * dotProduct;
         }

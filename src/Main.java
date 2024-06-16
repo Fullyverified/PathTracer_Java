@@ -12,12 +12,12 @@ public class Main {
         sceneObjectsList.add(new Sphere(8, 6.5, 0, 1));
 
         sceneObjectsList.add(new Sphere(8, 4, -2.5, 1));
-        sceneObjectsList.add(new Sphere(8, 4, 2.5, 1));
+        sceneObjectsList.add(new Sphere(8, 4, 0, 1));
 
         sceneObjectsList.add(new Sphere(8, 6.5, -2.5, 1));
         sceneObjectsList.add(new Sphere(8, 6.5, 2.5, 1));
 
-        sceneObjectsList.add(new SphereLight(8, 4,0, 1,500));
+        sceneObjectsList.add(new SphereLight(8, 4,2.5, 1,500));
 
         Camera cam = new Camera(80, 0, 5, 0, 1, 0, 0, 0, 1, 0, 55, 16, 9);
 

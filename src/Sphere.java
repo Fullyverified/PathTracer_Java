@@ -97,15 +97,20 @@ public class Sphere implements SceneObjects {
     }
 
     // calculate the normal of the sphere and a point
-    public void calculateNormal(double posX, double posY, double posZ) {
-        normalx = posX - this.centerx;
-        normaly = posY - this.centery;
-        normalz = posZ - this.centerz;
+    public void calculateNormal(Ray nthRay) {
+        normalx = nthRay.getPosX() - this.centerx;
+        normaly = nthRay.getPosY() - this.centery;
+        normalz = nthRay.getPosZ() - this.centerz;
         double magnitude = Math.sqrt((normalx * normalx) + (normaly * normaly) + (normalz * normalz));
         if (magnitude != 0) {
             this.normalx = normalx / magnitude;
             this.normaly = normaly / magnitude;
             this.normalz = normalz / magnitude;
+        }
+        if (centerx == 0 && centery == 0 && centerz == 0) {
+            normalx = nthRay.getPosX() * -1;
+            normaly = nthRay.getPosY() * -1;
+            normalz = nthRay.getPosZ() * -1;
         }
     }
 
@@ -114,7 +119,7 @@ public class Sphere implements SceneObjects {
         Random random = new Random();
 
         nthRay.marchRay(0);
-        calculateNormal(nthRay.getHitPointX(), nthRay.getHitPointY(), nthRay.getHitPointZ());
+        calculateNormal(nthRay);
 
         while (dotproduct <= 0){
             // Generate a random direction uniformly on a sphere
@@ -131,6 +136,18 @@ public class Sphere implements SceneObjects {
             // Calculate the dot product
             dotproduct = this.normalx * nthRay.getDirX() + this.normaly * nthRay.getDirY() + this.normalz * nthRay.getDirZ();
         }
+    }
+
+    // R = I - 2 * (I dot N) * N
+    public void reflectionBounce(Ray nthRay) {
+        double dotproduct = normalx * nthRay.getDirX() + normaly * nthRay.getDirY() + normalz * nthRay.getDirZ();
+        calculateNormal(nthRay);
+        double reflectionX = nthRay.getDirX() - 2 * (dotproduct) * normalx;
+        double reflectionY = nthRay.getDirY() - 2 * (dotproduct) * normaly;
+        double reflectionZ = nthRay.getDirZ() - 2 * (dotproduct) * normalz;
+
+        nthRay.setDirection(reflectionX, reflectionY, reflectionZ);
+        nthRay.updateNormalisation();
     }
 
 
