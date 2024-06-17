@@ -140,6 +140,7 @@ public class SphereLight implements SceneObjects {
             // Calculate the dot product
             dotproduct = this.normalx * nthRay.getDirX() + this.normaly * nthRay.getDirY() + this.normalz * nthRay.getDirZ();
         }
+        nthRay.updateOrigin(0.15); // march the ray a tiny amount to move it off the sphere
     }
 
     // R = I - 2 * (I dot N) * N
@@ -152,6 +153,7 @@ public class SphereLight implements SceneObjects {
 
         nthRay.setDirection(reflectionX, reflectionY, reflectionZ);
         nthRay.updateNormalisation();
+        nthRay.updateOrigin(0.15); // march the ray a tiny amount to move it off the sphere
     }
 
     // get sphere ID

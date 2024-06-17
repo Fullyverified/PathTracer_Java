@@ -11,8 +11,8 @@ public class Ray {
     private double px, py, pixelIndexX, pixelIndexY, pixelPosX, pixelPosY;
     private int collidedObject;
     private double lightAmplitude = 0;
-    private double[][] luminanceArray;
     private SceneObjects hitObject;
+    private long numHits = 0;
 
     // constructor
     public Ray(double oX, double oY, double oZ)
@@ -57,6 +57,22 @@ public class Ray {
         this.posZ = oZ;
     }
 
+    public void initializeRay(Ray primaryRay){
+        // initialise ray pos
+        setOrigin(primaryRay.getHitPointX(), primaryRay.getHitPointY(), primaryRay.getHitPointZ());
+        // give the ray a direction
+        marchRay(0);
+        setHitPoint(primaryRay.getHitPointX(), primaryRay.getHitPointY(), primaryRay.getHitPointZ());
+        setHitObject(primaryRay.getHitObject());
+        setHit(true);
+    }
+
+    public void updateHitProperties(SceneObjects hitObject){
+        setHit(true);
+        setHitPoint(posX, posY, posZ);
+        setOrigin(hitPointX, hitPointY, hitPointZ);
+        setHitObject(hitObject);
+    }
 
     // getter
     // origin
@@ -93,9 +109,11 @@ public class Ray {
 
     public double getLightAmplitude() {return this.lightAmplitude;}
 
-    public double[][] getLuminanceArray() {return this.luminanceArray;}
-
     public int getHitObjectID(){return this.collidedObject;}
+
+    public long getNumHits() {return this.numHits;}
+
+    public void addNumHits() {this.numHits++;}
 
     // setter
     // pos
