@@ -26,17 +26,20 @@ Done:
 13. Change the order of operations so that the first bounce, second bounce, third bounce etc is calculated for a pixel, then move onto the next pixel.
     Instead of doing for the first bounce for each pixel, then moving onto the second bounce etc.
     This is to truly make each pixel an independent entity to enable multi-threading in the future.
-14. Completely reorganised the render thread. Method now works for an arbitrary number of bounces. 
+14. Completely reorganised the render thread. Method now works for an arbitrary number of bounces.
+15. Cubes!
 
 TODO LIST OF THINGS TODO:
-1. Implement a correct monte carlo approximation
 2. Add more shapes, such as cubes, flat planes, triangles, and hopefully shapes of arbitrary proportions.
 3. Add colour
 4. Try to make it run in real time and add controls, so it can be game-ified (?)
 5. Re-write it in C++ (in order to learn C++)
-6. Re-write it in Vulkan to make it run on the GPU (big maybe) 
+6. Re-write it in Vulkan to make it run on the GPU (big maybe)
+7. Multi-threading
 
 Known Bugs:
+
+Fixed Bugs:
 *Fixed long-standing issue with normal calculation. Y direction was using the x position :(*
 *Major flaw found in second bounce method... removed for now*
 *Finally fixed a problem regarding new the random direction given to new rays not facing away from the center of the sphere. This seriously took me like a week to fix and Im not even sure why it wor̵̠͚̫̜̯̠͕̀̊̀̔̎͐̄̀̇̚k̵̡̮͖̇̇͆s̷͎̤̺͖̍̋ ̷͙̩̹̟̦́́͛͊̉̎̈́ñ̴̩̻͑̏̉ơ̵̳̖͉̠̙̩̤̙͒͐̄̃w̵͖̌ ̶̛̦̤̺͙͕̗͉̅͘͜i̸̮̙̺̱̲͗̃m̸̠͍̋̊̽̍̉͋ ̶̜̦̣͕͓̹̦̞͊̄̅̆͛̋ĝ̴̙͉̪͎̓́̆̆̔̽͆͝ò̴̢̖̭̯̤͖͖̦̥͙̏̒͐̌̚ĩ̵̛̜̭͔̘̤̊̃̍́́̚͠ņ̷̗̩̻̼̃̒g̷͚̲̤͉̠͒̆̂͐̃͗̃̉̕ ̴͉̔̊̈́̏̆̓͋̓ͅċ̴̢̨̛͇̣͇͕͉͉̪̑̀̌̕͝͝r̵̢̻͆́͐͊̊͘a̵̳͙̱͕̝͙̙̦̺͗̽͝z̵̬̥͕̫͕͔̤͌͆̎̇͌̃̀͝͝y̵̤̜̜̺̖̳̐͜ ̶̛̺̗̣̝̈́͆̆̍̈́̎͜͠͠h̶̦̖̮̭̣̖̼͚̑̌͜ͅë̴̟̘̯́̊͜͠l̷͚̫̒̽͆̍͠p̵͓̙͍̟̞̟͓̤̘͛͌̕̕͠
