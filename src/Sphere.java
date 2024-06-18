@@ -152,7 +152,6 @@ public class Sphere implements SceneObjects {
         nthRay.updateOrigin(0.15); // march the ray a tiny amount to move it off the sphere
     }
 
-
     // get each the normalised normal
     public double getNormalX() {
         return this.normalx;

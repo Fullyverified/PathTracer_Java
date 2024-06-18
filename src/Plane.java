@@ -1,140 +1,112 @@
 
-public class Plane {
+public class Plane implements SceneObjects{
 
-    private double centerx, centerOriginX;
-    private double centery, centerOriginY;
-    private double centerz, centerOriginZ;
-    private double sradius;
-    private double a, b, c, discriminant;
-    private double distanceToC, distanceToR;
-    private static int numSpheres = 0;
-    private int sphereID = 0;
     private double normalx, normaly, normalz;
-    private double luminance = 0;
+    double normalMagnitude;
+    private double pointx, pointy, pointz;
+    private static int numPLanes = 0;
+    private int planeID = 300;
+    private double luminance = 1000;
 
     //Equation of a sphere: (x - cx)^2 + (y - cy)^2 + (z - cz)^2 = r^2
 
     //Constructor
-    public Plane(double centerx, double centery, double centerz, double sradius) {
-        this.centerx = centerx;
-        this.centery = centery;
-        this.centerz = centerz;
-        this.sradius = sradius;
-        this.sphereID = numSpheres;
-        numSpheres++;
+    public Plane(double normalx, double normaly, double normalz, double pointx, double pointy, double pointz) {
+        this.normalx = normalx;
+        this.normaly = normaly;
+        this.normalz = normalz;
+        this.normalMagnitude = Math.sqrt(this.normalx*this.normalx + this.normaly*this.normaly + this.normalz*this.normalz);
+        this.normalx = (this.normalx / this.normalMagnitude);
+        this.normaly = (this.normaly / this.normalMagnitude);
+        this.normalz = (this.normalz / this.normalMagnitude);
+        this.pointx = pointx;
+        this.pointy = pointy;
+        this.pointz = pointz;
     }
-
-    // p = o + td
-    // p new ray position
-    // o ray origin
-    // t tscalar (amount to march the ray by)
-    // d direction vector
 
     // initial check to see if the ray will or will not hit an object (for performance)
     public boolean objectCulling(Ray ray) {
-        // calculate the vector from the spheres center to the origin of the ray
-        // oc = o - c
-        centerOriginX = ray.getPosX() - this.centerx;
-        centerOriginY = ray.getPosY() - this.centery;
-        centerOriginZ = ray.getPosZ() - this.centerz;
-        // oc = (vectorx, vectory, vectorz)
 
-        // calculate values of a, b, c for the quadratic equation
-        // a = the dot product of normx, normy, normz - should always equal 1
-        this.a = (ray.getDirX() * ray.getDirX()) + (ray.getDirY() * ray.getDirY() + (ray.getDirZ() * ray.getDirZ()));
-        // b = 2 * (the dot product of the centerorigin vector by the direction vector)
-        this.b = 2 * ((centerOriginX * ray.getDirX()) + (centerOriginY * ray.getDirY()) + (centerOriginZ * ray.getDirZ()));
-        // c = the dot product of centerorigin by itself, - the radius^2 of the sphere
-        this.c = ((centerOriginX * centerOriginX) + (centerOriginY * centerOriginY) + (centerOriginZ * centerOriginZ) - (this.sradius * this.sradius));
-
-        // calculate the discriminant | b^2 - 2ac
-        this.discriminant = (b * b) - (4 * (a * c));
-        //System.out.println("Discriminant: " + this.discriminant);
-
-        if (this.discriminant < 0)
-        {
-            //System.out.println("No intersection. x: ");
-            //System.out.println("----------------------------------------");
-            return false;
-        }
-        else if(this.discriminant == 0)
-        {
-            //System.out.println("Exactly one intersection");
-            //System.out.println("----------------------------------------");
-            return true;
-        }
-        else if (this.discriminant > 0) {
-            //System.out.println("The ray intersects at two points");
-            //System.out.println("----------------------------------------");
-            return true;
-        }
-        return false;
+        return true;
     }
 
     // check the distance between the current ray and the sphere
     // distance = sqrt(rayposxyz^2 - spherecenterxyz^2))
-    public boolean intersectionCheck(Ray ray)
-    {
-        // distance of the ray to the center of the sphere
-        this.distanceToC = Math.sqrt(Math.pow((ray.getPosX() - this.centerx),2) + Math.pow((ray.getPosY() - this.centery),2) + Math.pow((ray.getPosZ() - this.centerz),2));
-        this.distanceToR = this.distanceToC - this.sradius;
+    public boolean intersectionCheck(Ray nthRay) {
+        double dotproductDenomiator = this.normalx * nthRay.getDirX() + this.normaly * nthRay.getDirY() + this.normalz * nthRay.getDirZ();
 
-        // check if we have hit the sphere yet
-        if (distanceToC > sradius)
+        double valuex = pointx - nthRay.getPosX();
+        double valuey = pointy - nthRay.getPosY();
+        double valuez = pointz - nthRay.getPosZ();
+
+        double dotproductTop = valuex * normalx + valuey * normaly + valuez * normaly;
+
+        if (dotproductDenomiator > 0)
         {
-            //System.out.println("Not intersected yet. x: " + ray.getRayPointX() + " y: " + ray.getRayPointY() + " z: " + ray.getRayPointZ());
-            return false;
-        }
-        else if (distanceToC == sradius)
-        {
-            //System.out.println("Perfect intersection. x: " + ray.getRayPointX() + " y: " + ray.getRayPointY() + " z: " + ray.getRayPointZ());
+            double intersect = dotproductTop / dotproductDenomiator;
+            if (intersect > 0) {
             return true;
+            }
         }
-        else if (distanceToC < sradius)
-        {
-            //System.out.println("Ray inside sphere. x: " + ray.getRayPointX() + " y: " + ray.getRayPointY() + " z: " + ray.getRayPointZ());
-            return true;
-        }
-        else {System.out.println("Something is wrong");}
+
         return false;
     }
 
-    // calculate the normal of the sphere and a point
-    public void calculateNormal (double posX, double posY, double posZ)
-    {
-        normalx = posX - this.centerx;
+    // calculate the normal of the plane and a point
+    public void calculateNormal(double posX, double posY, double posZ) {
+        /*normalx = posX - this.centerx;
         normaly = posY - this.centerx;
         normalz = posZ - this.centerz;
-        double magnitude = Math.sqrt((normalx*normalx) + (normaly*normaly) + (normalz * normalz));
+        double magnitude = Math.sqrt((normalx * normalx) + (normaly * normaly) + (normalz * normalz));
         this.normalx = normalx / magnitude;
         this.normaly = normaly / magnitude;
-        this.normalz = normalz / magnitude;
+        this.normalz = normalz / magnitude;*/
     }
 
     public void randomDirection(Ray nthRay) {
 
     }
 
-    // get each the normalised normal
-    public double getNormalX() {return this.normalx;}
-    public double getNormalY() {return this.normaly;}
-    public double getNormalZ() {return this.normalz;}
+    public void reflectionBounce(Ray nthRay) {
 
-
-    // get sphere ID
-    public int getObjectID()
-    {
-        return this.sphereID;
     }
 
-    public double getPosX()
-    {return this.centerx;}
-    public double getPosY()
-    {return this.centery;}
-    public double getPosZ()
-    {return this.centerz;}
+    // get each the normalised normal
+    public double getNormalX() {
+        return this.normalx;
+    }
+
+    public double getNormalY() {
+        return this.normaly;
+    }
+
+    public double getNormalZ() {
+        return this.normalz;
+    }
 
 
-    public double getLuminance()
-    {return this.luminance;}
+    // get plane ID
+    public int getObjectID() {
+        return this.planeID;
+    }
+
+    public double getPosX() {
+        return pointx;
+    }
+
+    public double getPosY() {
+        return pointy;
+    }
+
+    public double getPosZ() {
+        return pointz;
+    }
+
+    public double getLuminance() {
+        return this.luminance;
+    }
+
+    public void calculateNormal(Ray nthRay) {
+
+    }
 }

@@ -7,22 +7,11 @@ public class Main {
 
         List<SceneObjects> sceneObjectsList = new ArrayList<>();
 
-        sceneObjectsList.add(new Sphere(7, 2.5, 0, 1));
-        sceneObjectsList.add(new Sphere(7, -2.5, 0, 1));
+        sceneObjectsList.add(new AABCubeCenter(0,-1,0,15,2,10)); // floor
+        sceneObjectsList.add(new AABCubeCenter(10,5,0,2,10,20)); // front wall
+        sceneObjectsList.add(new SphereLight(-3,3,0,2,20)); // sphere behind camera
 
-        sceneObjectsList.add(new Sphere(7, 0, -2.5, 1));
-        sceneObjectsList.add(new Sphere(7, 0, 2.5, 1));
-
-        sceneObjectsList.add(new Sphere(7, 2.5, -2.5, 1));
-        sceneObjectsList.add(new Sphere(7, 2.5, 2.5, 1));
-
-        sceneObjectsList.add(new Sphere(7, -2.5, -2.5, 1));
-        sceneObjectsList.add(new Sphere(7, -2.5, 2.5, 1));
-
-        sceneObjectsList.add(new SphereLight(7, 0,0, 1,100));
-
-        Camera cam = new Camera(60, 0, 0, 0, 1, 0, 0, 0, 1, 0, 50, 4, 4);
-
+        Camera cam = new Camera(70, 0, 0.5, 0, 1, 0, 0, 0, 1, 0, 90, 4, 3);
 
         cam.directionVector();
         cam.upVector();
@@ -30,6 +19,6 @@ public class Main {
         cam.imagePlane();
 
         Render render = new Render();
-        render.computePixels(sceneObjectsList, cam, 5000, 5);
+        render.computePixels(sceneObjectsList, cam, 10000, 3);
     }
 }

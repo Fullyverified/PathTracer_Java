@@ -176,10 +176,6 @@ public class Render {
         }
         System.out.println("_|");
         drawScreenLogarithm(cam, primaryRay);
-
-        System.out.println("whilecounter: " + whilecounter);
-        System.out.println("hitcounter: + " + hitcounter);
-        System.out.println("misscounter: + " + misscounter);
     }
 
     public void computePrimaryRay(Camera cam, Ray[][] primaryRay, List<SceneObjects> sceneObjectsList, int i, int j) {
