@@ -1,5 +1,6 @@
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Render {
@@ -13,12 +14,48 @@ public class Render {
     public static int count = 0;
 
     public List<SceneObjects> visibleObjects = new ArrayList<>();
+    List<Double> amplitudes = new ArrayList<>();
 
     public Render() {
     }
 
-    // ... ,,, ::: ;;; !!! ||| \\\ *** %%% $$$ ### @@@
-    public void drawScreen(Camera cam, Ray[][] primaryRay) {
+    public void brightnessDistribution(Camera cam, Ray[][] primaryRay) {
+        for (int i = 0; i < cam.getResX(); i++) {
+            for (int j = 0; j < cam.getResY(); j++) {
+                if (primaryRay[i][j].getLightAmplitude() != 0) { // filter out zeros
+                    amplitudes.add(primaryRay[i][j].getLightAmplitude());
+                }
+            }
+        }
+        Collections.sort(amplitudes);
+    }
+
+    double getQuantile(List<Double> data, double quantile) {
+        int index = (int) Math.ceil(quantile * data.size()) - 1;
+        return data.get(Math.max(index, 0));
+    }
+
+    // ... ,,, ::: ;;; XXX *** 000 DDD ### @@@
+    public void drawScreenQuantiles(Camera cam, Ray[][] primaryRay) {
+        double q1 = getQuantile(amplitudes, 0.05);
+        System.out.println("q1: " + q1);
+        double q2 = getQuantile(amplitudes, 0.10);
+        System.out.println("q2: " + q2);
+        double q3 = getQuantile(amplitudes, 0.25);
+        System.out.println("q3: " + q3);
+        double q4 = getQuantile(amplitudes, 0.35);
+        System.out.println("q4: " + q4);
+        double q5 = getQuantile(amplitudes, 0.45);
+        System.out.println("q5: " + q5);
+        double q6 = getQuantile(amplitudes, 0.60);
+        System.out.println("q6: " + q6);
+        double q7 = getQuantile(amplitudes, 0.70);
+        System.out.println("q7: " + q7);
+        double q8 = getQuantile(amplitudes, 0.85);
+        System.out.println("q8: " + q8);
+        double q9 = getQuantile(amplitudes, 0.90);
+        System.out.println("q9: " + q9);
+
         // iterate through each rays hit value and print the output
         System.out.print("|");
         for (int i = 0; i < cam.getResX(); i++) {
@@ -28,23 +65,27 @@ public class Render {
         for (int j = 0; j < cam.getResY(); j++) {
             System.out.print("|");
             for (int i = 0; i < cam.getResX(); i++) {
-                if (primaryRay[i][j].getHit()) {
-                    if (primaryRay[i][j].getLightAmplitude() >= 20) {
-                        System.out.print("###");
-                    } else if (primaryRay[i][j].getLightAmplitude() >= 15 && primaryRay[i][j].getLightAmplitude() < 20) {
-                        System.out.print("XXX");
-                    } else if (primaryRay[i][j].getLightAmplitude() >= 6 && primaryRay[i][j].getLightAmplitude() < 15) {
-                        System.out.print("***");
-                    } else if (primaryRay[i][j].getLightAmplitude() >= 0.4 && primaryRay[i][j].getLightAmplitude() < 6) {
-                        System.out.print(";;;");
-                    } else if (primaryRay[i][j].getLightAmplitude() > 0 && primaryRay[i][j].getLightAmplitude() < 0.4) {
-                        System.out.print("...");
-                    } else if (primaryRay[i][j].getLightAmplitude() == 0) {
-                        System.out.print("   ");
-                    } else {
-                        System.out.print(primaryRay[i][j].getLightAmplitude());
-                    }
-                } else if (!primaryRay[i][j].getHit()) {
+                if (primaryRay[i][j].getLightAmplitude() >= q9) {
+                    System.out.print("@@@");
+                } else if (primaryRay[i][j].getLightAmplitude() >= q8) {
+                    System.out.print("###");
+                } else if (primaryRay[i][j].getLightAmplitude() >= q7) {
+                    System.out.print("DDD");
+                } else if (primaryRay[i][j].getLightAmplitude() >= q6) {
+                    System.out.print("000");
+                } else if (primaryRay[i][j].getLightAmplitude() >= q5) {
+                    System.out.print("***");
+                } else if (primaryRay[i][j].getLightAmplitude() >= q4) {
+                    System.out.print("xxx");
+                } else if (primaryRay[i][j].getLightAmplitude() >= q3) {
+                    System.out.print(";;;");
+                } else if (primaryRay[i][j].getLightAmplitude() >= q2) {
+                    System.out.print(":::");
+                } else if (primaryRay[i][j].getLightAmplitude() >= q1) {
+                    System.out.print(",,,");
+                } else if (primaryRay[i][j].getLightAmplitude() > 0) {
+                    System.out.print("...");
+                } else if (primaryRay[i][j].getLightAmplitude() == 0) {
                     System.out.print("   ");
                 }
             }
@@ -55,104 +96,6 @@ public class Render {
             System.out.print("---");
         }
         System.out.println("|");
-    }
-
-    public void drawScreenLogarithm(Camera cam, Ray[][] primaryRay) {
-        // iterate through each rays hit value and print the output
-        System.out.print("|");
-        for (int i = 0; i < cam.getResX(); i++) {
-            System.out.print("-|-");
-        }
-        System.out.println("|");
-        for (int j = 0; j < cam.getResY(); j++) {
-            System.out.print("|");
-            for (int i = 0; i < cam.getResX(); i++) {
-                if (primaryRay[i][j].getHit()) {
-                    if (primaryRay[i][j].getLightAmplitude() >= 1000) {
-                        System.out.print("###");
-                    } else if (primaryRay[i][j].getLightAmplitude() >= 100 && primaryRay[i][j].getLightAmplitude() < 1000) {
-                        System.out.print("XXX");
-                    } else if (primaryRay[i][j].getLightAmplitude() >= 10 && primaryRay[i][j].getLightAmplitude() < 100) {
-                        System.out.print("***");
-                    } else if (primaryRay[i][j].getLightAmplitude() >= 1 && primaryRay[i][j].getLightAmplitude() < 10) {
-                        System.out.print(";;;");
-                    } else if (primaryRay[i][j].getLightAmplitude() > 0 && primaryRay[i][j].getLightAmplitude() < 1) {
-                        System.out.print("...");
-                    } else if (primaryRay[i][j].getLightAmplitude() == 0) {
-                        System.out.print("   ");
-                    } else {
-                        System.out.print(primaryRay[i][j].getLightAmplitude());
-                    }
-                } else if (!primaryRay[i][j].getHit()) {
-                    System.out.print("   ");
-                }
-            }
-            System.out.println("|");
-        }
-        System.out.print("|");
-        for (int i = 0; i < cam.getResX(); i++) {
-            System.out.print("---");
-        }
-        System.out.println("|");
-    }
-
-    // prints the brightness value of each pixel
-    public void debugDrawScreen(Camera cam, Ray[][] primaryRay) {
-        DecimalFormat df = new DecimalFormat("#.00");
-        // iterate through each rays hit value and print the output
-        for (int i = 0; i < cam.getResX(); i++) {
-            System.out.print("------");
-        }
-        System.out.println(" ");
-        for (int j = 0; j < cam.getResY(); j++) {
-            System.out.print("|");
-            for (int i = 0; i < cam.getResX(); i++) {
-                if (primaryRay[i][j].getHit()) {
-                    if (primaryRay[i][j].getLightAmplitude() >= 10) {
-                        System.out.print(df.format(primaryRay[i][j].getLightAmplitude()) + "|");
-                    } else if (primaryRay[i][j].getLightAmplitude() >= 1.0 && primaryRay[i][j].getLightAmplitude() < 10) {
-                        System.out.print("0" + df.format(primaryRay[i][j].getLightAmplitude()) + "|");
-                    } else if (primaryRay[i][j].getLightAmplitude() < 1) {
-                        System.out.print("00" + df.format(primaryRay[i][j].getLightAmplitude()) + "|");
-                    }
-                } else {
-                    System.out.print("00.00|");
-                }
-            }
-            System.out.println(" ");
-        }
-        for (int i = 0; i < cam.getResX(); i++) {
-            System.out.print("------");
-        }
-    }
-
-    public void debugDrawScreenTEST(Camera cam, Ray[][] primaryRay) {
-        DecimalFormat df = new DecimalFormat("#.00");
-        // iterate through each rays hit value and print the output
-        for (int i = 0; i < cam.getResX(); i++) {
-            System.out.print("------");
-        }
-        System.out.println(" ");
-        for (int j = 0; j < cam.getResY(); j++) {
-            System.out.print("|");
-            for (int i = 0; i < cam.getResX(); i++) {
-                if (primaryRay[i][j].getHit()) {
-                    if (primaryRay[i][j].getNumHits() >= 10) {
-                        System.out.print(df.format(primaryRay[i][j].getNumHits()) + "|");
-                    } else if (primaryRay[i][j].getNumHits() >= 1.0 && primaryRay[i][j].getNumHits() < 10) {
-                        System.out.print("0" + df.format(primaryRay[i][j].getNumHits()) + "|");
-                    } else if (primaryRay[i][j].getNumHits() < 1) {
-                        System.out.print("00" + df.format(primaryRay[i][j].getNumHits()) + "|");
-                    }
-                } else {
-                    System.out.print("00.00|");
-                }
-            }
-            System.out.println(" ");
-        }
-        for (int i = 0; i < cam.getResX(); i++) {
-            System.out.print("------");
-        }
     }
 
     public void computePixels(List<SceneObjects> sceneObjectsList, Camera cam, int numRays, int numBounces) {
@@ -175,7 +118,8 @@ public class Render {
             }
         }
         System.out.println("_|");
-        drawScreenLogarithm(cam, primaryRay);
+        brightnessDistribution(cam, primaryRay);
+        drawScreenQuantiles(cam, primaryRay);
     }
 
     public void computePrimaryRay(Camera cam, Ray[][] primaryRay, List<SceneObjects> sceneObjectsList, int i, int j) {
@@ -321,4 +265,137 @@ public class Render {
         return costheta;
     }
 
+
+    // prints the brightness value of each pixel
+    public void drawScreen(Camera cam, Ray[][] primaryRay) {
+        // iterate through each rays hit value and print the output
+        System.out.print("|");
+        for (int i = 0; i < cam.getResX(); i++) {
+            System.out.print("-|-");
+        }
+        System.out.println("|");
+        for (int j = 0; j < cam.getResY(); j++) {
+            System.out.print("|");
+            for (int i = 0; i < cam.getResX(); i++) {
+                if (primaryRay[i][j].getLightAmplitude() >= 20) {
+                    System.out.print("###");
+                } else if (primaryRay[i][j].getLightAmplitude() >= 15 && primaryRay[i][j].getLightAmplitude() < 20) {
+                    System.out.print("XXX");
+                } else if (primaryRay[i][j].getLightAmplitude() >= 6 && primaryRay[i][j].getLightAmplitude() < 15) {
+                    System.out.print("***");
+                } else if (primaryRay[i][j].getLightAmplitude() >= 0.4 && primaryRay[i][j].getLightAmplitude() < 6) {
+                    System.out.print(";;;");
+                } else if (primaryRay[i][j].getLightAmplitude() > 0 && primaryRay[i][j].getLightAmplitude() < 0.4) {
+                    System.out.print("...");
+                } else if (primaryRay[i][j].getLightAmplitude() == 0) {
+                    System.out.print("   ");
+                } else {
+                    System.out.print(primaryRay[i][j].getLightAmplitude());
+                }
+            }
+            System.out.println("|");
+        }
+        System.out.print("|");
+        for (int i = 0; i < cam.getResX(); i++) {
+            System.out.print("---");
+        }
+        System.out.println("|");
+    }
+
+    public void debugDrawScreenBrightness(Camera cam, Ray[][] primaryRay) {
+        DecimalFormat df = new DecimalFormat("#.00");
+        // iterate through each rays hit value and print the output
+        for (int i = 0; i < cam.getResX(); i++) {
+            System.out.print("------");
+        }
+        System.out.println(" ");
+        for (int j = 0; j < cam.getResY(); j++) {
+            System.out.print("|");
+            for (int i = 0; i < cam.getResX(); i++) {
+                if (primaryRay[i][j].getHit()) {
+                    if (primaryRay[i][j].getLightAmplitude() >= 10) {
+                        System.out.print(df.format(primaryRay[i][j].getLightAmplitude()) + "|");
+                    } else if (primaryRay[i][j].getLightAmplitude() >= 1.0 && primaryRay[i][j].getLightAmplitude() < 10) {
+                        System.out.print("0" + df.format(primaryRay[i][j].getLightAmplitude()) + "|");
+                    } else if (primaryRay[i][j].getLightAmplitude() < 1) {
+                        System.out.print("00" + df.format(primaryRay[i][j].getLightAmplitude()) + "|");
+                    }
+                } else {
+                    System.out.print("00.00|");
+                }
+            }
+            System.out.println(" ");
+        }
+        for (int i = 0; i < cam.getResX(); i++) {
+            System.out.print("------");
+        }
+    }
+
+    public void drawScreenLogarithm(Camera cam, Ray[][] primaryRay) {
+        // iterate through each rays hit value and print the output
+        System.out.print("|");
+        for (int i = 0; i < cam.getResX(); i++) {
+            System.out.print("-|-");
+        }
+        System.out.println("|");
+        for (int j = 0; j < cam.getResY(); j++) {
+            System.out.print("|");
+            for (int i = 0; i < cam.getResX(); i++) {
+                if (primaryRay[i][j].getHit()) {
+                    if (primaryRay[i][j].getLightAmplitude() >= 1000) {
+                        System.out.print("###");
+                    } else if (primaryRay[i][j].getLightAmplitude() >= 100 && primaryRay[i][j].getLightAmplitude() < 1000) {
+                        System.out.print("XXX");
+                    } else if (primaryRay[i][j].getLightAmplitude() >= 10 && primaryRay[i][j].getLightAmplitude() < 100) {
+                        System.out.print("***");
+                    } else if (primaryRay[i][j].getLightAmplitude() >= 1 && primaryRay[i][j].getLightAmplitude() < 10) {
+                        System.out.print(";;;");
+                    } else if (primaryRay[i][j].getLightAmplitude() > 0 && primaryRay[i][j].getLightAmplitude() < 1) {
+                        System.out.print("...");
+                    } else if (primaryRay[i][j].getLightAmplitude() == 0) {
+                        System.out.print("   ");
+                    } else {
+                        System.out.print(primaryRay[i][j].getLightAmplitude());
+                    }
+                } else if (!primaryRay[i][j].getHit()) {
+                    System.out.print("   ");
+                }
+            }
+            System.out.println("|");
+        }
+        System.out.print("|");
+        for (int i = 0; i < cam.getResX(); i++) {
+            System.out.print("---");
+        }
+        System.out.println("|");
+    }
+
+    public void debugDrawScreenNumHits(Camera cam, Ray[][] primaryRay) {
+        DecimalFormat df = new DecimalFormat("#.00");
+        // iterate through each rays hit value and print the output
+        for (int i = 0; i < cam.getResX(); i++) {
+            System.out.print("------");
+        }
+        System.out.println(" ");
+        for (int j = 0; j < cam.getResY(); j++) {
+            System.out.print("|");
+            for (int i = 0; i < cam.getResX(); i++) {
+                if (primaryRay[i][j].getHit()) {
+                    if (primaryRay[i][j].getNumHits() >= 10) {
+                        System.out.print(df.format(primaryRay[i][j].getNumHits()) + "|");
+                    } else if (primaryRay[i][j].getNumHits() >= 1.0 && primaryRay[i][j].getNumHits() < 10) {
+                        System.out.print("0" + df.format(primaryRay[i][j].getNumHits()) + "|");
+                    } else if (primaryRay[i][j].getNumHits() < 1) {
+                        System.out.print("00" + df.format(primaryRay[i][j].getNumHits()) + "|");
+                    }
+                } else {
+                    System.out.print("00.00|");
+                }
+            }
+            System.out.println(" ");
+        }
+        for (int i = 0; i < cam.getResX(); i++) {
+            System.out.print("------");
+        }
+    }
 }

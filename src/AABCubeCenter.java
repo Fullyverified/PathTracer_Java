@@ -29,24 +29,14 @@ public class AABCubeCenter implements SceneObjects {
 
         this.minX = centreX - xLength / 2;
         this.maxX = centreX + xLength / 2;
-        System.out.println("minx: " + minX + " maxx: " + maxX);
         this.minY = centreY - yLength / 2;
         this.maxY = centreY + yLength / 2;
-        System.out.println("miny: " + minY + " maxy: " + maxY);
         this.minZ = centreZ - zLength / 2;
         this.maxZ = centreZ + zLength / 2;
-        System.out.println("minz: " + minZ + " maxZ: " + maxZ);
 
         this.cubeID = numCubes;
         numCubes++;
     }
-
-    /*private double safeDivide(double numerator, double denominator) {
-        if (Math.abs(denominator) < 1e-8) { // use a small epsilon to avoid instability
-            return denominator > 0 ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
-        }
-        return numerator / denominator;
-    }*/
 
     public void computeMinMax(Ray ray) {
 

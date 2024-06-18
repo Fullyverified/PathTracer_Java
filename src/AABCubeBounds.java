@@ -18,35 +18,17 @@ public class AABCubeBounds implements SceneObjects {
     //Equation of a sphere: (x - cx)^2 + (y - cy)^2 + (z - cz)^2 = r^2
 
     //Constructor
-    public AABCubeBounds(double centreX, double centreY, double centreZ, double xLength, double yLength, double zLength) {
-        this.centreX = centreX;
-        this.centreY = centreY;
-        this.centreZ = centreZ;
-
-        this.xlength = xLength;
-        this.ylength = yLength;
-        this.zlength = zLength;
-
-        this.minX = centreX - xLength / 2;
-        this.maxX = centreX + xLength / 2;
-        System.out.println("minx: " + minX + " maxx: " + maxX);
-        this.minY = centreY - yLength / 2;
-        this.maxY = centreY + yLength / 2;
-        System.out.println("miny: " + minY + " maxy: " + maxY);
-        this.minZ = centreZ - zLength / 2;
-        this.maxZ = centreZ + zLength / 2;
-        System.out.println("minz: " + minZ + " maxZ: " + maxZ);
+    public AABCubeBounds(double minX, double maxX, double minY, double maxY, double minZ, double maxZ) {
+        this.minX = minX;
+        this.maxX = maxX;
+        this.minY = minY;
+        this.maxY = maxY;
+        this.minZ = minZ;
+        this.maxZ = maxZ;
 
         this.cubeID = numCubes;
         numCubes++;
     }
-
-    /*private double safeDivide(double numerator, double denominator) {
-        if (Math.abs(denominator) < 1e-8) { // use a small epsilon to avoid instability
-            return denominator > 0 ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
-        }
-        return numerator / denominator;
-    }*/
 
     public void computeMinMax(Ray ray) {
 
