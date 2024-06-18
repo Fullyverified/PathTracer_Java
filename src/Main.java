@@ -19,9 +19,9 @@ public class Main {
         sceneObjectsList.add(new Sphere(7, -2.5, -2.5, 1));
         sceneObjectsList.add(new Sphere(7, -2.5, 2.5, 1));
 
-        sceneObjectsList.add(new SphereLight(7, 0,0, 1,20));
+        sceneObjectsList.add(new SphereLight(7, 0,0, 1,500));
 
-        Camera cam = new Camera(65, 0, 0, 0, 1, 0, 0, 0, 1, 0, 50, 4, 4);
+        Camera cam = new Camera(70, 0, 0, 0, 1, 0, 0, 0, 1, 0, 50, 4, 4);
 
         cam.directionVector();
         cam.upVector();
@@ -29,6 +29,6 @@ public class Main {
         cam.imagePlane();
 
         Render render = new Render();
-        render.computePixels(sceneObjectsList, cam, 2500, 5);
+        render.computePixels(sceneObjectsList, cam, 2000, 3);
     }
 }
