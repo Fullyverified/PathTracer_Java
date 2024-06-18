@@ -7,21 +7,14 @@ public class Main {
 
         List<SceneObjects> sceneObjectsList = new ArrayList<>();
 
-        sceneObjectsList.add(new Sphere(7, 2.5, 0, 1));
-        sceneObjectsList.add(new Sphere(7, -2.5, 0, 1));
+        sceneObjectsList.add(new Sphere(7, 1.25, 0, 1));
+        sceneObjectsList.add(new AABCubeCenter(7, -1.25, 0, 1,1,1));
 
-        sceneObjectsList.add(new Sphere(7, 0, -2.5, 1));
-        sceneObjectsList.add(new Sphere(7, 0, 2.5, 1));
+        sceneObjectsList.add(new SphereLight(3, 0,2, 1,40));
 
-        sceneObjectsList.add(new Sphere(7, 2.5, -2.5, 1));
-        sceneObjectsList.add(new Sphere(7, 2.5, 2.5, 1));
+        sceneObjectsList.add(new AABCubeBounds(13, 14, -12, 12,-12,12));
 
-        sceneObjectsList.add(new Sphere(7, -2.5, -2.5, 1));
-        sceneObjectsList.add(new Sphere(7, -2.5, 2.5, 1));
-
-        sceneObjectsList.add(new SphereLight(7, 0,0, 1,500));
-
-        Camera cam = new Camera(70, 0, 0, 0, 1, 0, 0, 0, 1, 0, 50, 4, 4);
+        Camera cam = new Camera(60, 0, 0, -1.75, 0.80, 0, 0.2, 0, 1, 0, 50, 4, 4);
 
         cam.directionVector();
         cam.upVector();
@@ -29,6 +22,6 @@ public class Main {
         cam.imagePlane();
 
         Render render = new Render();
-        render.computePixels(sceneObjectsList, cam, 2000, 3);
+        render.computePixels(sceneObjectsList, cam, 10000, 2);
     }
 }

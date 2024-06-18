@@ -2,8 +2,9 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Executor;
 
-public class Render {
+public class Render implements Runnable {
 
     public long whilecounter = 0;
     public long hitcounter = 0;
@@ -12,12 +13,15 @@ public class Render {
     public long selfhits = 0;
     public long selfmisses = 0;
     public static int count = 0;
+    int loading = 0;
 
     public List<SceneObjects> visibleObjects = new ArrayList<>();
     List<Double> amplitudes = new ArrayList<>();
 
     public Render() {
     }
+
+
 
     public void brightnessDistribution(Camera cam, Ray[][] primaryRay) {
         for (int i = 0; i < cam.getResX(); i++) {
@@ -53,7 +57,7 @@ public class Render {
         System.out.println("q7: " + q7);
         double q8 = getQuantile(amplitudes, 0.85);
         System.out.println("q8: " + q8);
-        double q9 = getQuantile(amplitudes, 0.90);
+        double q9 = getQuantile(amplitudes, 0.95);
         System.out.println("q9: " + q9);
 
         // iterate through each rays hit value and print the output
@@ -98,6 +102,10 @@ public class Render {
         System.out.println("|");
     }
 
+    public void run() {
+
+    }
+
     public void computePixels(List<SceneObjects> sceneObjectsList, Camera cam, int numRays, int numBounces) {
         Ray[][] primaryRay = new Ray[(int) cam.getResX()][(int) cam.getResY()];
         Ray[][] nthRay = new Ray[(int) cam.getResX()][(int) cam.getResY()];
@@ -109,14 +117,12 @@ public class Render {
         System.out.println("-|");
         System.out.print("|_");
         for (int j = 0; j < cam.getResY(); j++) {
-            System.out.print("___");
             for (int i = 0; i < cam.getResX(); i++) {
                 computePrimaryRay(cam, primaryRay, sceneObjectsList, i, j);
-                if (primaryRay[i][j].getHit()) {
-                    marchIntersectionLogic(primaryRay, nthRay, sceneObjectsList, i, j, numRays, numBounces);
-                }
             }
         }
+        marchIntersectionLogic(primaryRay, nthRay, sceneObjectsList, numRays, numBounces, cam);
+
         System.out.println("_|");
         brightnessDistribution(cam, primaryRay);
         drawScreenQuantiles(cam, primaryRay);
@@ -180,64 +186,70 @@ public class Render {
         }
     }
 
-    public void marchIntersectionLogic(Ray[][] primaryRay, Ray[][] nthRay, List<SceneObjects> sceneObjectsList, int i, int j, int numRays, int numBounces) {
-        nthRay[i][j] = new Ray(primaryRay[i][j].getHitPointX(), primaryRay[i][j].getHitPointY(), primaryRay[i][j].getHitPointZ());
-        double[][] luminanceArray = new double[numBounces][4];
-        // BOUNCES PER RAY
-        for (int currentRay = 1; currentRay < numRays; currentRay++) {
-            // initialize ray starting conditions
-            nthRay[i][j].initializeRay(primaryRay[i][j]);
-            for (int currentBounce = 0; currentBounce < numBounces && nthRay[i][j].getHit(); currentBounce++) {
-                if (currentBounce == 0) {
-                    // first bounce uses random direction
-                    nthRay[i][j].getHitObject().randomDirection(nthRay[i][j]);
-                } else {
-                    // second uses a reflection vector
-                    nthRay[i][j].getHitObject().reflectionBounce(nthRay[i][j]);
-                }
-                // add all non culled objects to a list
-                visibleObjects.clear();
-                for (SceneObjects sceneObject1 : sceneObjectsList) {
-                    if (sceneObject1.objectCulling(nthRay[i][j])) {
-                        visibleObjects.add(sceneObject1);
-                    }
-                }
-                nthRay[i][j].setHit(false);
-                double distance = 0;
-                // march ray and check intersections
-                while (distance <= 25 && !nthRay[i][j].getHit() && !visibleObjects.isEmpty()) { // redundant to check !visibleObjects.isEmpty() every time but the code is cleaner
-                    // march the ray
-                    nthRay[i][j].marchRay(distance);
-                    // CHECK INTERSECTIONS for non-culled objects
-                    for (SceneObjects sceneObject1 : visibleObjects) {
-                        if (sceneObject1.intersectionCheck(nthRay[i][j])) {
-                            primaryRay[i][j].addNumHits(); // debug
-                            nthRay[i][j].updateHitProperties(sceneObject1);
-                            primaryRay[i][j].addLightAmplitude(lambertCosineLaw(nthRay[i][j], sceneObject1, (sceneObject1.getLuminance() / numRays) / (currentBounce + 1)));
-                            // data structure for storing object luminance, dot product and bounce depth, and boolean hit
-                            luminanceArray[currentBounce][0] = sceneObject1.getLuminance();
-                            luminanceArray[currentBounce][1] = lambertCosineLawTEST(nthRay[i][j], sceneObject1);
-                            luminanceArray[currentBounce][2] = currentBounce + 1;
-                            luminanceArray[currentBounce][3] = 1;
+    public void marchIntersectionLogic(Ray[][] primaryRay, Ray[][] nthRay, List<SceneObjects> sceneObjectsList, int numRays, int numBounces, Camera cam) {
+        for (int currentRay = 1; currentRay < numRays; currentRay++) { // sample one ray for each pixel, then move onto the next ray
+            for (int j = 0; j < cam.getResY(); j++) {
+                for (int i = 0; i < cam.getResX(); i++) {
+                    if (primaryRay[i][j].getHit()) {
+                        nthRay[i][j] = new Ray(primaryRay[i][j].getHitPointX(), primaryRay[i][j].getHitPointY(), primaryRay[i][j].getHitPointZ());
+                        double[][] luminanceArray = new double[numBounces][4];
+                        // BOUNCES PER RAY
+                        // initialize ray starting conditions
+                        nthRay[i][j].initializeRay(primaryRay[i][j]);
+                        for (int currentBounce = 0; currentBounce < numBounces && nthRay[i][j].getHit(); currentBounce++) {
+                            if (currentBounce == 0) {
+                                // first bounce uses random direction
+                                nthRay[i][j].getHitObject().randomDirection(nthRay[i][j]);
+                            } else {
+                                // second uses a reflection vector
+                                nthRay[i][j].getHitObject().reflectionBounce(nthRay[i][j]);
+                            }
+                            // add all non culled objects to a list
+                            visibleObjects.clear();
+                            for (SceneObjects sceneObject1 : sceneObjectsList) {
+                                if (sceneObject1.objectCulling(nthRay[i][j])) {
+                                    visibleObjects.add(sceneObject1);
+                                }
+                            }
+                            nthRay[i][j].setHit(false);
+                            double distance = 0;
+                            // march ray and check intersections
+                            while (distance <= 25 && !nthRay[i][j].getHit() && !visibleObjects.isEmpty()) { // redundant to check !visibleObjects.isEmpty() every time but the code is cleaner
+                                // march the ray
+                                nthRay[i][j].marchRay(distance);
+                                // CHECK INTERSECTIONS for non-culled objects
+                                for (SceneObjects sceneObject1 : visibleObjects) {
+                                    if (sceneObject1.intersectionCheck(nthRay[i][j])) {
+                                        primaryRay[i][j].addNumHits(); // debug
+                                        nthRay[i][j].updateHitProperties(sceneObject1);
+                                        primaryRay[i][j].addLightAmplitude(lambertCosineLaw(nthRay[i][j], sceneObject1, (sceneObject1.getLuminance() / numRays) / (currentBounce + 1)));
+                                        // data structure for storing object luminance, dot product and bounce depth, and boolean hit
+                                        luminanceArray[currentBounce][0] = sceneObject1.getLuminance();
+                                        luminanceArray[currentBounce][1] = lambertCosineLawTEST(nthRay[i][j], sceneObject1);
+                                        luminanceArray[currentBounce][2] = currentBounce + 1;
+                                        luminanceArray[currentBounce][3] = 1;
+                                    }
+                                }
+                                distance += 0.1;
+                            }
                         }
+                        /*double brightness = 0;
+                        if (!visibleObjects.isEmpty()) {
+                            // sum up values of lightness for each bounce into the scene
+                            // ((object brightness * lambertCosineLaw) / nthBounce) / numHits
+
+                            if (primaryRay[i][j].getHit()) {
+                                for (int index = luminanceArray.length - 1; index >= 0; index--) {
+                                    if (luminanceArray[index][3] == 1) {
+                                        brightness = +((Math.abs(luminanceArray[index][0]) + Math.abs(brightness)) * Math.abs(luminanceArray[index][1])) / Math.abs(luminanceArray[index][2]);
+                                    }
+                                }
+                            }
+                            primaryRay[i][j].addLightAmplitude(brightness / numRays);
+                        }*/
                     }
-                    distance += 0.1;
                 }
             }
-            /*double brightness = 0;
-            if (!visibleObjects.isEmpty()) {
-                // sum up values of lightness for each bounce into the scene
-                // ((object brightness * lambertCosineLaw) / nthBounce) / numHits
-
-                if (primaryRay[i][j].getHit()) {
-                    for (int index = luminanceArray.length - 1; index >= 0; index--) {
-                        if (luminanceArray[index][3] == 1) {
-                            brightness = +((Math.abs(luminanceArray[index][0]) + Math.abs(brightness)) * Math.abs(luminanceArray[index][1])) / Math.abs(luminanceArray[index][2]);
-                        }
-                    }
-                }
-                primaryRay[i][j].addLightAmplitude(brightness / numRays);
-            }*/
         }
     }
 
@@ -264,7 +276,6 @@ public class Render {
         double costheta = Math.abs(sceneObject.getNormalX() * currentRay.getDirX() + sceneObject.getNormalY() * currentRay.getDirY() + sceneObject.getNormalZ() * currentRay.getDirZ());
         return costheta;
     }
-
 
     // prints the brightness value of each pixel
     public void drawScreen(Camera cam, Ray[][] primaryRay) {
