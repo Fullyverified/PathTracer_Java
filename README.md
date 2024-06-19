@@ -7,8 +7,8 @@ One bounce.
 ![image](https://github.com/Fullyverified/ASCII_PathTracer/assets/138776324/547c1091-78af-43cc-9874-ba77062e2316)
 Five bonuces. Areas not directly visible to the light begin to fill in.
 
-Current formula is:
-Brightness / numberRays / currentBounce
+Current formula: sum from the last bounce to the first bounce :
+objectbrigthness * cosine law / * 0.85
 
 Done:
 1. Create ray and sphere objects.
