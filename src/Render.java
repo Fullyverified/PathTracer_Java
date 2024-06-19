@@ -55,7 +55,7 @@ public class Render {
         double q10 = getQuantile(amplitudes, 0.80);
         double q11 = getQuantile(amplitudes, 0.88);
         double q12 = getQuantile(amplitudes, 0.95);*/
-        double max = Collections.max(amplitudes) /** cam.getISO()*/;
+        double max = Collections.max(amplitudes) * cam.getISO();
         double q1 = (max * 0.08);
         double q2 = (max * 0.16);
         double q3 = (max * 0.24);
