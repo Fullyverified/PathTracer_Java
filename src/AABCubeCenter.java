@@ -14,11 +14,12 @@ public class AABCubeCenter implements SceneObjects {
     private int cubeID = 0;
     private double normalx, normaly, normalz;
     private double luminance = 0;
+    double reflectivity = 1;
 
     //Equation of a sphere: (x - cx)^2 + (y - cy)^2 + (z - cz)^2 = r^2
 
     //Constructor
-    public AABCubeCenter(double centreX, double centreY, double centreZ, double xLength, double yLength, double zLength) {
+    public AABCubeCenter(double centreX, double centreY, double centreZ, double xLength, double yLength, double zLength, double reflectivity) {
         this.centreX = centreX;
         this.centreY = centreY;
         this.centreZ = centreZ;
@@ -33,6 +34,7 @@ public class AABCubeCenter implements SceneObjects {
         this.maxY = centreY + yLength / 2;
         this.minZ = centreZ - zLength / 2;
         this.maxZ = centreZ + zLength / 2;
+        this.reflectivity = reflectivity;
 
         this.cubeID = numCubes;
         numCubes++;
@@ -222,6 +224,9 @@ public class AABCubeCenter implements SceneObjects {
 
     public double getLuminance() {
         return this.luminance;
+    }
+    public double getReflectivity() {
+        return this.reflectivity;
     }
 
 }

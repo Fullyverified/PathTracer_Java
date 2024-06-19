@@ -14,17 +14,19 @@ public class AABCubeBounds implements SceneObjects {
     private int cubeID = 0;
     private double normalx, normaly, normalz;
     private double luminance = 0;
+    double reflectivity = 1;
 
     //Equation of a sphere: (x - cx)^2 + (y - cy)^2 + (z - cz)^2 = r^2
 
     //Constructor
-    public AABCubeBounds(double minX, double maxX, double minY, double maxY, double minZ, double maxZ) {
+    public AABCubeBounds(double minX, double maxX, double minY, double maxY, double minZ, double maxZ, double reflectivity) {
         this.minX = minX;
         this.maxX = maxX;
         this.minY = minY;
         this.maxY = maxY;
         this.minZ = minZ;
         this.maxZ = maxZ;
+        this.reflectivity = reflectivity;
 
         this.cubeID = numCubes;
         numCubes++;
@@ -214,6 +216,9 @@ public class AABCubeBounds implements SceneObjects {
 
     public double getLuminance() {
         return this.luminance;
+    }
+    public double getReflectivity() {
+        return this.reflectivity;
     }
 
 }

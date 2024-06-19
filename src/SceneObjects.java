@@ -14,5 +14,6 @@ public interface SceneObjects {
     public double getNormalX();
     public double getNormalY();
     public double getNormalZ();
+    public double getReflectivity();
 }
 

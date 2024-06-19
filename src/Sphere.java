@@ -12,15 +12,17 @@ public class Sphere implements SceneObjects {
     private int sphereID = 0;
     private double normalx, normaly, normalz;
     private double luminance = 0;
+    double reflectivity = 1;
 
     //Equation of a sphere: (x - cx)^2 + (y - cy)^2 + (z - cz)^2 = r^2
 
     //Constructor
-    public Sphere(double centerx, double centery, double centerz, double sradius) {
+    public Sphere(double centerx, double centery, double centerz, double sradius, double reflectivity) {
         this.centerx = centerx;
         this.centery = centery;
         this.centerz = centerz;
         this.sradius = sradius;
+        this.reflectivity = reflectivity;
         this.sphereID = numSpheres;
         numSpheres++;
     }
@@ -185,5 +187,9 @@ public class Sphere implements SceneObjects {
 
     public double getLuminance() {
         return this.luminance;
+    }
+
+    public double getReflectivity() {
+        return this.reflectivity;
     }
 }

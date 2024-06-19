@@ -7,11 +7,12 @@ public class Plane implements SceneObjects{
     private static int numPLanes = 0;
     private int planeID = 300;
     private double luminance = 1000;
+    double reflectivity = 1;
 
     //Equation of a sphere: (x - cx)^2 + (y - cy)^2 + (z - cz)^2 = r^2
 
     //Constructor
-    public Plane(double normalx, double normaly, double normalz, double pointx, double pointy, double pointz) {
+    public Plane(double normalx, double normaly, double normalz, double pointx, double pointy, double pointz, double reflectivity) {
         this.normalx = normalx;
         this.normaly = normaly;
         this.normalz = normalz;
@@ -22,6 +23,7 @@ public class Plane implements SceneObjects{
         this.pointx = pointx;
         this.pointy = pointy;
         this.pointz = pointz;
+        this.reflectivity = reflectivity;
     }
 
     // initial check to see if the ray will or will not hit an object (for performance)
@@ -109,4 +111,8 @@ public class Plane implements SceneObjects{
     public void calculateNormal(Ray nthRay) {
 
     }
+    public double getReflectivity() {
+        return this.reflectivity;
+    }
+
 }
