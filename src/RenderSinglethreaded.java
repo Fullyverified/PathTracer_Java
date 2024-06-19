@@ -3,13 +3,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Render {
+public class RenderSinglethreaded {
 
     public int progress = 0;
     public List<SceneObjects> visibleObjects = new ArrayList<>();
     List<Double> amplitudes = new ArrayList<>();
 
-    public Render() {
+    public RenderSinglethreaded() {
     }
 
     public void brightnessDistribution(Camera cam, Ray[][] primaryRay) {
