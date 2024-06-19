@@ -5,7 +5,7 @@ Global Illuminiation is here!
 
 
 Current formula: sum from the last bounce to the first bounce :
-objectbrigthness * cosine law / * 0.85
+object brigthness * cosine law / * object reflectivity
 
 Done:
 1. Create ray and sphere objects.
