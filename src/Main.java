@@ -7,14 +7,15 @@ public class Main {
 
         List<SceneObjects> sceneObjectsList = new ArrayList<>();
 
-        sceneObjectsList.add(new Sphere(7, 1.25, 0, 1,0.85));
-        sceneObjectsList.add(new AABCubeCenter(7, -1.25, 0, 1,1,1, 0.85));
+        sceneObjectsList.add(new Sphere(7, 1.25, -1, 1,0.85));
+        sceneObjectsList.add(new AABCubeCenter(7, -1.25, -1, 1,1,1, 0.85));
 
-        sceneObjectsList.add(new SphereLight(3, 0,2, 1,40,1));
+        sceneObjectsList.add(new SphereLight(3, 0,3, 1,40,1));
 
         sceneObjectsList.add(new AABCubeBounds(13, 14, -12, 12,-12,12,0.25));
 
-        Camera cam = new Camera(110, 0, 0, -1.75, 0.80, 0, 0.2, 0, 1, 0, 50, 4, 4);
+        Camera cam = new Camera(0.5, 70, 55, 4, 3, 0,0,0, 1, 0, 0, 0, 1, 0);
+
 
         cam.directionVector();
         cam.upVector();

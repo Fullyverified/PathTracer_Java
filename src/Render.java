@@ -28,21 +28,7 @@ public class Render {
         return data.get(Math.max(index, 0));
     }
 
-    // ... ,,, ~~~ ::: ;;; XXX *** 000 DDD ### @@@
-    public void drawScreenQuantiles(Camera cam, Ray[][] primaryRay) {
-        double q1 = getQuantile(amplitudes, 0.08);
-        double q2 = getQuantile(amplitudes, 0.16);
-        double q3 = getQuantile(amplitudes, 0.24);
-        double q4 = getQuantile(amplitudes, 0.32);
-        double q5 = getQuantile(amplitudes, 0.40);
-        double q6 = getQuantile(amplitudes, 0.48);
-        double q7 = getQuantile(amplitudes, 0.56);
-        double q8 = getQuantile(amplitudes, 0.64);
-        double q9 = getQuantile(amplitudes, 0.72);
-        double q10 = getQuantile(amplitudes, 0.80);
-        double q11 = getQuantile(amplitudes, 0.88);
-        double q12 = getQuantile(amplitudes, 0.95);
-        System.out.println("q1: " + q1);
+        /*System.out.println("q1: " + q1);
         System.out.println("q2: " + q2);
         System.out.println("q3: " + q3);
         System.out.println("q4: " + q4);
@@ -53,7 +39,35 @@ public class Render {
         System.out.println("q9: " + q9);
         System.out.println("q10: " + q10);
         System.out.println("q11: " + q11);
-        System.out.println("q12: " + q12);
+        System.out.println("q12: " + q12);*/
+
+    // ... ,,, ~~~ ::: ;;; XXX *** 000 DDD ### @@@
+    public void drawScreenQuantiles(Camera cam, Ray[][] primaryRay) {
+        /*double q1 = getQuantile(amplitudes, 0.08);
+        double q2 = getQuantile(amplitudes, 0.16);
+        double q3 = getQuantile(amplitudes, 0.24);
+        double q4 = getQuantile(amplitudes, 0.32);
+        double q5 = getQuantile(amplitudes, 0.40);
+        double q6 = getQuantile(amplitudes, 0.48);
+        double q7 = getQuantile(amplitudes, 0.56);
+        double q8 = getQuantile(amplitudes, 0.64);
+        double q9 = getQuantile(amplitudes, 0.72);
+        double q10 = getQuantile(amplitudes, 0.80);
+        double q11 = getQuantile(amplitudes, 0.88);
+        double q12 = getQuantile(amplitudes, 0.95);*/
+        double max = Collections.max(amplitudes) /** cam.getISO()*/;
+        double q1 = (max * 0.08);
+        double q2 = (max * 0.16);
+        double q3 = (max * 0.24);
+        double q4 = (max * 0.32);
+        double q5 = (max * 0.40);
+        double q6 = (max * 0.48);
+        double q7 = (max * 0.56);
+        double q8 = (max * 0.64);
+        double q9 = (max * 0.72);
+        double q10 = (max * 0.80);
+        double q11 = (max * 0.88);
+        double q12 = (max * 0.95);
 
         // iterate through each rays hit value and print the output
         System.out.print("|");

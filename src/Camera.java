@@ -8,12 +8,14 @@ public class Camera{
     private double dirMagnitude, upMagnitude, rightMagnitude;
     private double fOV, planeWidth, planeHeight;
     private double aspectRatioX, aspectRatioY, resX, resY;
+    private double ISO = 1;
 
     public static void main(String[] args) {}
 
     // constructor
-    public Camera(double resX, double posX, double posY, double posZ, double dirX, double dirY, double dirZ, double upX, double upY, double upZ, double fOV, double aspectX, double aspectY)
+    public Camera(double ISO, double resX, double fOV, double aspectX, double aspectY, double posX, double posY, double posZ, double dirX, double dirY, double dirZ, double upX, double upY, double upZ)
     {
+        this.ISO = ISO;
         this.posX = posX;
         this.posY = posY;
         this.posZ = posZ;
@@ -117,6 +119,8 @@ public class Camera{
 
     public double getCamWidth() {return this.planeWidth;}
     public double getCamHeight() {return this.planeHeight;}
+
+    public double getISO() {return this.ISO;}
 
 
     // setter
