@@ -1,11 +1,8 @@
 I'm trying to make an Ascii Pathtracer. Nothing that hasn't been done before :)
 Global Illuminiation is here!
 
-![image](https://github.com/Fullyverified/ASCII_PathTracer/assets/138776324/16e03837-aced-4de1-9a79-d79761d5805e)
-One bounce.
+![sphere and cube v10 10000 rays random reflections](https://github.com/Fullyverified/ASCII_PathTracer/assets/138776324/65fcac25-cea8-48f5-a6c7-6f25d58adb87)
 
-![image](https://github.com/Fullyverified/ASCII_PathTracer/assets/138776324/547c1091-78af-43cc-9874-ba77062e2316)
-Five bonuces. Areas not directly visible to the light begin to fill in.
 
 Current formula: sum from the last bounce to the first bounce :
 objectbrigthness * cosine law / * 0.85
