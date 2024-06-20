@@ -2,12 +2,16 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class RenderMultithreaded {
 
     public int progress = 0;
-    public List<SceneObjects> visibleObjects = new ArrayList<>();
     List<Double> amplitudes = new ArrayList<>();
+
 
     public RenderMultithreaded() {
     }
@@ -29,7 +33,8 @@ public class RenderMultithreaded {
     }
 
     // ... ,,, ~~~ ::: ;;; XXX *** 000 DDD ### @@@
-    public void drawScreenQuantiles(Camera cam, Ray[][] primaryRay) {
+    public void drawScreen(Camera cam, Ray[][] primaryRay) {
+        amplitudes.add(0.0);
         double max = Collections.max(amplitudes) * cam.getISO();
         double q1 = (max * 0.08);
         double q2 = (max * 0.16);
@@ -59,7 +64,7 @@ public class RenderMultithreaded {
                     System.out.print("DDD");
                 } else if (primaryRay[i][j].getLightAmplitude() >= q10) {
                     System.out.print("000");
-                }else if (primaryRay[i][j].getLightAmplitude() >= q9) {
+                } else if (primaryRay[i][j].getLightAmplitude() >= q9) {
                     System.out.print("UUU");
                 } else if (primaryRay[i][j].getLightAmplitude() >= q8) {
                     System.out.print("###");
@@ -92,31 +97,75 @@ public class RenderMultithreaded {
         System.out.println("|");
     }
 
+    public static void threadRenderSegmentation(int res, int nThreads, int[][] boundArray) {
+        int bound = res / nThreads;
+        int lower = 0, upper = 0;
+        for (int i = 0; i < nThreads; i++) {
+            if (i != nThreads - 1) {
+                lower = i * bound;
+                boundArray[i][0] = lower;
+                upper = ((i + 1) * bound) - 1;
+                boundArray[i][1] = upper;
+            }
+            if (i == nThreads - 1) {
+                lower = i * bound;
+                boundArray[i][0] = lower - 1;
+                upper = res;
+                boundArray[i][1] = upper - 1;
+            }
+        }
+    }
+
     public void computePixels(List<SceneObjects> sceneObjectsList, Camera cam, int numRays, int numBounces) {
+        ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()-4);
+
+        System.out.println("Threads available: 16");
         Ray[][] primaryRay = new Ray[(int) cam.getResX()][(int) cam.getResY()];
         Ray[][] nthRay = new Ray[(int) cam.getResX()][(int) cam.getResY()];
+        int[][] boundArrayX = new int[Runtime.getRuntime().availableProcessors()][2]; // x bounds
+        threadRenderSegmentation(cam.getResX(), Runtime.getRuntime().availableProcessors(), boundArrayX);
+        int[][] boundArrayY = new int[Runtime.getRuntime().availableProcessors()][2]; // y bounds
+        threadRenderSegmentation(cam.getResY(), Runtime.getRuntime().availableProcessors(), boundArrayY);
 
         System.out.print("|-");
-        for (int l = 0; l < 99; l++) {
+        for (int l = 0; l < Runtime.getRuntime().availableProcessors() * 2; l++) {
             System.out.print("-");
         }
         System.out.println("-|");
-        System.out.print("||");
+        System.out.print("|-");
+
         for (int j = 0; j < cam.getResY(); j++) {
             for (int i = 0; i < cam.getResX(); i++) {
                 computePrimaryRay(cam, primaryRay, sceneObjectsList, i, j);
             }
         }
 
+        for (int segmenty = 0; segmenty < Runtime.getRuntime().availableProcessors(); segmenty++) {
+            for (int segmentx = 0; segmentx < Runtime.getRuntime().availableProcessors(); segmentx++) {
+                int finalSegmentx = segmentx;
+                int finalSegmenty = segmenty;
+                executor.execute(() -> marchIntersectionLogic(primaryRay, nthRay, sceneObjectsList, numRays, numBounces, boundArrayX[finalSegmentx][0], boundArrayX[finalSegmentx][1], boundArrayY[finalSegmenty][0], boundArrayY[finalSegmenty][1]));
+            }
+            System.out.print("--");
+        }
+        executor.shutdown();
+        try {
+            if (!executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS)) {
+                System.err.println("Executor did not terminate in the specified time.");
+            }
+        } catch (InterruptedException e) {
+            System.err.println("Thread was interrupted while waiting for termination.");
+            Thread.currentThread().interrupt();  // Restore the interrupted status
+        }
 
-        marchIntersectionLogic(primaryRay, nthRay, sceneObjectsList, numRays, numBounces, cam);
 
-        System.out.println("||");
+        System.out.println("-|");
         brightnessDistribution(cam, primaryRay);
-        drawScreenQuantiles(cam, primaryRay);
+        drawScreen(cam, primaryRay);
     }
 
     public void computePrimaryRay(Camera cam, Ray[][] primaryRay, List<SceneObjects> sceneObjectsList, int i, int j) {
+        List<SceneObjects> visibleObjects = new ArrayList<>();
         primaryRay[i][j] = new Ray(cam.getPosX(), cam.getPosY(), cam.getPosZ());
         // update the rays index to the current pixel
         primaryRay[i][j].setPixelX(i);
@@ -164,7 +213,7 @@ public class RenderMultithreaded {
                         primaryRay[i][j].setHitObject(sceneObject1);
                         // add light amplitude
                         if (sceneObject1.getLuminance() != 0) {
-                            primaryRay[i][j].addLightAmplitude(lambertCosineLaw(primaryRay[i][j], sceneObject1, sceneObject1.getLuminance() * sceneObject1.getReflectivity()));
+                            primaryRay[i][j].addLightAmplitude(lambertCosineLaw(primaryRay[i][j], sceneObject1) * sceneObject1.getLuminance() * sceneObject1.getReflectivity());
                         }
                     }
                     // hit is already false otherwise
@@ -174,10 +223,11 @@ public class RenderMultithreaded {
         }
     }
 
-    public void marchIntersectionLogic(Ray[][] primaryRay, Ray[][] nthRay, List<SceneObjects> sceneObjectsList, int numRays, int numBounces, Camera cam) {
+    public void marchIntersectionLogic(Ray[][] primaryRay, Ray[][] nthRay, List<SceneObjects> sceneObjectsList, int numRays, int numBounces, int lowerx, int upperx, int lowery, int uppery) {
+        List<SceneObjects> visibleObjects = new ArrayList<>();
         for (int currentRay = 1; currentRay < numRays; currentRay++) { // sample one ray for each pixel, then move onto the next ray
-            for (int j = 0; j < cam.getResY(); j++) {
-                for (int i = 0; i < cam.getResX(); i++) {
+            for (int j = lowery; j <= uppery; j++) {
+                for (int i = lowerx; i <= upperx; i++) {
                     if (primaryRay[i][j].getHit()) {
                         nthRay[i][j] = new Ray(primaryRay[i][j].getHitPointX(), primaryRay[i][j].getHitPointY(), primaryRay[i][j].getHitPointZ());
                         double[][] luminanceArray = new double[numBounces][5];
@@ -187,11 +237,11 @@ public class RenderMultithreaded {
                         for (int currentBounce = 0; currentBounce < numBounces && nthRay[i][j].getHit(); currentBounce++) {
                             if (currentBounce == 0) {
                                 // first bounce uses random direction
-                                nthRay[i][j].getHitObject().randomDirection(nthRay[i][j]);
+                                randomDirection(nthRay[i][j], nthRay[i][j].getHitObject());
                             } else {
                                 // second uses a reflection vector
-                                //nthRay[i][j].getHitObject().reflectionBounce(nthRay[i][j]);
-                                nthRay[i][j].getHitObject().randomDirection(nthRay[i][j]);
+                                randomDirection(nthRay[i][j], nthRay[i][j].getHitObject());
+                                reflectionBounce(nthRay[i][j], nthRay[i][j].getHitObject());
                             }
                             // add all non culled objects to a list
                             visibleObjects.clear();
@@ -213,7 +263,7 @@ public class RenderMultithreaded {
                                         nthRay[i][j].updateHitProperties(sceneObject1);
                                         // data structure for storing object luminance, dot product and bounce depth, and boolean hit
                                         luminanceArray[currentBounce][0] = sceneObject1.getLuminance(); // object luminance
-                                        luminanceArray[currentBounce][1] = lambertCosineLawTEST(nthRay[i][j], sceneObject1); // dot product
+                                        luminanceArray[currentBounce][1] = lambertCosineLaw(nthRay[i][j], sceneObject1); // dot product
                                         luminanceArray[currentBounce][2] = currentBounce + 1; // which bounce
                                         luminanceArray[currentBounce][3] = 1; // boolean hit
                                         luminanceArray[currentBounce][4] = sceneObject1.getReflectivity(); // reflectivity
@@ -236,72 +286,54 @@ public class RenderMultithreaded {
                     }
                 }
             }
-            int loading = (int) (((float) currentRay / numRays) * 100); // loading bar
-            if (loading > progress) {
-                System.out.print("|");
-                progress = loading;
-            }
         }
     }
 
-    public double lambertCosineLaw(Ray currentRay, SceneObjects sceneObject, double brightness) {
-        sceneObject.calculateNormal(currentRay);
-        currentRay.updateNormalisation();
+    public void randomDirection(Ray nthRay, SceneObjects sceneObject) {
+        double dotproduct = -1;
+        Random random = new Random();
 
-        // dot product of sphere normal and ray direction
-        double costheta = sceneObject.getNormalX() * currentRay.getDirX() + sceneObject.getNormalY() * currentRay.getDirY() + sceneObject.getNormalZ() * currentRay.getDirZ();
-        brightness = Math.abs(brightness * costheta);
+        nthRay.marchRay(0);
+        sceneObject.calculateNormal(nthRay);
 
-        if (costheta < 0) {
-            return brightness;
-        } else {
-            return 0;
+        while (dotproduct <= 0){
+            // Generate a random direction uniformly on a sphere
+            double theta = Math.acos(2 * random.nextDouble() - 1); // polar angle
+            double phi = 2 * Math.PI * random.nextDouble(); // azimuthal angle
+
+            nthRay.setDirX(Math.sin(theta) * Math.cos(phi));
+            nthRay.setDirY(Math.sin(theta) * Math.sin(phi));
+            nthRay.setDirZ(Math.cos(theta));
+
+            // Normalize the random direction
+            nthRay.updateNormalisation();
+
+            // Calculate the dot product
+            dotproduct = sceneObject.getNormalX() * nthRay.getDirX() + sceneObject.getNormalY() * nthRay.getDirY() + sceneObject.getNormalZ() * nthRay.getDirZ();
         }
+        nthRay.updateOrigin(0.15); // march the ray a tiny amount to move it off the sphere
     }
 
-    public double lambertCosineLawTEST(Ray currentRay, SceneObjects sceneObject) {
+    // R = I - 2 * (I dot N) * N
+    public void reflectionBounce(Ray nthRay, SceneObjects sceneObject) {
+        double dotproduct = sceneObject.getNormalX() * nthRay.getDirX() + sceneObject.getNormalY() * nthRay.getDirY() + sceneObject.getNormalZ() * nthRay.getDirZ();
+        sceneObject.calculateNormal(nthRay);
+        double reflectionX = nthRay.getDirX() - 2 * (dotproduct) * sceneObject.getNormalX();
+        double reflectionY = nthRay.getDirY() - 2 * (dotproduct) * sceneObject.getNormalY();
+        double reflectionZ = nthRay.getDirZ() - 2 * (dotproduct) * sceneObject.getNormalZ();
+
+        nthRay.setDirection(reflectionX, reflectionY, reflectionZ);
+        nthRay.updateNormalisation();
+        nthRay.updateOrigin(0.15); // march the ray a tiny amount to move it off the sphere
+    }
+
+    public double lambertCosineLaw(Ray currentRay, SceneObjects sceneObject) {
         sceneObject.calculateNormal(currentRay);
         currentRay.updateNormalisation();
 
         // dot product of sphere normal and ray direction
         double costheta = Math.abs(sceneObject.getNormalX() * currentRay.getDirX() + sceneObject.getNormalY() * currentRay.getDirY() + sceneObject.getNormalZ() * currentRay.getDirZ());
         return costheta;
-    }
-
-    // prints the brightness value of each pixel
-    public void drawScreen(Camera cam, Ray[][] primaryRay) {
-        // iterate through each rays hit value and print the output
-        System.out.print("|");
-        for (int i = 0; i < cam.getResX(); i++) {
-            System.out.print("-|-");
-        }
-        System.out.println("|");
-        for (int j = 0; j < cam.getResY(); j++) {
-            System.out.print("|");
-            for (int i = 0; i < cam.getResX(); i++) {
-                if (primaryRay[i][j].getLightAmplitude() >= 20) {
-                    System.out.print("###");
-                } else if (primaryRay[i][j].getLightAmplitude() >= 15 && primaryRay[i][j].getLightAmplitude() < 20) {
-                    System.out.print("XXX");
-                } else if (primaryRay[i][j].getLightAmplitude() >= 6 && primaryRay[i][j].getLightAmplitude() < 15) {
-                    System.out.print("***");
-                } else if (primaryRay[i][j].getLightAmplitude() >= 0.4 && primaryRay[i][j].getLightAmplitude() < 6) {
-                    System.out.print(";;;");
-                } else if (primaryRay[i][j].getLightAmplitude() > 0 && primaryRay[i][j].getLightAmplitude() < 0.4) {
-                    System.out.print("...");
-                } else if (primaryRay[i][j].getLightAmplitude() == 0) {
-                    System.out.print("   ");
-                } else {
-                    System.out.print(primaryRay[i][j].getLightAmplitude());
-                }
-            }
-            System.out.println("|");
-        }
-        System.out.print("|");
-        for (int i = 0; i < cam.getResX(); i++) {
-            System.out.print("---");
-        }
-        System.out.println("|");
     }
 
     public void debugDrawScreenBrightness(Camera cam, Ray[][] primaryRay) {
@@ -331,45 +363,6 @@ public class RenderMultithreaded {
         for (int i = 0; i < cam.getResX(); i++) {
             System.out.print("------");
         }
-    }
-
-    public void drawScreenLogarithm(Camera cam, Ray[][] primaryRay) {
-        // iterate through each rays hit value and print the output
-        System.out.print("|");
-        for (int i = 0; i < cam.getResX(); i++) {
-            System.out.print("-|-");
-        }
-        System.out.println("|");
-        for (int j = 0; j < cam.getResY(); j++) {
-            System.out.print("|");
-            for (int i = 0; i < cam.getResX(); i++) {
-                if (primaryRay[i][j].getHit()) {
-                    if (primaryRay[i][j].getLightAmplitude() >= 1000) {
-                        System.out.print("###");
-                    } else if (primaryRay[i][j].getLightAmplitude() >= 100 && primaryRay[i][j].getLightAmplitude() < 1000) {
-                        System.out.print("XXX");
-                    } else if (primaryRay[i][j].getLightAmplitude() >= 10 && primaryRay[i][j].getLightAmplitude() < 100) {
-                        System.out.print("***");
-                    } else if (primaryRay[i][j].getLightAmplitude() >= 1 && primaryRay[i][j].getLightAmplitude() < 10) {
-                        System.out.print(";;;");
-                    } else if (primaryRay[i][j].getLightAmplitude() > 0 && primaryRay[i][j].getLightAmplitude() < 1) {
-                        System.out.print("...");
-                    } else if (primaryRay[i][j].getLightAmplitude() == 0) {
-                        System.out.print("   ");
-                    } else {
-                        System.out.print(primaryRay[i][j].getLightAmplitude());
-                    }
-                } else if (!primaryRay[i][j].getHit()) {
-                    System.out.print("   ");
-                }
-            }
-            System.out.println("|");
-        }
-        System.out.print("|");
-        for (int i = 0; i < cam.getResX(); i++) {
-            System.out.print("---");
-        }
-        System.out.println("|");
     }
 
     public void debugDrawScreenNumHits(Camera cam, Ray[][] primaryRay) {

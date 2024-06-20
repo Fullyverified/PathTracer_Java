@@ -2,6 +2,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 public class RenderSinglethreaded {
 
@@ -28,33 +29,8 @@ public class RenderSinglethreaded {
         return data.get(Math.max(index, 0));
     }
 
-        /*System.out.println("q1: " + q1);
-        System.out.println("q2: " + q2);
-        System.out.println("q3: " + q3);
-        System.out.println("q4: " + q4);
-        System.out.println("q5: " + q5);
-        System.out.println("q6: " + q6);
-        System.out.println("q7: " + q7);
-        System.out.println("q8: " + q8);
-        System.out.println("q9: " + q9);
-        System.out.println("q10: " + q10);
-        System.out.println("q11: " + q11);
-        System.out.println("q12: " + q12);*/
-
     // ... ,,, ~~~ ::: ;;; XXX *** 000 DDD ### @@@
     public void drawScreenQuantiles(Camera cam, Ray[][] primaryRay) {
-        /*double q1 = getQuantile(amplitudes, 0.08);
-        double q2 = getQuantile(amplitudes, 0.16);
-        double q3 = getQuantile(amplitudes, 0.24);
-        double q4 = getQuantile(amplitudes, 0.32);
-        double q5 = getQuantile(amplitudes, 0.40);
-        double q6 = getQuantile(amplitudes, 0.48);
-        double q7 = getQuantile(amplitudes, 0.56);
-        double q8 = getQuantile(amplitudes, 0.64);
-        double q9 = getQuantile(amplitudes, 0.72);
-        double q10 = getQuantile(amplitudes, 0.80);
-        double q11 = getQuantile(amplitudes, 0.88);
-        double q12 = getQuantile(amplitudes, 0.95);*/
         double max = Collections.max(amplitudes) * cam.getISO();
         double q1 = (max * 0.08);
         double q2 = (max * 0.16);
@@ -187,7 +163,7 @@ public class RenderSinglethreaded {
                         primaryRay[i][j].setHitObject(sceneObject1);
                         // add light amplitude
                         if (sceneObject1.getLuminance() != 0) {
-                            primaryRay[i][j].addLightAmplitude(lambertCosineLaw(primaryRay[i][j], sceneObject1, sceneObject1.getLuminance() * sceneObject1.getReflectivity()));
+                            primaryRay[i][j].addLightAmplitude(lambertCosineLaw(primaryRay[i][j], sceneObject1) *  sceneObject1.getLuminance() * sceneObject1.getReflectivity());
                         }
                     }
                     // hit is already false otherwise
@@ -210,11 +186,11 @@ public class RenderSinglethreaded {
                         for (int currentBounce = 0; currentBounce < numBounces && nthRay[i][j].getHit(); currentBounce++) {
                             if (currentBounce == 0) {
                                 // first bounce uses random direction
-                                nthRay[i][j].getHitObject().randomDirection(nthRay[i][j]);
+                                randomDirection(nthRay[i][j], nthRay[i][j].getHitObject());
                             } else {
                                 // second uses a reflection vector
-                                //nthRay[i][j].getHitObject().reflectionBounce(nthRay[i][j]);
-                                nthRay[i][j].getHitObject().randomDirection(nthRay[i][j]);
+                                //reflectionBounce(nthRay[i][j], nthRay[i][j].getHitObject());
+                                randomDirection(nthRay[i][j], nthRay[i][j].getHitObject());
                             }
                             // add all non culled objects to a list
                             visibleObjects.clear();
@@ -236,7 +212,7 @@ public class RenderSinglethreaded {
                                         nthRay[i][j].updateHitProperties(sceneObject1);
                                         // data structure for storing object luminance, dot product and bounce depth, and boolean hit
                                         luminanceArray[currentBounce][0] = sceneObject1.getLuminance(); // object luminance
-                                        luminanceArray[currentBounce][1] = lambertCosineLawTEST(nthRay[i][j], sceneObject1); // dot product
+                                        luminanceArray[currentBounce][1] = lambertCosineLaw(nthRay[i][j], sceneObject1); // dot product
                                         luminanceArray[currentBounce][2] = currentBounce + 1; // which bounce
                                         luminanceArray[currentBounce][3] = 1; // boolean hit
                                         luminanceArray[currentBounce][4] = sceneObject1.getReflectivity(); // reflectivity
@@ -267,132 +243,51 @@ public class RenderSinglethreaded {
         }
     }
 
-    public double lambertCosineLaw(Ray currentRay, SceneObjects sceneObject, double brightness) {
-        sceneObject.calculateNormal(currentRay);
-        currentRay.updateNormalisation();
+    public void randomDirection(Ray nthRay, SceneObjects sceneObject) {
+        double dotproduct = -1;
+        Random random = new Random();
 
-        // dot product of sphere normal and ray direction
-        double costheta = sceneObject.getNormalX() * currentRay.getDirX() + sceneObject.getNormalY() * currentRay.getDirY() + sceneObject.getNormalZ() * currentRay.getDirZ();
-        brightness = Math.abs(brightness * costheta);
+        nthRay.marchRay(0);
+        sceneObject.calculateNormal(nthRay);
 
-        if (costheta < 0) {
-            return brightness;
-        } else {
-            return 0;
+        while (dotproduct <= 0){
+            // Generate a random direction uniformly on a sphere
+            double theta = Math.acos(2 * random.nextDouble() - 1); // polar angle
+            double phi = 2 * Math.PI * random.nextDouble(); // azimuthal angle
+
+            nthRay.setDirX(Math.sin(theta) * Math.cos(phi));
+            nthRay.setDirY(Math.sin(theta) * Math.sin(phi));
+            nthRay.setDirZ(Math.cos(theta));
+
+            // Normalize the random direction
+            nthRay.updateNormalisation();
+
+            // Calculate the dot product
+            dotproduct = sceneObject.getNormalX() * nthRay.getDirX() + sceneObject.getNormalY() * nthRay.getDirY() + sceneObject.getNormalZ() * nthRay.getDirZ();
         }
+        nthRay.updateOrigin(0.15); // march the ray a tiny amount to move it off the sphere
     }
 
-    public double lambertCosineLawTEST(Ray currentRay, SceneObjects sceneObject) {
+    // R = I - 2 * (I dot N) * N
+    public void reflectionBounce(Ray nthRay, SceneObjects sceneObject) {
+        double dotproduct = sceneObject.getNormalX() * nthRay.getDirX() + sceneObject.getNormalY() * nthRay.getDirY() + sceneObject.getNormalZ() * nthRay.getDirZ();
+        sceneObject.calculateNormal(nthRay);
+        double reflectionX = nthRay.getDirX() - 2 * (dotproduct) * sceneObject.getNormalX();
+        double reflectionY = nthRay.getDirY() - 2 * (dotproduct) * sceneObject.getNormalY();
+        double reflectionZ = nthRay.getDirZ() - 2 * (dotproduct) * sceneObject.getNormalZ();
+
+        nthRay.setDirection(reflectionX, reflectionY, reflectionZ);
+        nthRay.updateNormalisation();
+        nthRay.updateOrigin(0.15); // march the ray a tiny amount to move it off the sphere
+    }
+
+    public double lambertCosineLaw(Ray currentRay, SceneObjects sceneObject) {
         sceneObject.calculateNormal(currentRay);
         currentRay.updateNormalisation();
 
         // dot product of sphere normal and ray direction
         double costheta = Math.abs(sceneObject.getNormalX() * currentRay.getDirX() + sceneObject.getNormalY() * currentRay.getDirY() + sceneObject.getNormalZ() * currentRay.getDirZ());
         return costheta;
-    }
-
-    // prints the brightness value of each pixel
-    public void drawScreen(Camera cam, Ray[][] primaryRay) {
-        // iterate through each rays hit value and print the output
-        System.out.print("|");
-        for (int i = 0; i < cam.getResX(); i++) {
-            System.out.print("-|-");
-        }
-        System.out.println("|");
-        for (int j = 0; j < cam.getResY(); j++) {
-            System.out.print("|");
-            for (int i = 0; i < cam.getResX(); i++) {
-                if (primaryRay[i][j].getLightAmplitude() >= 20) {
-                    System.out.print("###");
-                } else if (primaryRay[i][j].getLightAmplitude() >= 15 && primaryRay[i][j].getLightAmplitude() < 20) {
-                    System.out.print("XXX");
-                } else if (primaryRay[i][j].getLightAmplitude() >= 6 && primaryRay[i][j].getLightAmplitude() < 15) {
-                    System.out.print("***");
-                } else if (primaryRay[i][j].getLightAmplitude() >= 0.4 && primaryRay[i][j].getLightAmplitude() < 6) {
-                    System.out.print(";;;");
-                } else if (primaryRay[i][j].getLightAmplitude() > 0 && primaryRay[i][j].getLightAmplitude() < 0.4) {
-                    System.out.print("...");
-                } else if (primaryRay[i][j].getLightAmplitude() == 0) {
-                    System.out.print("   ");
-                } else {
-                    System.out.print(primaryRay[i][j].getLightAmplitude());
-                }
-            }
-            System.out.println("|");
-        }
-        System.out.print("|");
-        for (int i = 0; i < cam.getResX(); i++) {
-            System.out.print("---");
-        }
-        System.out.println("|");
-    }
-
-    public void debugDrawScreenBrightness(Camera cam, Ray[][] primaryRay) {
-        DecimalFormat df = new DecimalFormat("#.00");
-        // iterate through each rays hit value and print the output
-        for (int i = 0; i < cam.getResX(); i++) {
-            System.out.print("------");
-        }
-        System.out.println(" ");
-        for (int j = 0; j < cam.getResY(); j++) {
-            System.out.print("|");
-            for (int i = 0; i < cam.getResX(); i++) {
-                if (primaryRay[i][j].getHit()) {
-                    if (primaryRay[i][j].getLightAmplitude() >= 10) {
-                        System.out.print(df.format(primaryRay[i][j].getLightAmplitude()) + "|");
-                    } else if (primaryRay[i][j].getLightAmplitude() >= 1.0 && primaryRay[i][j].getLightAmplitude() < 10) {
-                        System.out.print("0" + df.format(primaryRay[i][j].getLightAmplitude()) + "|");
-                    } else if (primaryRay[i][j].getLightAmplitude() < 1) {
-                        System.out.print("00" + df.format(primaryRay[i][j].getLightAmplitude()) + "|");
-                    }
-                } else {
-                    System.out.print("00.00|");
-                }
-            }
-            System.out.println(" ");
-        }
-        for (int i = 0; i < cam.getResX(); i++) {
-            System.out.print("------");
-        }
-    }
-
-    public void drawScreenLogarithm(Camera cam, Ray[][] primaryRay) {
-        // iterate through each rays hit value and print the output
-        System.out.print("|");
-        for (int i = 0; i < cam.getResX(); i++) {
-            System.out.print("-|-");
-        }
-        System.out.println("|");
-        for (int j = 0; j < cam.getResY(); j++) {
-            System.out.print("|");
-            for (int i = 0; i < cam.getResX(); i++) {
-                if (primaryRay[i][j].getHit()) {
-                    if (primaryRay[i][j].getLightAmplitude() >= 1000) {
-                        System.out.print("###");
-                    } else if (primaryRay[i][j].getLightAmplitude() >= 100 && primaryRay[i][j].getLightAmplitude() < 1000) {
-                        System.out.print("XXX");
-                    } else if (primaryRay[i][j].getLightAmplitude() >= 10 && primaryRay[i][j].getLightAmplitude() < 100) {
-                        System.out.print("***");
-                    } else if (primaryRay[i][j].getLightAmplitude() >= 1 && primaryRay[i][j].getLightAmplitude() < 10) {
-                        System.out.print(";;;");
-                    } else if (primaryRay[i][j].getLightAmplitude() > 0 && primaryRay[i][j].getLightAmplitude() < 1) {
-                        System.out.print("...");
-                    } else if (primaryRay[i][j].getLightAmplitude() == 0) {
-                        System.out.print("   ");
-                    } else {
-                        System.out.print(primaryRay[i][j].getLightAmplitude());
-                    }
-                } else if (!primaryRay[i][j].getHit()) {
-                    System.out.print("   ");
-                }
-            }
-            System.out.println("|");
-        }
-        System.out.print("|");
-        for (int i = 0; i < cam.getResX(); i++) {
-            System.out.print("---");
-        }
-        System.out.println("|");
     }
 
     public void debugDrawScreenNumHits(Camera cam, Ray[][] primaryRay) {

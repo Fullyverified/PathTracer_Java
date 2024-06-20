@@ -114,8 +114,8 @@ public class Camera{
     public double getUpMagnitude() {return this.upMagnitude;}
     public double getRightMagnitude() {return this.rightMagnitude;}
 
-    public double getResX() {return this.resX;}
-    public double getResY() {return this.resY;}
+    public int getResX() {return (int) this.resX;}
+    public int getResY() {return (int) this.resY;}
 
     public double getCamWidth() {return this.planeWidth;}
     public double getCamHeight() {return this.planeHeight;}

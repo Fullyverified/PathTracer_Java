@@ -1,5 +1,5 @@
 
-public class Plane implements SceneObjects{
+public class Plane{
 
     private double normalx, normaly, normalz;
     double normalMagnitude;

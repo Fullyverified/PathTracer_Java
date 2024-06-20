@@ -138,44 +138,6 @@ public class AABCubeBounds implements SceneObjects {
         }
     }
 
-    public void randomDirection(Ray nthRay) {
-        double dotproduct = -1;
-        Random random = new Random();
-
-        nthRay.marchRay(0);
-        calculateNormal(nthRay);
-
-        while (dotproduct <= 0){
-            // Generate a random direction uniformly on a sphere
-            double theta = Math.acos(2 * random.nextDouble() - 1); // polar angle
-            double phi = 2 * Math.PI * random.nextDouble(); // azimuthal angle
-
-            nthRay.setDirX(Math.sin(theta) * Math.cos(phi));
-            nthRay.setDirY(Math.sin(theta) * Math.sin(phi));
-            nthRay.setDirZ(Math.cos(theta));
-
-            // Normalize the random direction
-            nthRay.updateNormalisation();
-
-            // Calculate the dot product
-            dotproduct = this.normalx * nthRay.getDirX() + this.normaly * nthRay.getDirY() + this.normalz * nthRay.getDirZ();
-        }
-        nthRay.updateOrigin(0.15); // march the ray a tiny amount to move it off the sphere
-    }
-
-    // R = I - 2 * (I dot N) * N
-    public void reflectionBounce(Ray nthRay) {
-        calculateNormal(nthRay);
-        double dotproduct = normalx * nthRay.getDirX() + normaly * nthRay.getDirY() + normalz * nthRay.getDirZ();
-        double reflectionX = nthRay.getDirX() - 2 * (dotproduct) * normalx;
-        double reflectionY = nthRay.getDirY() - 2 * (dotproduct) * normaly;
-        double reflectionZ = nthRay.getDirZ() - 2 * (dotproduct) * normalz;
-
-        nthRay.setDirection(reflectionX, reflectionY, reflectionZ);
-        nthRay.updateNormalisation();
-        nthRay.updateOrigin(0.15); // march the ray a tiny amount to move it off the sphere
-    }
-
     // get each the normalised normal
     public double getNormalX() {
         return this.normalx;
