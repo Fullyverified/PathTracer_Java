@@ -7,13 +7,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class RenderMultithreaded {
+public class RenderMultiThreaded {
 
     public int progress = 0;
     List<Double> amplitudes = new ArrayList<>();
 
 
-    public RenderMultithreaded() {
+    public RenderMultiThreaded() {
     }
 
     public void brightnessDistribution(Camera cam, Ray[][] primaryRay) {
@@ -117,11 +117,11 @@ public class RenderMultithreaded {
     }
 
     public void computePixels(List<SceneObjects> sceneObjectsList, Camera cam, int numRays, int numBounces) {
-        ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()-4);
+        ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-        System.out.println("Threads available: 16");
-        Ray[][] primaryRay = new Ray[(int) cam.getResX()][(int) cam.getResY()];
-        Ray[][] nthRay = new Ray[(int) cam.getResX()][(int) cam.getResY()];
+        System.out.println("Threads available:" + Runtime.getRuntime().availableProcessors());
+        Ray[][] primaryRay = new Ray[cam.getResX()][cam.getResY()];
+        Ray[][] nthRay = new Ray[cam.getResX()][cam.getResY()];
         int[][] boundArrayX = new int[Runtime.getRuntime().availableProcessors()][2]; // x bounds
         threadRenderSegmentation(cam.getResX(), Runtime.getRuntime().availableProcessors(), boundArrayX);
         int[][] boundArrayY = new int[Runtime.getRuntime().availableProcessors()][2]; // y bounds
@@ -230,10 +230,11 @@ public class RenderMultithreaded {
                 for (int i = lowerx; i <= upperx; i++) {
                     if (primaryRay[i][j].getHit()) {
                         nthRay[i][j] = new Ray(primaryRay[i][j].getHitPointX(), primaryRay[i][j].getHitPointY(), primaryRay[i][j].getHitPointZ());
-                        double[][] luminanceArray = new double[numBounces][5];
+                        double[][] luminanceArray = new double[numBounces+1][5];
                         // BOUNCES PER RAY
                         // initialize ray starting conditions
                         nthRay[i][j].initializeRay(primaryRay[i][j]);
+                        storeHitData(luminanceArray, nthRay[i][j], -1, nthRay[i][j].getHitObject());
                         for (int currentBounce = 0; currentBounce < numBounces && nthRay[i][j].getHit(); currentBounce++) {
                             if (currentBounce == 0) {
                                 // first bounce uses random direction
@@ -262,11 +263,7 @@ public class RenderMultithreaded {
                                         primaryRay[i][j].addNumHits(); // debug
                                         nthRay[i][j].updateHitProperties(sceneObject1);
                                         // data structure for storing object luminance, dot product and bounce depth, and boolean hit
-                                        luminanceArray[currentBounce][0] = sceneObject1.getLuminance(); // object luminance
-                                        luminanceArray[currentBounce][1] = lambertCosineLaw(nthRay[i][j], sceneObject1); // dot product
-                                        luminanceArray[currentBounce][2] = currentBounce + 1; // which bounce
-                                        luminanceArray[currentBounce][3] = 1; // boolean hit
-                                        luminanceArray[currentBounce][4] = sceneObject1.getReflectivity(); // reflectivity
+                                        storeHitData(luminanceArray, nthRay[i][j], currentBounce, sceneObject1);
                                     }
                                 }
                                 distance += 0.1;
@@ -286,6 +283,19 @@ public class RenderMultithreaded {
                     }
                 }
             }
+        }
+    }
+
+    public synchronized void storeHitData(double[][] luminanceArray, Ray nthRay, int currentBounce, SceneObjects sceneObject){
+        int pos = currentBounce + 1;
+        luminanceArray[pos][0] = sceneObject.getLuminance(); // object luminance
+        luminanceArray[pos][1] = lambertCosineLaw(nthRay, sceneObject); // dot product
+        luminanceArray[pos][2] = currentBounce + 1; // which bounce
+        luminanceArray[pos][3] = 1; // boolean hit
+        luminanceArray[pos][4] = sceneObject.getReflectivity(); // reflectivity
+
+        if (currentBounce == -1){
+            luminanceArray[pos][1] = 1;
         }
     }
 

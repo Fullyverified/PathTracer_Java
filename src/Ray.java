@@ -64,6 +64,7 @@ public class Ray {
         marchRay(0);
         setHitPoint(primaryRay.getHitPointX(), primaryRay.getHitPointY(), primaryRay.getHitPointZ());
         setHitObject(primaryRay.getHitObject());
+        setDirection(primaryRay.getDirX(), primaryRay.getDirY(), primaryRay.getDirZ());
         setHit(true);
     }
 
