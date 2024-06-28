@@ -185,7 +185,7 @@ public class RenderSingleThreaded {
                         // BOUNCES PER RAY
                         // initialize ray starting conditions
                         nthRay[i][j].initializeRay(primaryRay[i][j]);
-                        storeHitData(luminanceArray, nthRay[i][j], -1, nthRay[i][j].getHitObject());
+                        //storeHitData(luminanceArray, nthRay[i][j], -1, nthRay[i][j].getHitObject());
                         for (int currentBounce = 0; currentBounce < numBounces && nthRay[i][j].getHit(); currentBounce++) {
                             if (currentBounce == 0) {
                                 // first bounce uses random direction

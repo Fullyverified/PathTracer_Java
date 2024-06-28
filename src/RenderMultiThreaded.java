@@ -117,15 +117,16 @@ public class RenderMultiThreaded {
     }
 
     public void computePixels(List<SceneObjects> sceneObjectsList, Camera cam, int numRays, int numBounces) {
-        ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        int numThreads = Runtime.getRuntime().availableProcessors();
+        ExecutorService executor = Executors.newFixedThreadPool(numThreads);
 
-        System.out.println("Threads available:" + Runtime.getRuntime().availableProcessors());
+        System.out.println("Threads available:" + numThreads);
         Ray[][] primaryRay = new Ray[cam.getResX()][cam.getResY()];
         Ray[][] nthRay = new Ray[cam.getResX()][cam.getResY()];
-        int[][] boundArrayX = new int[Runtime.getRuntime().availableProcessors()][2]; // x bounds
-        threadRenderSegmentation(cam.getResX(), Runtime.getRuntime().availableProcessors(), boundArrayX);
-        int[][] boundArrayY = new int[Runtime.getRuntime().availableProcessors()][2]; // y bounds
-        threadRenderSegmentation(cam.getResY(), Runtime.getRuntime().availableProcessors(), boundArrayY);
+        int[][] boundArrayX = new int[numThreads][2]; // x bounds
+        threadRenderSegmentation(cam.getResX(), numThreads, boundArrayX);
+        int[][] boundArrayY = new int[numThreads][2]; // y bounds
+        threadRenderSegmentation(cam.getResY(), numThreads, boundArrayY);
 
         System.out.print("|-");
         for (int l = 0; l < Runtime.getRuntime().availableProcessors() * 2; l++) {
@@ -140,8 +141,8 @@ public class RenderMultiThreaded {
             }
         }
 
-        for (int segmenty = 0; segmenty < Runtime.getRuntime().availableProcessors(); segmenty++) {
-            for (int segmentx = 0; segmentx < Runtime.getRuntime().availableProcessors(); segmentx++) {
+        for (int segmenty = 0; segmenty < numThreads; segmenty++) {
+            for (int segmentx = 0; segmentx < numThreads; segmentx++) {
                 int finalSegmentx = segmentx;
                 int finalSegmenty = segmenty;
                 executor.execute(() -> marchIntersectionLogic(primaryRay, nthRay, sceneObjectsList, numRays, numBounces, boundArrayX[finalSegmentx][0], boundArrayX[finalSegmentx][1], boundArrayY[finalSegmenty][0], boundArrayY[finalSegmenty][1]));
@@ -234,7 +235,7 @@ public class RenderMultiThreaded {
                         // BOUNCES PER RAY
                         // initialize ray starting conditions
                         nthRay[i][j].initializeRay(primaryRay[i][j]);
-                        storeHitData(luminanceArray, nthRay[i][j], -1, nthRay[i][j].getHitObject());
+                        //storeHitData(luminanceArray, nthRay[i][j], -1, nthRay[i][j].getHitObject());
                         for (int currentBounce = 0; currentBounce < numBounces && nthRay[i][j].getHit(); currentBounce++) {
                             if (currentBounce == 0) {
                                 // first bounce uses random direction
