@@ -1,5 +1,3 @@
-import java.util.Random;
-
 public class Sphere implements SceneObjects {
 
     private double centerx, centerOriginX;
@@ -116,6 +114,7 @@ public class Sphere implements SceneObjects {
         }
     }
 
+
     // get each the normalised normal
     public double getNormalX() {
         return this.normalx;
@@ -146,6 +145,11 @@ public class Sphere implements SceneObjects {
         return this.centerz;
     }
 
+    public void setPos(double x, double y, double z){
+        this.centerx = x;
+        this.centery = y;
+        this.centerz = z;
+    }
 
     public double getLuminance() {
         return this.luminance;

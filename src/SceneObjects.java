@@ -13,4 +13,5 @@ public interface SceneObjects {
     public double getNormalY();
     public double getNormalZ();
     public double getReflectivity();
+    public void setPos(double x, double y, double z);
 }

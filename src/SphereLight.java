@@ -1,5 +1,3 @@
-import java.util.Random;
-
 public class SphereLight implements SceneObjects {
 
     private double centerx, centerOriginX;
@@ -138,6 +136,12 @@ public class SphereLight implements SceneObjects {
     {return this.centery;}
     public double getPosZ()
     {return this.centerz;}
+
+    public void setPos(double x, double y, double z){
+        this.centerx = x;
+        this.centery = y;
+        this.centerz = z;
+    }
 
     // get each the normalised normal
     public double getNormalX() {return this.normalx;}

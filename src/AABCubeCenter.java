@@ -1,16 +1,14 @@
-import java.util.Random;
-
 public class AABCubeCenter implements SceneObjects {
 
     private double minX, maxX;
     private double minY, maxY;
     private double minZ, maxZ;
     private double centreX, centreY, centreZ;
-    private double xlength, ylength, zlength;
+    private double xLength, yLength, zLength;
     private double tminX, tminY, tminZ;
     private double tmaxX, tmaxY, tmaxZ;
     private double tNear = 0, tFar = 0;
-    private static int numCubes = 200;
+    private static int numCubes = 300;
     private int cubeID = 0;
     private double normalx, normaly, normalz;
     private double luminance = 0;
@@ -24,9 +22,9 @@ public class AABCubeCenter implements SceneObjects {
         this.centreY = centreY;
         this.centreZ = centreZ;
 
-        this.xlength = xLength;
-        this.ylength = yLength;
-        this.zlength = zLength;
+        this.xLength = xLength;
+        this.yLength = yLength;
+        this.zLength = zLength;
 
         this.minX = centreX - xLength / 2;
         this.maxX = centreX + xLength / 2;
@@ -39,6 +37,8 @@ public class AABCubeCenter implements SceneObjects {
         this.cubeID = numCubes;
         numCubes++;
     }
+
+
 
     public void computeMinMax(Ray ray) {
 
@@ -165,6 +165,18 @@ public class AABCubeCenter implements SceneObjects {
         this.normalz = z;
     }
 
+    public void setPos(double x, double y, double z){
+        this.centreX = x;
+        this.centreY = y;
+        this.centreZ = z;
+
+        this.minX = centreX - xLength / 2;
+        this.maxX = centreX + xLength / 2;
+        this.minY = centreY - yLength / 2;
+        this.maxY = centreY + yLength / 2;
+        this.minZ = centreZ - zLength / 2;
+        this.maxZ = centreZ + zLength / 2;
+    }
 
     // get sphere ID
     public int getObjectID() {

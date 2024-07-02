@@ -1,5 +1,3 @@
-import java.util.Random;
-
 public class AABCubeBounds implements SceneObjects {
 
     private double minX, maxX;
@@ -157,6 +155,11 @@ public class AABCubeBounds implements SceneObjects {
         this.normalz = z;
     }
 
+    public void setPos(double x, double y, double z){
+        this.centreX = x;
+        this.centreY = y;
+        this.centreZ = z;
+    }
 
     // get sphere ID
     public int getObjectID() {

@@ -145,7 +145,8 @@ public class RenderMultiThreaded {
             for (int segmentx = 0; segmentx < numThreads; segmentx++) {
                 int finalSegmentx = segmentx;
                 int finalSegmenty = segmenty;
-                executor.execute(() -> marchIntersectionLogic(primaryRay, nthRay, sceneObjectsList, numRays, numBounces, boundArrayX[finalSegmentx][0], boundArrayX[finalSegmentx][1], boundArrayY[finalSegmenty][0], boundArrayY[finalSegmenty][1]));
+                final List<SceneObjects> threadSafeList = sceneObjectsList;
+                executor.execute(() -> marchIntersectionLogic(primaryRay, nthRay, threadSafeList, numRays, numBounces, boundArrayX[finalSegmentx][0], boundArrayX[finalSegmentx][1], boundArrayY[finalSegmenty][0], boundArrayY[finalSegmenty][1]));
             }
             System.out.print("--");
         }
@@ -163,6 +164,15 @@ public class RenderMultiThreaded {
         System.out.println("-|");
         brightnessDistribution(cam, primaryRay);
         drawScreen(cam, primaryRay);
+    }
+
+    private List<SceneObjects> cloneSceneObjects(List<SceneObjects> originalSceneObjects) {
+        List<SceneObjects> clonedList = new ArrayList<>();
+        for (SceneObjects sceneObjects : originalSceneObjects) {
+
+            //clonedList.add();  // Ensure deep copy if mutable objects
+        }
+        return clonedList;
     }
 
     public void computePrimaryRay(Camera cam, Ray[][] primaryRay, List<SceneObjects> sceneObjectsList, int i, int j) {
