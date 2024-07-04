@@ -14,7 +14,7 @@ public class Main {
 
         sceneObjectsList.add(new AABCubeBounds(13, 14, -12, 12,-12,12,0.25));
 
-        int resolutionX = 350;
+        int resolutionX = 550;
         int aspectX = 4;
         int aspectY = 3;
         int fov = 60;
@@ -26,7 +26,7 @@ public class Main {
         cam.imagePlane();
 
         RenderSingleThreaded renderSingleThreaded = new RenderSingleThreaded();
-        renderSingleThreaded.computePixels(sceneObjectsList, cam, 5000, 4,250);
+        renderSingleThreaded.computePixels(sceneObjectsList, cam, 1000, 4,16);
 
         //RenderMultiThreaded renderMultiThreaded = new RenderMultiThreaded();
         //renderMultiThreaded.computePixels(sceneObjectsList, cam, 6000, 4);

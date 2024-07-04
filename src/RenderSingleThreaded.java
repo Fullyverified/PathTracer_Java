@@ -21,20 +21,21 @@ public class RenderSingleThreaded {
         Ray[][] primaryRay = new Ray[cam.getResX()][cam.getResY()];
         Ray[][] nthRay = new Ray[cam.getResX()][cam.getResY()];
 
-        /*System.out.print("|-");
-        for (int l = 0; l < 100; l++) {
-            System.out.print("-");
-        }
-        System.out.println("-|");
-        System.out.print("|-");*/
         DrawScreenASCII drawScreenASCII = new DrawScreenASCII(cam, primaryRay, frameTime);
-        DrawScreen drawScreen = new DrawScreen(cam.getResX(), cam.getResY());
+        DrawScreen drawScreen = new DrawScreen(cam.getResX(), cam.getResY(), 3);
 
         for (int j = 0; j < cam.getResY(); j++) {
             for (int i = 0; i < cam.getResX(); i++) {
                 computePrimaryRay(cam, primaryRay, sceneObjectsList, i, j);
             }
         }
+        System.out.println("Finished Primary Rays");
+        System.out.print("|-");
+        for (int l = 0; l < 100; l++) {
+            System.out.print("-");
+        }
+        System.out.println("-|");
+        System.out.print("|-");
 
         ScheduledExecutorService drawScreenExecutor = Executors.newScheduledThreadPool(1);
         AtomicBoolean updateScreen = new AtomicBoolean(false);
@@ -60,7 +61,7 @@ public class RenderSingleThreaded {
         // final print
         //drawScreenASCII.drawScreenQuantiles(cam, primaryRay, loadingProgress); // ascii
         drawScreen.updateImage(cam.getResX(), cam.getResY(), primaryRay, cam); // real
-        /*System.out.print("-|");*/
+        System.out.print("-|");
 
     }
 
@@ -181,10 +182,10 @@ public class RenderSingleThreaded {
             }
         }
         loadingProgress = (int) (((float) currentRay / numRays) * 100); // loading bar
-        /*if (currentProgress < loadingProgress){
+        if (currentProgress < loadingProgress){
             currentProgress = loadingProgress;
             System.out.print("|");
-        }*/
+        }
     }
 
     public void storeHitData(double[][] luminanceArray, Ray nthRay, int currentBounce, SceneObjects sceneObject) {

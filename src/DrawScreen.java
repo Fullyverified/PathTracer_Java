@@ -10,11 +10,12 @@ public class DrawScreen extends JPanel {
 
     List<Double> amplitudes = new ArrayList<>();
 
-    int scalingFactor = 5;
+    private int scalingFactor;
 
     private BufferedImage image;
 
-    public DrawScreen(int width, int height) {
+    public DrawScreen(int width, int height, int scalingFactor) {
+        this.scalingFactor = scalingFactor;
         // Initialize the canvas with specified width and height
         image = new BufferedImage(width*scalingFactor, height*scalingFactor, BufferedImage.TYPE_INT_RGB);
 
@@ -58,25 +59,6 @@ public class DrawScreen extends JPanel {
             }
         }
         repaint(); // update image
-    }
-
-    public void randomColours(int width, int height) {
-        // Paint each pixel with a different color
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                // Example color pattern: create a gradient
-                int red = (x * 255) / width;
-                int green = (y * 255) / height;
-                int blue = ((x + y) * 255) / (width + height);
-
-                int color = (red << 16) | (green << 8) | blue;
-                image.setRGB(x, y, color);
-            }
-        }
-    }
-    public void setPixelColor(int x, int y, Color color) {
-        image.setRGB(x, y, color.getRGB());
-        repaint();
     }
 
     @Override
