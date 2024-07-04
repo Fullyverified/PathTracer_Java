@@ -27,13 +27,10 @@ Done:
 15. Cubes!
 
 TODO LIST OF THINGS TODO:
-1. Add more shapes, flat planes, triangles, and hopefully shapes of arbitrary proportions.
-2. Add colour
-3. Add the ability to move things around within the scene
-4. Try to make it run in real time and add controls, so it can be game-ified (?)
-5. Re-write it in C++ (in order to learn C++)
-6. Re-write it in Vulkan to make it run on the GPU (big maybe)
-7. Multi-threading
+1. Add the possibility to output actual pixel values instead of ACSCII
+2. Change ray bounce direction to be biased so that specular lighting becomes possible
+3. Add colour
+4. Multi-threading
 
 Known Bugs:
-Specular lighting doesn't work? I only just noticed.
+No specular lighting (whoops)
