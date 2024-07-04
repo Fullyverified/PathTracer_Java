@@ -17,12 +17,12 @@ public class RenderSingleThreaded {
     public RenderSingleThreaded() {
     }
 
-    public void computePixels(List<SceneObjects> sceneObjectsList, Camera cam, int numRays, int numBounces, long frameTime) {
+    public void computePixels(List<SceneObjects> sceneObjectsList, Camera cam, int numRays, int numBounces, long frameTime, int scalingFactor) {
         Ray[][] primaryRay = new Ray[cam.getResX()][cam.getResY()];
         Ray[][] nthRay = new Ray[cam.getResX()][cam.getResY()];
 
         DrawScreenASCII drawScreenASCII = new DrawScreenASCII(cam, primaryRay, frameTime);
-        DrawScreen drawScreen = new DrawScreen(cam.getResX(), cam.getResY(), 3);
+        DrawScreen drawScreen = new DrawScreen(cam.getResX(), cam.getResY(), scalingFactor);
 
         for (int j = 0; j < cam.getResY(); j++) {
             for (int i = 0; i < cam.getResX(); i++) {
@@ -31,7 +31,7 @@ public class RenderSingleThreaded {
         }
         System.out.println("Finished Primary Rays");
         System.out.print("|-");
-        for (int l = 0; l < 100; l++) {
+        for (int l = 1; l < 100; l++) {
             System.out.print("-");
         }
         System.out.println("-|");

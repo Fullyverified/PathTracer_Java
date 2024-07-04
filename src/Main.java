@@ -3,6 +3,11 @@ import java.util.List;
 
 public class Main {
 
+    public static int resolutionX = 250;
+    public static int aspectX = 4;
+    public static int aspectY = 3;
+    public static int fov = 60;
+
     public static void main(String[] args) {
 
         List<SceneObjects> sceneObjectsList = new ArrayList<>();
@@ -14,10 +19,7 @@ public class Main {
 
         sceneObjectsList.add(new AABCubeBounds(13, 14, -12, 12,-12,12,0.25));
 
-        int resolutionX = 550;
-        int aspectX = 4;
-        int aspectY = 3;
-        int fov = 60;
+
         Camera cam = new Camera(1, resolutionX, fov, aspectX, aspectY, 0,0,-3.5, 0.75, 0, 0.25, 0, 1, 0);
 
         cam.directionVector();
@@ -26,7 +28,7 @@ public class Main {
         cam.imagePlane();
 
         RenderSingleThreaded renderSingleThreaded = new RenderSingleThreaded();
-        renderSingleThreaded.computePixels(sceneObjectsList, cam, 1000, 4,16);
+        renderSingleThreaded.computePixels(sceneObjectsList, cam, 2000, 4,16, 5);
 
         //RenderMultiThreaded renderMultiThreaded = new RenderMultiThreaded();
         //renderMultiThreaded.computePixels(sceneObjectsList, cam, 6000, 4);
