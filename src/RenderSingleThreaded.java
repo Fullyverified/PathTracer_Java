@@ -1,6 +1,5 @@
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -11,105 +10,26 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RenderSingleThreaded {
 
-    public int progress = 0;
     public List<SceneObjects> visibleObjects = new ArrayList<>();
-    List<Double> amplitudes = new ArrayList<>();
+    private int loadingProgress, currentProgress = 0;
+    private String loadingString = "";
 
     public RenderSingleThreaded() {
     }
 
-    public void brightnessDistribution(Camera cam, Ray[][] primaryRay) {
-        for (int i = 0; i < cam.getResX(); i++) {
-            for (int j = 0; j < cam.getResY(); j++) {
-                if (primaryRay[i][j].getLightAmplitude() != 0) { // filter out zeros
-                    amplitudes.add(primaryRay[i][j].getLightAmplitude());
-                }
-            }
-        }
-        amplitudes.add(0.0);
-        Collections.sort(amplitudes);
-    }
-
-    double getQuantile(List<Double> data, double quantile) {
-        int index = (int) Math.ceil(quantile * data.size()) - 1;
-        return data.get(Math.max(index, 0));
-    }
-
-    // ... ,,, ~~~ ::: ;;; XXX *** 000 DDD ### @@@
-    public void drawScreenQuantiles(Camera cam, Ray[][] primaryRay) {
-        double max = Collections.max(amplitudes) * cam.getISO();
-        System.out.println("Max Brightness" + Collections.max(amplitudes));
-        double q1 = (max * 0.08);
-        double q2 = (max * 0.16);
-        double q3 = (max * 0.24);
-        double q4 = (max * 0.32);
-        double q5 = (max * 0.40);
-        double q6 = (max * 0.48);
-        double q7 = (max * 0.56);
-        double q8 = (max * 0.64);
-        double q9 = (max * 0.72);
-        double q10 = (max * 0.80);
-        double q11 = (max * 0.88);
-        double q12 = (max * 0.95);
-
-        // iterate through each rays hit value and print the output
-        System.out.print("|");
-        for (int i = 0; i < cam.getResX(); i++) {
-            System.out.print("-|-");
-        }
-        System.out.println("|");
-        for (int j = 0; j < cam.getResY(); j++) {
-            System.out.print("|");
-            for (int i = 0; i < cam.getResX(); i++) {
-                if (primaryRay[i][j].getLightAmplitude() >= q12) {
-                    System.out.print("@@@");
-                } else if (primaryRay[i][j].getLightAmplitude() >= q11) {
-                    System.out.print("DDD");
-                } else if (primaryRay[i][j].getLightAmplitude() >= q10) {
-                    System.out.print("000");
-                } else if (primaryRay[i][j].getLightAmplitude() >= q9) {
-                    System.out.print("UUU");
-                } else if (primaryRay[i][j].getLightAmplitude() >= q8) {
-                    System.out.print("###");
-                } else if (primaryRay[i][j].getLightAmplitude() >= q7) {
-                    System.out.print("ZZZ");
-                } else if (primaryRay[i][j].getLightAmplitude() >= q6) {
-                    System.out.print("***");
-                } else if (primaryRay[i][j].getLightAmplitude() >= q5) {
-                    System.out.print("xxx");
-                } else if (primaryRay[i][j].getLightAmplitude() >= q4) {
-                    System.out.print("~~~");
-                } else if (primaryRay[i][j].getLightAmplitude() >= q3) {
-                    System.out.print(";;;");
-                } else if (primaryRay[i][j].getLightAmplitude() >= q2) {
-                    System.out.print(":::");
-                } else if (primaryRay[i][j].getLightAmplitude() >= q1) {
-                    System.out.print(",,,");
-                } else if (primaryRay[i][j].getLightAmplitude() > 0) {
-                    System.out.print("...");
-                } else if (primaryRay[i][j].getLightAmplitude() == 0) {
-                    System.out.print("   ");
-                }
-            }
-            System.out.println("|");
-        }
-        System.out.print("|");
-        for (int i = 0; i < cam.getResX(); i++) {
-            System.out.print("---");
-        }
-        System.out.println("|");
-    }
-
-    public void computePixels(List<SceneObjects> sceneObjectsList, Camera cam, int numRays, int numBounces) {
+    public void computePixels(List<SceneObjects> sceneObjectsList, Camera cam, int numRays, int numBounces, long frameTime) {
         Ray[][] primaryRay = new Ray[cam.getResX()][cam.getResY()];
         Ray[][] nthRay = new Ray[cam.getResX()][cam.getResY()];
 
-        System.out.print("|-");
-        for (int l = 0; l < 99; l++) {
+        /*System.out.print("|-");
+        for (int l = 0; l < 100; l++) {
             System.out.print("-");
         }
         System.out.println("-|");
-        System.out.print("||");
+        System.out.print("|-");*/
+        DrawScreenASCII drawScreenASCII = new DrawScreenASCII(cam, primaryRay, frameTime);
+        DrawScreen drawScreen = new DrawScreen(cam.getResX(), cam.getResY());
+
         for (int j = 0; j < cam.getResY(); j++) {
             for (int i = 0; i < cam.getResX(); i++) {
                 computePrimaryRay(cam, primaryRay, sceneObjectsList, i, j);
@@ -122,25 +42,26 @@ public class RenderSingleThreaded {
         Runnable screenUpdateTask = () -> {
             updateScreen.set(true);
         };
-        drawScreenExecutor.scheduleAtFixedRate(screenUpdateTask, 100, 500, TimeUnit.MILLISECONDS);
+        drawScreenExecutor.scheduleAtFixedRate(screenUpdateTask, 10, frameTime, TimeUnit.MILLISECONDS);
 
         // sample a ray for every pixel, then move to the next ray
         for (int currentRay = 1; currentRay < numRays; currentRay++) {
             marchIntersectionLogic(primaryRay, nthRay, sceneObjectsList, numRays, currentRay, numBounces, cam);
             if (updateScreen.get()) {
-                brightnessDistribution(cam, primaryRay);
-                drawScreenQuantiles(cam, primaryRay);
+                //drawScreenASCII.drawScreenQuantiles(cam, primaryRay, loadingProgress); // ascii
+                drawScreen.updateImage(cam.getResX(), cam.getResY(), primaryRay, cam); // real
                 updateScreen.set(false);
             }
         }
 
+
         drawScreenExecutor.shutdown();
 
         // final print
-        brightnessDistribution(cam, primaryRay);
-        drawScreenQuantiles(cam, primaryRay);
+        //drawScreenASCII.drawScreenQuantiles(cam, primaryRay, loadingProgress); // ascii
+        drawScreen.updateImage(cam.getResX(), cam.getResY(), primaryRay, cam); // real
+        /*System.out.print("-|");*/
 
-        System.out.println("||");
     }
 
     public void computePrimaryRay(Camera cam, Ray[][] primaryRay, List<SceneObjects> sceneObjectsList, int i, int j) {
@@ -215,10 +136,10 @@ public class RenderSingleThreaded {
                         if (currentBounce == 0) {
                             // first bounce uses random direction
                             randomDirection(nthRay[i][j], nthRay[i][j].getHitObject());
-                        } else {
-                            // second uses a reflection vector
                             //reflectionBounce(nthRay[i][j], nthRay[i][j].getHitObject());
+                        } else {
                             randomDirection(nthRay[i][j], nthRay[i][j].getHitObject());
+                            //reflectionBounce(nthRay[i][j], nthRay[i][j].getHitObject());
                         }
                         // add all non culled objects to a list
                         visibleObjects.clear();
@@ -259,11 +180,11 @@ public class RenderSingleThreaded {
                 }
             }
         }
-        int loading = (int) (((float) currentRay / numRays) * 100); // loading bar
-        if (loading > progress) {
+        loadingProgress = (int) (((float) currentRay / numRays) * 100); // loading bar
+        /*if (currentProgress < loadingProgress){
+            currentProgress = loadingProgress;
             System.out.print("|");
-            progress = loading;
-        }
+        }*/
     }
 
     public void storeHitData(double[][] luminanceArray, Ray nthRay, int currentBounce, SceneObjects sceneObject) {

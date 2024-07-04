@@ -14,7 +14,11 @@ public class Main {
 
         sceneObjectsList.add(new AABCubeBounds(13, 14, -12, 12,-12,12,0.25));
 
-        Camera cam = new Camera(1, 125, 60, 4, 3, 0,0,-3.5, 0.75, 0, 0.25, 0, 1, 0);
+        int resolutionX = 350;
+        int aspectX = 4;
+        int aspectY = 3;
+        int fov = 60;
+        Camera cam = new Camera(1, resolutionX, fov, aspectX, aspectY, 0,0,-3.5, 0.75, 0, 0.25, 0, 1, 0);
 
         cam.directionVector();
         cam.upVector();
@@ -22,7 +26,7 @@ public class Main {
         cam.imagePlane();
 
         RenderSingleThreaded renderSingleThreaded = new RenderSingleThreaded();
-        renderSingleThreaded.computePixels(sceneObjectsList, cam, 2000, 4);
+        renderSingleThreaded.computePixels(sceneObjectsList, cam, 5000, 4,250);
 
         //RenderMultiThreaded renderMultiThreaded = new RenderMultiThreaded();
         //renderMultiThreaded.computePixels(sceneObjectsList, cam, 6000, 4);
