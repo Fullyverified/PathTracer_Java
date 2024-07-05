@@ -3,7 +3,7 @@ import java.util.List;
 
 public class Main {
 
-    public static int RenderResolutionX = 250;
+    public static int RenderResolutionX = 400;
     public static int aspectX = 4;
     public static int aspectY = 3;
     public static int fov = 60;

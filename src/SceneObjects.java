@@ -15,12 +15,12 @@ public interface SceneObjects {
     public double getReflectivity();
     public void setPos(double x, double y, double z);
 
-    /*public double getRBrightness();
+    public double getRBrightness();
     public double getGBrightness();
     public double getBBrightness();
     public double getReflecR();
     public double getReflecG();
-    public double getReflecB();*/
+    public double getReflecB();
 
 
 

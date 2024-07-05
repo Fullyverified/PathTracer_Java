@@ -26,7 +26,7 @@ public class DrawScreen extends JPanel {
     private JFrame window = new JFrame("Path Tracer");
 
     private float lineSpacing = 1f;
-    private int fontSize = 8;
+    private int fontSize = 12;
     private boolean ASCII = true;
     private JTextPane areaASCII;
 
