@@ -9,14 +9,14 @@ public class SphereLight implements SceneObjects {
     private static int numPointLights = 100;
     private int pointLightID = 0;
     private double normalx, normaly, normalz;
-    double reflectivity, reflecR, reflecB, reflecG = 1;
+    double reflectivity, reflecR, reflecB, reflecG, roughness = 1;
     private double luminance, R, G, B = 0;
 
 
     //Equation of a sphere: (x - cx)^2 + (y - cy)^2 + (z - cz)^2 = r^2
 
     //Constructor
-    public SphereLight(double centerx, double centery, double centerz, double sradius, double luminance, double reflectivity) {
+    public SphereLight(double centerx, double centery, double centerz, double sradius, double luminance, double reflectivity, double roughness) {
         this.centerx = centerx;
         this.centery = centery;
         this.centerz = centerz;
@@ -32,9 +32,10 @@ public class SphereLight implements SceneObjects {
         this.R = luminance;
         this.G = luminance;
         this.B = luminance;
+        this.roughness = roughness;
     }
 
-    public SphereLight(double centerx, double centery, double centerz, double sradius, double redBrightness, double greenBrightness, double blueBrightness, double redReflectivity, double greenReflectivity, double blueReflectivity) {
+    public SphereLight(double centerx, double centery, double centerz, double sradius, double redBrightness, double greenBrightness, double blueBrightness, double redReflectivity, double greenReflectivity, double blueReflectivity, double roughness) {
         this.centerx = centerx;
         this.centery = centery;
         this.centerz = centerz;
@@ -49,6 +50,7 @@ public class SphereLight implements SceneObjects {
         this.reflecR = redReflectivity;
         this.reflecG = greenReflectivity;
         this.reflecB = blueReflectivity;
+        this.roughness = roughness;
     }
 
     // p = o + td
@@ -182,8 +184,6 @@ public class SphereLight implements SceneObjects {
     public double getNormalY() {return this.normaly;}
     public double getNormalZ() {return this.normalz;}
 
-    public double getDistanceToC() {
-        return this.distanceToC;
-    }
+    public double getRoughness() {return this.roughness;}
 
 }

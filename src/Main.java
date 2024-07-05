@@ -16,15 +16,15 @@ public class Main {
 
         List<SceneObjects> sceneObjectsList = new ArrayList<>();
 
-        sceneObjectsList.add(new AABCubeCenter(10,-3, 0,14,1,7,1,0.1,0.1)); // floor
-        sceneObjectsList.add(new AABCubeCenter(10,3,0,14,1,7,1,1,1)); // roof
+        sceneObjectsList.add(new AABCubeCenter(10,-3, 0,14,1,7,1,0.1,0.1, 0.5)); // floor
+        sceneObjectsList.add(new AABCubeCenter(10,3,0,14,1,7,1,1,1, 0.5)); // roof
 
-        sceneObjectsList.add(new AABCubeCenter(8,0,0,1,6,7,1,1,1)); // back wall
+        sceneObjectsList.add(new AABCubeCenter(8,0,0,1,6,7,1,1,1,0.5)); // back wall
 
-        sceneObjectsList.add(new AABCubeCenter(9,3,3,14,12,1,1,1,1)); // left wall
-        sceneObjectsList.add(new AABCubeCenter(9,3,-3,14,12,2,1,1,1)); // left wall
+        sceneObjectsList.add(new AABCubeCenter(9,3,3,14,12,1,1,1,1,0.5)); // left wall
+        sceneObjectsList.add(new AABCubeCenter(9,3,-3,14,12,1,1,1,1,0.5)); // left wall
 
-        sceneObjectsList.add(new SphereLight(-2,0,0,1,40,1)); // sphere behind camera
+        sceneObjectsList.add(new SphereLight(-2,0,0,1,40,1,0.5)); // sphere behind camera
 
         Camera cam = new Camera(1, RenderResolutionX, fov, aspectX, aspectY, 0,0,0, 1, 0, 0, 0, 1, 0);
 

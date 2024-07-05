@@ -9,13 +9,13 @@ public class Sphere implements SceneObjects {
     private static int numSpheres = 0;
     private int sphereID = 0;
     private double normalx, normaly, normalz;
-    double reflectivity, reflecR, reflecB, reflecG = 1;
+    double reflectivity, reflecR, reflecB, reflecG, roughness = 1;
     private double luminance, R, G, B = 0;
 
     //Equation of a sphere: (x - cx)^2 + (y - cy)^2 + (z - cz)^2 = r^2
 
     //Constructor
-    public Sphere(double centerx, double centery, double centerz, double sradius, double reflectivity) {
+    public Sphere(double centerx, double centery, double centerz, double sradius, double reflectivity, double roughness) {
         this.centerx = centerx;
         this.centery = centery;
         this.centerz = centerz;
@@ -27,9 +27,10 @@ public class Sphere implements SceneObjects {
         this.reflecR = reflectivity;
         this.reflecG = reflectivity;
         this.reflecB = reflectivity;
+        this.roughness = roughness;
     }
 
-    public Sphere(double centerx, double centery, double centerz, double sradius, double colourR, double colourG, double colourB) {
+    public Sphere(double centerx, double centery, double centerz, double sradius, double colourR, double colourG, double colourB, double roughness) {
         this.centerx = centerx;
         this.centery = centery;
         this.centerz = centerz;
@@ -41,6 +42,8 @@ public class Sphere implements SceneObjects {
         this.reflecR = colourR;
         this.reflecG = colourG;
         this.reflecB = colourB;
+        this.roughness = roughness;
+
     }
 
     // p = o + td
@@ -184,5 +187,7 @@ public class Sphere implements SceneObjects {
     public double getReflecR() {return this.reflecR;}
     public double getReflecG() {return this.reflecG;}
     public double getReflecB() {return this.reflecB;}
+
+    public double getRoughness() {return this.roughness;}
 
 }

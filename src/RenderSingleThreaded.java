@@ -172,7 +172,7 @@ public class RenderSingleThreaded {
                                     storeHitDataRGB(luminanceBlue, nthRay[i][j], currentBounce, sceneObject1, sceneObject1.getBBrightness(), sceneObject1.getReflecB());
                                 }
                             }
-                            distance += 0.01;
+                            distance += 0.1;
                         }
                     }
 
@@ -215,6 +215,35 @@ public class RenderSingleThreaded {
             luminanceArray[pos][1] = 1;
         }
     }
+
+    public void importanceSampling(Ray nthRay, SceneObjects sceneObject) {
+       // calculate a reflection direction
+        double dotproduct = sceneObject.getNormalX() * nthRay.getDirX() + sceneObject.getNormalY() * nthRay.getDirY() + sceneObject.getNormalZ() * nthRay.getDirZ();
+        sceneObject.calculateNormal(nthRay);
+        double reflectionX = nthRay.getDirX() - 2 * (dotproduct) * sceneObject.getNormalX();
+        double reflectionY = nthRay.getDirY() - 2 * (dotproduct) * sceneObject.getNormalY();
+        double reflectionZ = nthRay.getDirZ() - 2 * (dotproduct) * sceneObject.getNormalZ();
+
+        // calculate a random direction
+        Random random = new Random();
+        double randomX = random.nextDouble() * 2 - 1;
+        double randomY = random.nextDouble() * 2 - 1;
+        double randomZ = random.nextDouble() * 2 - 1;
+        // normalize it
+        double dirMagnitude = Math.sqrt(randomX*randomX + randomY*randomY + randomZ*randomZ);
+        randomX = randomX / dirMagnitude;
+        randomY = randomY / dirMagnitude;
+        randomZ = randomZ / dirMagnitude;
+
+        // bias the reflection direction with the random direction
+        // biasedDirection = (1 - roughness) * reflectionDirection + roughness * randomDirection
+        double roughness = sceneObject.getRoughness();
+        double directionX = ((1 - roughness) * reflectionX) + roughness * randomX;
+        double directionY = ((1 - roughness) * reflectionY) + roughness * randomY;
+        double directionZ = ((1 - roughness) * reflectionZ) + roughness * randomZ;
+
+    }
+
 
     public void randomDirection(Ray nthRay, SceneObjects sceneObject) {
         double dotproduct = -1;

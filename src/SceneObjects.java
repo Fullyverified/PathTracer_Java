@@ -22,6 +22,6 @@ public interface SceneObjects {
     public double getReflecG();
     public double getReflecB();
 
-
+    public double getRoughness();
 
 }

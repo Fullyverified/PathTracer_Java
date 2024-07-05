@@ -12,12 +12,12 @@ public class AABCubeBounds implements SceneObjects {
     private int cubeID = 0;
     private double normalx, normaly, normalz;
     private double luminance, R, G, B = 0;
-    double reflectivity, reflecR, reflecB, reflecG = 1;
+    double reflectivity, reflecR, reflecB, reflecG, roughness = 1;
 
     //Equation of a sphere: (x - cx)^2 + (y - cy)^2 + (z - cz)^2 = r^2
 
     //Constructor
-    public AABCubeBounds(double minX, double maxX, double minY, double maxY, double minZ, double maxZ, double reflectivity) {
+    public AABCubeBounds(double minX, double maxX, double minY, double maxY, double minZ, double maxZ, double reflectivity, double roughness) {
         this.minX = minX;
         this.maxX = maxX;
         this.minY = minY;
@@ -32,9 +32,10 @@ public class AABCubeBounds implements SceneObjects {
         this.reflecR = reflectivity;
         this.reflecG = reflectivity;
         this.reflecB = reflectivity;
+        this.roughness = roughness;
     }
 
-    public AABCubeBounds(double minX, double maxX, double minY, double maxY, double minZ, double maxZ, double colourR, double colourG, double colourB) {
+    public AABCubeBounds(double minX, double maxX, double minY, double maxY, double minZ, double maxZ, double colourR, double colourG, double colourB, double roughness) {
         this.minX = minX;
         this.maxX = maxX;
         this.minY = minY;
@@ -48,6 +49,7 @@ public class AABCubeBounds implements SceneObjects {
         this.reflecR = colourR;
         this.reflecG = colourG;
         this.reflecB = colourB;
+        this.roughness = roughness;
     }
 
     public void computeMinMax(Ray ray) {
@@ -214,4 +216,5 @@ public class AABCubeBounds implements SceneObjects {
     public double getReflecG() {return this.reflecG;}
     public double getReflecB() {return this.reflecB;}
 
+    public double getRoughness() {return this.roughness;}
 }

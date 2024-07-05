@@ -12,12 +12,12 @@ public class AABCubeCenter implements SceneObjects {
     private int cubeID = 0;
     private double normalx, normaly, normalz;
     private double luminance, R, G, B = 0;
-    double reflectivity, reflecR, reflecB, reflecG = 1;
+    double reflectivity, reflecR, reflecB, reflecG, roughness = 1;
 
     //Equation of a sphere: (x - cx)^2 + (y - cy)^2 + (z - cz)^2 = r^2
 
     //Constructor
-    public AABCubeCenter(double centreX, double centreY, double centreZ, double xLength, double yLength, double zLength, double reflectivity) {
+    public AABCubeCenter(double centreX, double centreY, double centreZ, double xLength, double yLength, double zLength, double reflectivity, double roughness) {
         this.centreX = centreX;
         this.centreY = centreY;
         this.centreZ = centreZ;
@@ -40,9 +40,10 @@ public class AABCubeCenter implements SceneObjects {
         this.reflecR = reflectivity;
         this.reflecG = reflectivity;
         this.reflecB = reflectivity;
+        this.roughness = roughness;
     }
 
-    public AABCubeCenter(double centreX, double centreY, double centreZ, double xLength, double yLength, double zLength, double colourR, double colourG, double colourB) {
+    public AABCubeCenter(double centreX, double centreY, double centreZ, double xLength, double yLength, double zLength, double colourR, double colourG, double colourB, double roughness) {
         this.centreX = centreX;
         this.centreY = centreY;
         this.centreZ = centreZ;
@@ -64,6 +65,8 @@ public class AABCubeCenter implements SceneObjects {
         this.reflecR = colourR;
         this.reflecG = colourG;
         this.reflecB = colourB;
+        this.roughness = roughness;
+
     }
 
 
@@ -238,5 +241,7 @@ public class AABCubeCenter implements SceneObjects {
     public double getReflecR() {return this.reflecR;}
     public double getReflecG() {return this.reflecG;}
     public double getReflecB() {return this.reflecB;}
+
+    public double getRoughness() {return this.roughness;}
 
 }
