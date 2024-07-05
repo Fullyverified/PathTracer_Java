@@ -19,7 +19,6 @@ public class Main {
         sceneObjectsList.add(new Sphere(7, 1.25, 0, 1,1,1,1));
         sceneObjectsList.add(new AABCubeCenter(7, -1.25, 0, 1,1,1, 1));
 
-        //sceneObjectsList.add(new SphereLight(3, 0,2, 1,40,1));
         sceneObjectsList.add(new SphereLight(3, 0,2, 1,40,40,40,1,1,1));
 
         sceneObjectsList.add(new AABCubeBounds(13, 14, -12, 12,-12,12,1));
@@ -32,7 +31,7 @@ public class Main {
         cam.imagePlane();
 
         //RenderSingleThreaded renderSingleThreaded = new RenderSingleThreaded();
-        RenderSingleThreadedRGB renderSingleThreaded = new RenderSingleThreadedRGB();
+        RenderSingleThreaded renderSingleThreaded = new RenderSingleThreaded();
 
         renderSingleThreaded.computePixels(sceneObjectsList, cam, raysPerPixel, bouncesPerRay, frameTime, ASCIIMode);
 
