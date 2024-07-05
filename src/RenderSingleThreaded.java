@@ -22,7 +22,7 @@ public class RenderSingleThreaded {
 
         ScheduledExecutorService drawScreenExecutor = Executors.newScheduledThreadPool(1);
         AtomicBoolean updateScreen = new AtomicBoolean(false);
-        // Define the screen update task
+        //Define the screen update task
         Runnable screenUpdateTask = () -> {
             updateScreen.set(true);
         };
@@ -147,6 +147,7 @@ public class RenderSingleThreaded {
                             randomDirection(nthRay[i][j], nthRay[i][j].getHitObject());
                             //reflectionBounce(nthRay[i][j], nthRay[i][j].getHitObject());
                         }
+                        System.out.println("finished direction");
                         // add all non culled objects to a list
                         visibleObjects.clear();
                         for (SceneObjects sceneObject1 : sceneObjectsList) {
@@ -171,7 +172,7 @@ public class RenderSingleThreaded {
                                     storeHitDataRGB(luminanceBlue, nthRay[i][j], currentBounce, sceneObject1, sceneObject1.getBBrightness(), sceneObject1.getReflecB());
                                 }
                             }
-                            distance += 0.1;
+                            distance += 0.01;
                         }
                     }
 
@@ -221,6 +222,7 @@ public class RenderSingleThreaded {
 
         nthRay.marchRay(0);
         sceneObject.calculateNormal(nthRay);
+        System.out.println("calculating random direction");
 
         while (dotproduct <= 0) {
             // Generate a random direction uniformly on a sphere

@@ -6,24 +6,27 @@ public class Main {
     public static int RenderResolutionX = 400;
     public static int aspectX = 4;
     public static int aspectY = 3;
-    public static int fov = 60;
-    public static int frameTime = 16; // Milliseconds
-    public static int raysPerPixel = 1200;
-    public static int bouncesPerRay = 1;
+    public static int fov = 90;
+    public static int frameTime = 1000; // Milliseconds
+    public static int raysPerPixel = 5000;
+    public static int bouncesPerRay = 4;
     public static boolean ASCIIMode = false;
 
     public static void main(String[] args) {
 
         List<SceneObjects> sceneObjectsList = new ArrayList<>();
 
-        sceneObjectsList.add(new Sphere(7, 1.25, 0, 1,1,1,1));
-        sceneObjectsList.add(new AABCubeCenter(7, -1.25, 0, 1,1,1, 1));
+        sceneObjectsList.add(new AABCubeCenter(10,-3, 0,14,1,7,1,0.1,0.1)); // floor
+        sceneObjectsList.add(new AABCubeCenter(10,3,0,14,1,7,1,1,1)); // roof
 
-        sceneObjectsList.add(new SphereLight(3, 0,2, 1,40,40,40,1,1,1));
+        sceneObjectsList.add(new AABCubeCenter(8,0,0,1,6,7,1,1,1)); // back wall
 
-        sceneObjectsList.add(new AABCubeBounds(13, 14, -12, 12,-12,12,1));
+        sceneObjectsList.add(new AABCubeCenter(9,3,3,14,12,1,1,1,1)); // left wall
+        sceneObjectsList.add(new AABCubeCenter(9,3,-3,14,12,2,1,1,1)); // left wall
 
-        Camera cam = new Camera(1, RenderResolutionX, fov, aspectX, aspectY, 0,0,-3.5, 0.75, 0, 0.25, 0, 1, 0);
+        sceneObjectsList.add(new SphereLight(-2,0,0,1,40,1)); // sphere behind camera
+
+        Camera cam = new Camera(1, RenderResolutionX, fov, aspectX, aspectY, 0,0,0, 1, 0, 0, 0, 1, 0);
 
         cam.directionVector();
         cam.upVector();
