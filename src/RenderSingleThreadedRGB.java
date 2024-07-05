@@ -2,19 +2,18 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class RenderSingleThreaded {
+public class RenderSingleThreadedRGB {
 
     public List<SceneObjects> visibleObjects = new ArrayList<>();
     private int loadingProgress, currentProgress = 0;
     private String loadingString = "";
 
-    public RenderSingleThreaded() {
+    public RenderSingleThreadedRGB() {
     }
 
     public void computePixels(List<SceneObjects> sceneObjectsList, Camera cam, int numRays, int numBounces, long frameTime, boolean ASCII) {
@@ -35,6 +34,7 @@ public class RenderSingleThreaded {
                 computePrimaryRay(cam, primaryRay, sceneObjectsList, i, j);
             }
         }
+
         System.out.println("Finished Primary Rays");
         System.out.print("|-");
         for (int l = 1; l < 100; l++) {
@@ -50,7 +50,7 @@ public class RenderSingleThreaded {
         for (int currentRay = 1; currentRay < numRays; currentRay++) {
             marchIntersectionLogic(primaryRay, nthRay, sceneObjectsList, numRays, currentRay, numBounces, cam);
             if (updateScreen.get()) {
-                drawScreen.drawFrame(primaryRay, cam);
+                drawScreen.drawFrameRGB(primaryRay, cam);
                 updateScreen.set(false);
             }
         }
@@ -59,7 +59,7 @@ public class RenderSingleThreaded {
         drawScreenExecutor.shutdown();
 
         // final print
-        drawScreen.drawFrame(primaryRay, cam);
+        drawScreen.drawFrameRGB(primaryRay, cam);
         System.out.print("-|");
 
     }
@@ -112,7 +112,9 @@ public class RenderSingleThreaded {
                         primaryRay[i][j].setHitObject(sceneObject1);
                         // add light amplitude
                         if (sceneObject1.getLuminance() != 0) {
-                            primaryRay[i][j].addLightAmplitude(lambertCosineLaw(primaryRay[i][j], sceneObject1) * sceneObject1.getLuminance() * sceneObject1.getReflectivity());
+                            primaryRay[i][j].addRed(lambertCosineLaw(primaryRay[i][j], sceneObject1) * sceneObject1.getRBrightness() * sceneObject1.getReflecR());
+                            primaryRay[i][j].addGreen(lambertCosineLaw(primaryRay[i][j], sceneObject1) * sceneObject1.getGBrightness() * sceneObject1.getReflecG());
+                            primaryRay[i][j].addBlue(lambertCosineLaw(primaryRay[i][j], sceneObject1) * sceneObject1.getBBrightness() * sceneObject1.getReflecB());
                         }
                     }
                     // hit is already false otherwise
@@ -127,11 +129,15 @@ public class RenderSingleThreaded {
             for (int i = 0; i < cam.getResX(); i++) {
                 if (primaryRay[i][j].getHit()) {
                     nthRay[i][j] = new Ray(primaryRay[i][j].getHitPointX(), primaryRay[i][j].getHitPointY(), primaryRay[i][j].getHitPointZ());
-                    double[][] luminanceArray = new double[numBounces + 1][5];
+                    double[][] luminanceRed= new double[numBounces + 1][5];
+                    double[][] luminanceGreen = new double[numBounces + 1][5];
+                    double[][] luminanceBlue = new double[numBounces + 1][5];
                     // BOUNCES PER RAY
                     // initialize ray starting conditions
                     nthRay[i][j].initializeRay(primaryRay[i][j]);
-                    storeHitData(luminanceArray, nthRay[i][j], -1, nthRay[i][j].getHitObject());
+                    storeHitDataRGB(luminanceRed, nthRay[i][j], -1, nthRay[i][j].getHitObject(), nthRay[i][j].getHitObject().getRBrightness(), nthRay[i][j].getHitObject().getReflecR());
+                    storeHitDataRGB(luminanceGreen, nthRay[i][j], -1, nthRay[i][j].getHitObject(), nthRay[i][j].getHitObject().getGBrightness(), nthRay[i][j].getHitObject().getReflecG());
+                    storeHitDataRGB(luminanceBlue, nthRay[i][j], -1, nthRay[i][j].getHitObject(), nthRay[i][j].getHitObject().getBBrightness(), nthRay[i][j].getHitObject().getReflecB());
                     for (int currentBounce = 0; currentBounce < numBounces && nthRay[i][j].getHit(); currentBounce++) {
                         if (currentBounce == 0) {
                             // first bounce uses random direction
@@ -160,26 +166,32 @@ public class RenderSingleThreaded {
                                     primaryRay[i][j].addNumHits(); // debug
                                     nthRay[i][j].updateHitProperties(sceneObject1);
                                     // data structure for storing object luminance, dot product and bounce depth, and boolean hit
-                                    storeHitData(luminanceArray, nthRay[i][j], currentBounce, sceneObject1);
-                                    if (sceneObject1.getReflectivity() == 10){
-                                        System.out.println("yes");
-                                    }
+                                    storeHitDataRGB(luminanceRed, nthRay[i][j], currentBounce, sceneObject1, sceneObject1.getRBrightness(), sceneObject1.getReflecR());
+                                    storeHitDataRGB(luminanceGreen, nthRay[i][j], currentBounce, sceneObject1, sceneObject1.getGBrightness(), sceneObject1.getReflecG());
+                                    storeHitDataRGB(luminanceBlue, nthRay[i][j], currentBounce, sceneObject1, sceneObject1.getBBrightness(), sceneObject1.getReflecB());
                                 }
                             }
                             distance += 0.1;
                         }
                     }
-                    double brightness = 0;
-                    // sum up values of lightness for each bounce into the scene
-                    // ((object brightness * lambertCosineLaw) * object reflectivity)
+
+                    double redAmplitude = 0;
+                    double blueAmplitude = 0;
+                    double greenAmplitude = 0;
                     if (primaryRay[i][j].getHit()) {
-                        for (int index = luminanceArray.length - 1; index >= 0; index--) {
-                            if (luminanceArray[index][3] == 1) {
-                                brightness = ((luminanceArray[index][0] + brightness) * luminanceArray[index][1]) * luminanceArray[index][4];
+                        for (int index = luminanceRed.length - 1; index >= 0; index--) {
+                            if (luminanceRed[index][3] == 1) {
+                                redAmplitude = ((luminanceRed[index][0] + redAmplitude) * luminanceRed[index][1]) * luminanceRed[index][4];
+                            }
+                            if (luminanceGreen[index][3] == 1) {
+                                blueAmplitude = ((luminanceGreen[index][0] + blueAmplitude) * luminanceGreen[index][1]) * luminanceGreen[index][4];
+                            }
+                            if (luminanceBlue[index][3] == 1) {
+                                greenAmplitude = ((luminanceBlue[index][0] + greenAmplitude) * luminanceBlue[index][1]) * luminanceBlue[index][4];
                             }
                         }
                     }
-                    primaryRay[i][j].addLightAmplitude(brightness / numRays);
+                    primaryRay[i][j].addLightRGB(redAmplitude, greenAmplitude, blueAmplitude);
                 }
             }
         }
@@ -190,13 +202,13 @@ public class RenderSingleThreaded {
         }
     }
 
-    public void storeHitData(double[][] luminanceArray, Ray nthRay, int currentBounce, SceneObjects sceneObject) {
+    public void storeHitDataRGB(double[][] luminanceArray, Ray nthRay, int currentBounce, SceneObjects sceneObject, double objectBrightness, double objectReflectivity) {
         int pos = currentBounce + 1;
-        luminanceArray[pos][0] = sceneObject.getLuminance();
+        luminanceArray[pos][0] = objectBrightness;
         luminanceArray[pos][1] = lambertCosineLaw(nthRay, sceneObject); // dot product
         luminanceArray[pos][2] = currentBounce + 1; // which bounce
         luminanceArray[pos][3] = 1; // boolean hit
-        luminanceArray[pos][4] = sceneObject.getReflectivity(); // reflectivity
+        luminanceArray[pos][4] = objectReflectivity; // reflectivity
 
         if (currentBounce == -1) {
             luminanceArray[pos][1] = 1;

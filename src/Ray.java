@@ -172,10 +172,10 @@ public class Ray {
     public void addLightAmplitude(double luminance) {
         this.lightAmplitude = this.lightAmplitude + luminance;
     }
-    /*public void addLightRGB(double R, double G, double B) {
-        this.R = R;
-        this.G = G;
-        this.B = B;
+    public void addLightRGB(double R, double G, double B) {
+        this.R = this.R + R;
+        this.G = this.G + G;
+        this.B = this.B + B;
     }
     public void addRed(double red) {
         this.R = red;
@@ -185,7 +185,7 @@ public class Ray {
     }
     public void addBlue(double blue) {
         this.B = blue;
-    }*/
+    }
 
 
 }

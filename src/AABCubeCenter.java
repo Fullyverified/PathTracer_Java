@@ -42,6 +42,30 @@ public class AABCubeCenter implements SceneObjects {
         this.reflecB = reflectivity;
     }
 
+    public AABCubeCenter(double centreX, double centreY, double centreZ, double xLength, double yLength, double zLength, double colourR, double colourG, double colourB) {
+        this.centreX = centreX;
+        this.centreY = centreY;
+        this.centreZ = centreZ;
+
+        this.xLength = xLength;
+        this.yLength = yLength;
+        this.zLength = zLength;
+
+        this.minX = centreX - xLength / 2;
+        this.maxX = centreX + xLength / 2;
+        this.minY = centreY - yLength / 2;
+        this.maxY = centreY + yLength / 2;
+        this.minZ = centreZ - zLength / 2;
+        this.maxZ = centreZ + zLength / 2;
+
+        this.cubeID = numCubes;
+        numCubes++;
+
+        this.reflecR = colourR;
+        this.reflecG = colourG;
+        this.reflecB = colourB;
+    }
+
 
 
     public void computeMinMax(Ray ray) {

@@ -100,61 +100,6 @@ public class DrawScreen extends JPanel {
         return Collections.max(amplitudes);
     }
 
-    /*public double maxAmplitudeColour(Ray[][] primaryRay) {
-        amplitudesRed.clear();
-        amplitudesGreen.clear();
-        amplitudesBlue.clear();
-
-        for (int i = 0; i < internalWidth; i++) {
-            for (int j = 0; j < internalHeight; j++) {
-                if (primaryRay[i][j].getRed() != 0) { // filter out zeros
-                    amplitudesRed.add(primaryRay[i][j].getRed());
-                }
-                if (primaryRay[i][j].getGreen() != 0) { // filter out zeros
-                    amplitudesGreen.add(primaryRay[i][j].getGreen());
-                }
-                if (primaryRay[i][j].getBlue() != 0) { // filter out zeros
-                    amplitudesBlue.add(primaryRay[i][j].getBlue());
-                }
-            }
-        }
-        amplitudesRed.add(0.0);
-        amplitudesGreen.add(0.0);
-        amplitudesBlue.add(0.0);
-
-        System.out.println("red brightness");
-        System.out.println(Collections.max(amplitudesRed));
-        System.out.println("blue brightness");
-        System.out.println(Collections.max(amplitudesBlue));
-        System.out.println("green brightness");
-        System.out.println(Collections.max(amplitudesGreen));
-
-        // return the max of the red, green, or blue light amplitdues
-        return Math.max(Math.max(Collections.max(amplitudesRed), Collections.max(amplitudesGreen)), Collections.max(amplitudesBlue));
-    }*/
-
-    /*public void drawFrameRGB(Ray[][] primaryRay, Camera cam) {
-        double factor = 255 / maxAmplitudeColour(primaryRay);
-        for (int y = 0; y < internalHeight; y++) {
-            for (int x = 0; x < internalWidth; x++) {
-                double brightness = primaryRay[x][y].getLightAmplitude() * factor;
-
-                int red = (int) (primaryRay[x][y].getRed() * factor);
-                int green = (int) (primaryRay[x][y].getGreen() * factor);
-                int blue = (int) (primaryRay[x][y].getBlue() * factor);
-
-                int rgb = (red << 16) | (green << 8) | blue;
-
-                for (int i = 0; i < scalingFactor; i++) {
-                    for (int k = 0; k < scalingFactor; k++) {
-                        image.setRGB((int) (x * scalingFactor + i), (int) (y * scalingFactor + k), rgb);
-                    }
-                }
-            }
-        }
-        repaint(); // update image
-    }*/
-
     public void drawFrame(Ray[][] primaryRay, Camera cam) {
         if (ASCII == false) {
             double factor = 255 / maxBrightness(primaryRay);
@@ -243,6 +188,57 @@ public class DrawScreen extends JPanel {
                 e.printStackTrace();
             }
         }
+    }
+
+    public double maxAmplitudeColour(Ray[][] primaryRay) {
+        amplitudesRed.clear();
+        amplitudesGreen.clear();
+        amplitudesBlue.clear();
+
+        for (int i = 0; i < internalWidth; i++) {
+            for (int j = 0; j < internalHeight; j++) {
+                if (primaryRay[i][j].getRed() != 0) { // filter out zeros
+                    amplitudesRed.add(primaryRay[i][j].getRed());
+                }
+                if (primaryRay[i][j].getGreen() != 0) { // filter out zeros
+                    amplitudesGreen.add(primaryRay[i][j].getGreen());
+                }
+                if (primaryRay[i][j].getBlue() != 0) { // filter out zeros
+                    amplitudesBlue.add(primaryRay[i][j].getBlue());
+                }
+            }
+        }
+        amplitudesRed.add(0.0);
+        amplitudesGreen.add(0.0);
+        amplitudesBlue.add(0.0);
+
+        System.out.println(Collections.max(amplitudesRed));
+        System.out.println(Collections.max(amplitudesBlue));
+        System.out.println(Collections.max(amplitudesGreen));
+
+        // return the max of the red, green, or blue light amplitdues
+        return Math.max(Math.max(Collections.max(amplitudesRed), Collections.max(amplitudesGreen)), Collections.max(amplitudesBlue));
+    }
+
+    public void drawFrameRGB(Ray[][] primaryRay, Camera cam) {
+        double factor = 255 / maxAmplitudeColour(primaryRay);
+        for (int y = 0; y < internalHeight; y++) {
+            for (int x = 0; x < internalWidth; x++) {
+
+                int red =  (int) (primaryRay[x][y].getRed() * factor);
+                int green = (int) (primaryRay[x][y].getGreen() * factor);
+                int blue = (int) (primaryRay[x][y].getBlue() * factor);
+
+                int rgb = (red << 16) | (green << 8) | blue;
+
+                for (int i = 0; i < scalingFactor; i++) {
+                    for (int k = 0; k < scalingFactor; k++) {
+                        image.setRGB((int) (x * scalingFactor + i), (int) (y * scalingFactor + k), rgb);
+                    }
+                }
+            }
+        }
+        repaint(); // update image
     }
 
     @Override

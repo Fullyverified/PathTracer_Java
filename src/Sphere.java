@@ -29,6 +29,20 @@ public class Sphere implements SceneObjects {
         this.reflecB = reflectivity;
     }
 
+    public Sphere(double centerx, double centery, double centerz, double sradius, double colourR, double colourG, double colourB) {
+        this.centerx = centerx;
+        this.centery = centery;
+        this.centerz = centerz;
+        this.sradius = sradius;
+        this.reflectivity = reflectivity;
+        this.sphereID = numSpheres;
+        numSpheres++;
+
+        this.reflecR = colourR;
+        this.reflecG = colourG;
+        this.reflecB = colourB;
+    }
+
     // p = o + td
     // p new ray position
     // o ray origin

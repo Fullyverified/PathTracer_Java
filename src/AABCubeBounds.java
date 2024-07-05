@@ -34,6 +34,22 @@ public class AABCubeBounds implements SceneObjects {
         this.reflecB = reflectivity;
     }
 
+    public AABCubeBounds(double minX, double maxX, double minY, double maxY, double minZ, double maxZ, double colourR, double colourG, double colourB) {
+        this.minX = minX;
+        this.maxX = maxX;
+        this.minY = minY;
+        this.maxY = maxY;
+        this.minZ = minZ;
+        this.maxZ = maxZ;
+
+        this.cubeID = numCubes;
+        numCubes++;
+
+        this.reflecR = colourR;
+        this.reflecG = colourG;
+        this.reflecB = colourB;
+    }
+
     public void computeMinMax(Ray ray) {
 
         // (cubecorner - ray origin) / ray direction
