@@ -11,6 +11,9 @@ public class Ray {
     private double px, py, pixelIndexX, pixelIndexY, pixelPosX, pixelPosY;
     private int collidedObject;
     private double lightAmplitude = 0;
+
+    private double R, G, B = 0;
+
     private SceneObjects hitObject;
     private long numHits = 0;
 
@@ -110,6 +113,16 @@ public class Ray {
 
     public double getLightAmplitude() {return this.lightAmplitude;}
 
+    public double getRed() {
+        return this.R;
+    }
+    public double getGreen() {
+        return this.G;
+    }
+    public double getBlue() {
+        return this.B;
+    }
+
     public int getHitObjectID(){return this.collidedObject;}
 
     public long getNumHits() {return this.numHits;}
@@ -159,5 +172,20 @@ public class Ray {
     public void addLightAmplitude(double luminance) {
         this.lightAmplitude = this.lightAmplitude + luminance;
     }
+    /*public void addLightRGB(double R, double G, double B) {
+        this.R = R;
+        this.G = G;
+        this.B = B;
+    }
+    public void addRed(double red) {
+        this.R = red;
+    }
+    public void addGreen(double green) {
+        this.G = green;
+    }
+    public void addBlue(double blue) {
+        this.B = blue;
+    }*/
+
 
 }

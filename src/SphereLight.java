@@ -3,13 +3,14 @@ public class SphereLight implements SceneObjects {
     private double centerx, centerOriginX;
     private double centery, centerOriginY;
     private double centerz, centerOriginZ;
-    private double sradius, luminance;
+    private double sradius;
     private double a, b, c, discriminant, sqrtDiscriminant;
     private double distanceToC, distanceToR;
     private static int numPointLights = 100;
     private int pointLightID = 0;
     private double normalx, normaly, normalz;
-    private double reflectivity = 1;
+    double reflectivity, reflecR, reflecB, reflecG = 1;
+    private double luminance, R, G, B = 0;
 
 
     //Equation of a sphere: (x - cx)^2 + (y - cy)^2 + (z - cz)^2 = r^2
@@ -24,6 +25,30 @@ public class SphereLight implements SceneObjects {
         this.reflectivity = reflectivity;
         this.pointLightID = numPointLights;
         numPointLights++;
+
+        this.reflecR = reflectivity;
+        this.reflecG = reflectivity;
+        this.reflecB = reflectivity;
+        this.R = luminance;
+        this.G = luminance;
+        this.B = luminance;
+    }
+
+    public SphereLight(double centerx, double centery, double centerz, double sradius, double redBrightness, double greenBrightness, double blueBrightness, double redReflectivity, double greenReflectivity, double blueReflectivity) {
+        this.centerx = centerx;
+        this.centery = centery;
+        this.centerz = centerz;
+        this.sradius = sradius;
+        this.R = redBrightness;
+        this.G = greenBrightness;
+        this.B = blueBrightness;
+        this.reflectivity = reflectivity;
+        this.pointLightID = numPointLights;
+        numPointLights++;
+
+        this.reflecR = redReflectivity;
+        this.reflecG = greenReflectivity;
+        this.reflecB = blueReflectivity;
     }
 
     // p = o + td
@@ -128,6 +153,15 @@ public class SphereLight implements SceneObjects {
         return this.reflectivity;
     }
     public double getLuminance() {return this.luminance;}
+
+    public double getRBrightness() {return this.R;}
+    public double getGBrightness() {return this.G;}
+    public double getBBrightness() {return this.B;}
+
+    public double getReflecR() {return this.reflecR;}
+    public double getReflecG() {return this.reflecG;}
+    public double getReflecB() {return this.reflecB;}
+
     public void setLuminance(double luminance) {this.luminance = luminance;}
 
     public double getPosX()

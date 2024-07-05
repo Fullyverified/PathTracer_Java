@@ -9,8 +9,8 @@ public class Sphere implements SceneObjects {
     private static int numSpheres = 0;
     private int sphereID = 0;
     private double normalx, normaly, normalz;
-    private double luminance = 0;
-    double reflectivity = 1;
+    double reflectivity, reflecR, reflecB, reflecG = 1;
+    private double luminance, R, G, B = 0;
 
     //Equation of a sphere: (x - cx)^2 + (y - cy)^2 + (z - cz)^2 = r^2
 
@@ -23,6 +23,10 @@ public class Sphere implements SceneObjects {
         this.reflectivity = reflectivity;
         this.sphereID = numSpheres;
         numSpheres++;
+
+        this.reflecR = reflectivity;
+        this.reflecG = reflectivity;
+        this.reflecB = reflectivity;
     }
 
     // p = o + td
@@ -158,4 +162,13 @@ public class Sphere implements SceneObjects {
     public double getReflectivity() {
         return this.reflectivity;
     }
+
+    public double getRBrightness() {return this.R;}
+    public double getGBrightness() {return this.G;}
+    public double getBBrightness() {return this.B;}
+
+    public double getReflecR() {return this.reflecR;}
+    public double getReflecG() {return this.reflecG;}
+    public double getReflecB() {return this.reflecB;}
+
 }

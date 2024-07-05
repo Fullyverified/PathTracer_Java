@@ -11,8 +11,8 @@ public class AABCubeCenter implements SceneObjects {
     private static int numCubes = 300;
     private int cubeID = 0;
     private double normalx, normaly, normalz;
-    private double luminance = 0;
-    double reflectivity = 1;
+    private double luminance, R, G, B = 0;
+    double reflectivity, reflecR, reflecB, reflecG = 1;
 
     //Equation of a sphere: (x - cx)^2 + (y - cy)^2 + (z - cz)^2 = r^2
 
@@ -36,6 +36,10 @@ public class AABCubeCenter implements SceneObjects {
 
         this.cubeID = numCubes;
         numCubes++;
+
+        this.reflecR = reflectivity;
+        this.reflecG = reflectivity;
+        this.reflecB = reflectivity;
     }
 
 
@@ -202,5 +206,13 @@ public class AABCubeCenter implements SceneObjects {
     public double getReflectivity() {
         return this.reflectivity;
     }
+
+    public double getRBrightness() {return this.R;}
+    public double getGBrightness() {return this.G;}
+    public double getBBrightness() {return this.B;}
+
+    public double getReflecR() {return this.reflecR;}
+    public double getReflecG() {return this.reflecG;}
+    public double getReflecB() {return this.reflecB;}
 
 }
