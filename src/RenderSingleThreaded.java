@@ -1,4 +1,3 @@
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -12,6 +11,8 @@ public class RenderSingleThreaded {
     public List<SceneObjects> visibleObjects = new ArrayList<>();
     private int loadingProgress, currentProgress = 0;
     private String loadingString = "";
+
+    public double generations = 0;
 
     public RenderSingleThreaded() {
     }
@@ -129,7 +130,7 @@ public class RenderSingleThreaded {
             for (int i = 0; i < cam.getResX(); i++) {
                 if (primaryRay[i][j].getHit()) {
                     nthRay[i][j] = new Ray(primaryRay[i][j].getHitPointX(), primaryRay[i][j].getHitPointY(), primaryRay[i][j].getHitPointZ());
-                    double[][] luminanceRed= new double[numBounces + 1][5];
+                    double[][] luminanceRed = new double[numBounces + 1][5];
                     double[][] luminanceGreen = new double[numBounces + 1][5];
                     double[][] luminanceBlue = new double[numBounces + 1][5];
                     // BOUNCES PER RAY
@@ -139,15 +140,9 @@ public class RenderSingleThreaded {
                     storeHitDataRGB(luminanceGreen, nthRay[i][j], -1, nthRay[i][j].getHitObject(), nthRay[i][j].getHitObject().getGBrightness(), nthRay[i][j].getHitObject().getReflecG());
                     storeHitDataRGB(luminanceBlue, nthRay[i][j], -1, nthRay[i][j].getHitObject(), nthRay[i][j].getHitObject().getBBrightness(), nthRay[i][j].getHitObject().getReflecB());
                     for (int currentBounce = 0; currentBounce < numBounces && nthRay[i][j].getHit(); currentBounce++) {
-                        if (currentBounce == 0) {
-                            // first bounce uses random direction
-                            randomDirection(nthRay[i][j], nthRay[i][j].getHitObject());
-                            //reflectionBounce(nthRay[i][j], nthRay[i][j].getHitObject());
-                        } else {
-                            randomDirection(nthRay[i][j], nthRay[i][j].getHitObject());
-                            //reflectionBounce(nthRay[i][j], nthRay[i][j].getHitObject());
-                        }
-                        System.out.println("finished direction");
+                        // sample a new direction with importance sampling
+                        cosineWeightedHemisphereImportanceSampling(nthRay[i][j], nthRay[i][j].getHitObject());
+                        //importanceSampling(nthRay[i][j], nthRay[i][j].getHitObject());
                         // add all non culled objects to a list
                         visibleObjects.clear();
                         for (SceneObjects sceneObject1 : sceneObjectsList) {
@@ -210,40 +205,145 @@ public class RenderSingleThreaded {
         luminanceArray[pos][2] = currentBounce + 1; // which bounce
         luminanceArray[pos][3] = 1; // boolean hit
         luminanceArray[pos][4] = objectReflectivity; // reflectivity
+    }
 
-        if (currentBounce == -1) {
-            luminanceArray[pos][1] = 1;
-        }
+    public double lambertCosineLaw(Ray currentRay, SceneObjects sceneObject) {
+        sceneObject.calculateNormal(currentRay);
+        currentRay.updateNormalisation();
+
+        // dot product of sphere normal and ray direction
+        double costheta = Math.abs(sceneObject.getNormalX() * currentRay.getDirX() + sceneObject.getNormalY() * currentRay.getDirY() + sceneObject.getNormalZ() * currentRay.getDirZ());
+        return costheta;
     }
 
     public void importanceSampling(Ray nthRay, SceneObjects sceneObject) {
-       // calculate a reflection direction
-        double dotproduct = sceneObject.getNormalX() * nthRay.getDirX() + sceneObject.getNormalY() * nthRay.getDirY() + sceneObject.getNormalZ() * nthRay.getDirZ();
+        // calculate the reflection direction relative to the normal
         sceneObject.calculateNormal(nthRay);
+        double dotproduct = sceneObject.getNormalX() * nthRay.getDirX() + sceneObject.getNormalY() * nthRay.getDirY() + sceneObject.getNormalZ() * nthRay.getDirZ();
         double reflectionX = nthRay.getDirX() - 2 * (dotproduct) * sceneObject.getNormalX();
         double reflectionY = nthRay.getDirY() - 2 * (dotproduct) * sceneObject.getNormalY();
         double reflectionZ = nthRay.getDirZ() - 2 * (dotproduct) * sceneObject.getNormalZ();
 
-        // calculate a random direction
-        Random random = new Random();
-        double randomX = random.nextDouble() * 2 - 1;
-        double randomY = random.nextDouble() * 2 - 1;
-        double randomZ = random.nextDouble() * 2 - 1;
-        // normalize it
-        double dirMagnitude = Math.sqrt(randomX*randomX + randomY*randomY + randomZ*randomZ);
-        randomX = randomX / dirMagnitude;
-        randomY = randomY / dirMagnitude;
-        randomZ = randomZ / dirMagnitude;
+        if (sceneObject.getRoughness() > 0) {
+            // calculate a random direction
+            Random random = new Random();
+            double randomX = random.nextDouble() * 2 - 1;
+            double randomY = random.nextDouble() * 2 - 1;
+            double randomZ = random.nextDouble() * 2 - 1;
+            // normalize it
+            double randDirMagnitude = Math.sqrt(randomX * randomX + randomY * randomY + randomZ * randomZ);
+            randomX = randomX / randDirMagnitude;
+            randomY = randomY / randDirMagnitude;
+            randomZ = randomZ / randDirMagnitude;
 
+            // bias the reflection direction with the random direction
+            // biasedDirection = (1 - roughness) * reflectionDirection + roughness * randomDirection
+            double roughness = sceneObject.getRoughness();
+            double directionX = ((1 - roughness) * reflectionX) + roughness * randomX;
+            double directionY = ((1 - roughness) * reflectionY) + roughness * randomY;
+            double directionZ = ((1 - roughness) * reflectionZ) + roughness * randomZ;
+
+            nthRay.setDirection(directionX, directionY, directionZ);
+            nthRay.updateNormalisation();
+            // check new dotproduict
+            dotproduct = sceneObject.getNormalX() * nthRay.getDirX() + sceneObject.getNormalY() * nthRay.getDirY() + sceneObject.getNormalZ() * nthRay.getDirZ();
+
+            if (dotproduct < 0) {
+                directionX = -directionX;
+                directionY = -directionY;
+                directionZ = -directionZ;
+                nthRay.setDirection(directionX, directionY, directionZ);
+                nthRay.updateNormalisation();
+            }
+
+        } else if (sceneObject.getRoughness() == 0) {
+            sceneObject.calculateNormal(nthRay);
+            dotproduct = sceneObject.getNormalX() * nthRay.getDirX() + sceneObject.getNormalY() * nthRay.getDirY() + sceneObject.getNormalZ() * nthRay.getDirZ();
+            reflectionX = nthRay.getDirX() - 2 * dotproduct * sceneObject.getNormalX();
+            reflectionY = nthRay.getDirY() - 2 * dotproduct * sceneObject.getNormalY();
+            reflectionZ = nthRay.getDirZ() - 2 * dotproduct * sceneObject.getNormalZ();
+
+            nthRay.setDirection(reflectionX, reflectionY, reflectionZ);
+            nthRay.updateNormalisation();
+        }
+        nthRay.updateOrigin(0.1); // march the ray a tiny amount to move it off the sphere
+    }
+
+    public void cosineWeightedHemisphereImportanceSampling(Ray nthRay, SceneObjects sceneObject) {
+
+        // calculate the reflection direction relative to the normal
+        sceneObject.calculateNormal(nthRay);
+        double dotproduct = sceneObject.getNormalX() * nthRay.getDirX() + sceneObject.getNormalY() * nthRay.getDirY() + sceneObject.getNormalZ() * nthRay.getDirZ();
+        double reflectionX = nthRay.getDirX() - 2 * (dotproduct) * sceneObject.getNormalX();
+        double reflectionY = nthRay.getDirY() - 2 * (dotproduct) * sceneObject.getNormalY();
+        double reflectionZ = nthRay.getDirZ() - 2 * (dotproduct) * sceneObject.getNormalZ();
+
+        // generate random direction
+        Random random = new Random();
+        double alpha = random.nextDouble();
+        double gamma = random.nextDouble();
+        // convert to sphereical coodinates
+        alpha = Math.acos(Math.sqrt(alpha));
+        gamma = 2 * Math.PI * gamma;
+
+        // create a sample vector S in tangent space
+        double randomX = Math.sin(alpha) * Math.cos(gamma);
+        double randomY = Math.sin(alpha) * Math.sin(gamma);
+        double randomZ = Math.cos(alpha);
+        //System.out.println(randomX + " " + randomY + " " + randomZ);
+        // calculate Tangent and Bitangnet vectors
+        double aX, aY, aZ;
+        if (sceneObject.getNormalX() <= sceneObject.getNormalZ()) {
+            aX = 0;
+            aY = 1;
+            aZ = 0;
+        } else {
+            aX = 1;
+            aY = 0;
+            aZ = 0;
+        }
+        // tangent equals cross product of normal N and arbituary vector a
+        double tangentX = sceneObject.getNormalY() * aZ - sceneObject.getNormalZ() * aY;
+        double tangentY = sceneObject.getNormalZ() * aX - sceneObject.getNormalX() * aZ;
+        double tangentZ = sceneObject.getNormalX() * aY - sceneObject.getNormalY() * aX;
+        // normalize
+        double tangentMagnitude = Math.sqrt(tangentX * tangentX + tangentY * tangentY + tangentZ * tangentZ);
+        tangentX = tangentX / tangentMagnitude;
+        tangentY = tangentY / tangentMagnitude;
+        tangentZ = tangentZ / tangentMagnitude;
+        // bitangnet equals cross product of tangent and normal
+        double bitangentX = sceneObject.getNormalY() * tangentZ - sceneObject.getNormalZ() * tangentY;
+        double bitangentY = sceneObject.getNormalZ() * tangentX - sceneObject.getNormalX() * tangentZ;
+        double bitangentZ = sceneObject.getNormalX() * tangentY - sceneObject.getNormalY() * tangentX;
+        // set final sampled direction
+        // x = randomX * tangentX + randomY * bitangentX + randomZ * normalX
+        double directionX = randomX * tangentX + randomY * bitangentX + randomZ * sceneObject.getNormalX();
+        double directionY = randomX * tangentY + randomY * bitangentY + randomZ * sceneObject.getNormalY();
+        double directionZ = randomX * tangentZ + randomY * bitangentZ + randomZ * sceneObject.getNormalZ();
+
+        // bias direction with roughness calculation:
         // bias the reflection direction with the random direction
         // biasedDirection = (1 - roughness) * reflectionDirection + roughness * randomDirection
         double roughness = sceneObject.getRoughness();
-        double directionX = ((1 - roughness) * reflectionX) + roughness * randomX;
-        double directionY = ((1 - roughness) * reflectionY) + roughness * randomY;
-        double directionZ = ((1 - roughness) * reflectionZ) + roughness * randomZ;
+        directionX = ((1 - roughness) * reflectionX) + roughness * directionX;
+        directionY = ((1 - roughness) * reflectionY) + roughness * directionY;
+        directionZ = ((1 - roughness) * reflectionZ) + roughness * directionZ;
 
+        nthRay.setDirection(directionX, directionY, directionZ);
+        nthRay.updateNormalisation();
+        // check new dot product - invert if necessary
+        dotproduct = sceneObject.getNormalX() * nthRay.getDirX() + sceneObject.getNormalY() * nthRay.getDirY() + sceneObject.getNormalZ() * nthRay.getDirZ();
+        if (dotproduct < 0) {
+            directionX = -directionX;
+            directionY = -directionY;
+            directionZ = -directionZ;
+
+            nthRay.setDirection(directionX, directionY, directionZ);
+            nthRay.updateNormalisation();
+
+        }
+        nthRay.updateOrigin(0.1); // march the ray a tiny amount to move it off the sphere
     }
-
 
     public void randomDirection(Ray nthRay, SceneObjects sceneObject) {
         double dotproduct = -1;
@@ -251,7 +351,6 @@ public class RenderSingleThreaded {
 
         nthRay.marchRay(0);
         sceneObject.calculateNormal(nthRay);
-        System.out.println("calculating random direction");
 
         while (dotproduct <= 0) {
             // Generate a random direction uniformly on a sphere
@@ -264,7 +363,6 @@ public class RenderSingleThreaded {
 
             // Normalize the random direction
             nthRay.updateNormalisation();
-
             // Calculate the dot product
             dotproduct = sceneObject.getNormalX() * nthRay.getDirX() + sceneObject.getNormalY() * nthRay.getDirY() + sceneObject.getNormalZ() * nthRay.getDirZ();
         }
@@ -273,8 +371,8 @@ public class RenderSingleThreaded {
 
     // R = I - 2 * (I dot N) * N
     public void reflectionBounce(Ray nthRay, SceneObjects sceneObject) {
-        double dotproduct = sceneObject.getNormalX() * nthRay.getDirX() + sceneObject.getNormalY() * nthRay.getDirY() + sceneObject.getNormalZ() * nthRay.getDirZ();
         sceneObject.calculateNormal(nthRay);
+        double dotproduct = sceneObject.getNormalX() * nthRay.getDirX() + sceneObject.getNormalY() * nthRay.getDirY() + sceneObject.getNormalZ() * nthRay.getDirZ();
         double reflectionX = nthRay.getDirX() - 2 * (dotproduct) * sceneObject.getNormalX();
         double reflectionY = nthRay.getDirY() - 2 * (dotproduct) * sceneObject.getNormalY();
         double reflectionZ = nthRay.getDirZ() - 2 * (dotproduct) * sceneObject.getNormalZ();
@@ -284,41 +382,5 @@ public class RenderSingleThreaded {
         nthRay.updateOrigin(0.15); // march the ray a tiny amount to move it off the sphere
     }
 
-    public double lambertCosineLaw(Ray currentRay, SceneObjects sceneObject) {
-        sceneObject.calculateNormal(currentRay);
-        currentRay.updateNormalisation();
 
-        // dot product of sphere normal and ray direction
-        double costheta = Math.abs(sceneObject.getNormalX() * currentRay.getDirX() + sceneObject.getNormalY() * currentRay.getDirY() + sceneObject.getNormalZ() * currentRay.getDirZ());
-        return costheta;
-    }
-
-    public void debugDrawScreenNumHits(Camera cam, Ray[][] primaryRay) {
-        DecimalFormat df = new DecimalFormat("#.00");
-        // iterate through each rays hit value and print the output
-        for (int i = 0; i < cam.getResX(); i++) {
-            System.out.print("------");
-        }
-        System.out.println(" ");
-        for (int j = 0; j < cam.getResY(); j++) {
-            System.out.print("|");
-            for (int i = 0; i < cam.getResX(); i++) {
-                if (primaryRay[i][j].getHit()) {
-                    if (primaryRay[i][j].getNumHits() >= 10) {
-                        System.out.print(df.format(primaryRay[i][j].getNumHits()) + "|");
-                    } else if (primaryRay[i][j].getNumHits() >= 1.0 && primaryRay[i][j].getNumHits() < 10) {
-                        System.out.print("0" + df.format(primaryRay[i][j].getNumHits()) + "|");
-                    } else if (primaryRay[i][j].getNumHits() < 1) {
-                        System.out.print("00" + df.format(primaryRay[i][j].getNumHits()) + "|");
-                    }
-                } else {
-                    System.out.print("00.00|");
-                }
-            }
-            System.out.println(" ");
-        }
-        for (int i = 0; i < cam.getResX(); i++) {
-            System.out.print("------");
-        }
-    }
 }

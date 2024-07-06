@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-
 public class DrawScreen extends JPanel {
 
     List<Double> amplitudes = new ArrayList<>();
@@ -51,7 +50,8 @@ public class DrawScreen extends JPanel {
             window.add(this);
             window.setSize(outputWidth, outputHeight);
             window.setVisible(true);
-        } else if (ASCII == true) {
+        }
+        else if (ASCII == true) {
             areaASCII = new JTextPane();
             setLayout(new BorderLayout());
             int fontSize = (int) (8 * scalingFactor);
@@ -111,26 +111,88 @@ public class DrawScreen extends JPanel {
     }
 
     public void drawFrameRGB(Ray[][] primaryRay, Camera cam) {
-        double factor = 255 / (maxAmplitudeColour(primaryRay) * cam.getISO()); // convert absolute brightness to 8 bit colour space
-        for (int y = 0; y < internalHeight; y++) {
-            for (int x = 0; x < internalWidth; x++) {
 
-                // convert brightness of red green and blue to 8 bit colour space
-                int red =  (int) (primaryRay[x][y].getRed() * factor);
-                int green = (int) (primaryRay[x][y].getGreen() * factor);
-                int blue = (int) (primaryRay[x][y].getBlue() * factor);
+        if (ASCII == false) {
+            double factor = 255 / (maxAmplitudeColour(primaryRay) * cam.getISO()); // convert absolute brightness to 8 bit colour space
+            for (int y = 0; y < internalHeight; y++) {
+                for (int x = 0; x < internalWidth; x++) {
 
-                // first 8 bits are alpha, next 8 red, next 8 green, final 8 blue
-                int rgb = (red << 16) | (green << 8) | blue;
+                    // convert brightness of red green and blue to 8 bit colour space
+                    int red = (int) (primaryRay[x][y].getRed() * factor);
+                    if (red > 255) {red = 255;}
+                    int green = (int) (primaryRay[x][y].getGreen() * factor);
+                    if (green > 255) {green = 255;}
+                    int blue = (int) (primaryRay[x][y].getBlue() * factor);
+                    if (blue > 255) {blue = 255;}
 
-                for (int i = 0; i < scalingFactor; i++) {
-                    for (int k = 0; k < scalingFactor; k++) {
-                        image.setRGB((int) (x * scalingFactor + i), (int) (y * scalingFactor + k), rgb);
+                    // first 8 bits are alpha, next 8 red, next 8 green, final 8 blue
+                    int rgb = (red << 16) | (green << 8) | blue;
+
+                    for (int i = 0; i < scalingFactor; i++) {
+                        for (int k = 0; k < scalingFactor; k++) {
+                            image.setRGB((int) (x * scalingFactor + i), (int) (y * scalingFactor + k), rgb);
+                        }
                     }
                 }
             }
+            repaint(); // update image
         }
-        repaint(); // update image
+        else if (ASCII == true) {
+            // ASCII CODE HERE
+            /*StringBuilder stringBuffer = new StringBuilder();
+
+            double max = maxBrightness(primaryRay);
+            double q1 = (max * 0.08);
+            double q2 = (max * 0.16);
+            double q3 = (max * 0.24);
+            double q4 = (max * 0.32);
+            double q5 = (max * 0.40);
+            double q6 = (max * 0.48);
+            double q7 = (max * 0.56);
+            double q8 = (max * 0.64);
+            double q9 = (max * 0.72);
+            double q10 = (max * 0.80);
+            double q11 = (max * 0.88);
+            double q12 = (max * 0.95);
+
+            // internal resolution
+            for (int y = 0; y < internalHeight; y++) {
+                for (int x = 0; x < internalWidth; x++) {
+                    if (primaryRay[x][y].getLightAmplitude() >= q12) {
+                        stringBuffer.append("@@@");
+                    } else if (primaryRay[x][y].getLightAmplitude() >= q11) {
+                        stringBuffer.append("DDD");
+                    } else if (primaryRay[x][y].getLightAmplitude() >= q10) {
+                        stringBuffer.append("000");
+                    } else if (primaryRay[x][y].getLightAmplitude() >= q9) {
+                        stringBuffer.append("UUU");
+                    } else if (primaryRay[x][y].getLightAmplitude() >= q8) {
+                        stringBuffer.append("###");
+                    } else if (primaryRay[x][y].getLightAmplitude() >= q7) {
+                        stringBuffer.append("ZZZ");
+                    } else if (primaryRay[x][y].getLightAmplitude() >= q6) {
+                        stringBuffer.append("***");
+                    } else if (primaryRay[x][y].getLightAmplitude() >= q5) {
+                        stringBuffer.append("xxx");
+                    } else if (primaryRay[x][y].getLightAmplitude() >= q4) {
+                        stringBuffer.append("~~~");
+                    } else if (primaryRay[x][y].getLightAmplitude() >= q3) {
+                        stringBuffer.append(";;;");
+                    } else if (primaryRay[x][y].getLightAmplitude() >= q2) {
+                        stringBuffer.append(":::");
+                    } else if (primaryRay[x][y].getLightAmplitude() >= q1) {
+                        stringBuffer.append(",,,");
+                    } else if (primaryRay[x][y].getLightAmplitude() > 0) {
+                        stringBuffer.append("...");
+                    } else if (primaryRay[x][y].getLightAmplitude() == 0) {
+                        stringBuffer.append("   ");
+                    }
+                }
+                stringBuffer.append("\n");
+            }
+            textArea.setText(stringBuffer.toString()); // update ASCII output
+            ((CardLayout) cardPanel.getLayout()).show(cardPanel, "ASCII"); */
+        }
     }
 
     @Override
