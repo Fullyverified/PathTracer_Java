@@ -27,7 +27,6 @@ public class RenderSingleThreaded {
         Runnable screenUpdateTask = () -> {
             updateScreen.set(true);
         };
-
         DrawScreen drawScreen = new DrawScreen(cam.getResX(), cam.getResY(), ASCII);
 
         for (int j = 0; j < cam.getResY(); j++) {
@@ -43,7 +42,6 @@ public class RenderSingleThreaded {
         }
         System.out.println("-|");
         System.out.print("|-");
-
 
         drawScreenExecutor.scheduleAtFixedRate(screenUpdateTask, 50, frameTime, TimeUnit.MILLISECONDS);
 

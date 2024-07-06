@@ -27,7 +27,7 @@ public class Main {
 
         sceneObjectsList.add(new SphereLight(7, 0,0, 1,40,40,40,1,1,1,0.5));
 
-        Camera cam = new Camera(0.15, RenderResolutionX, fov, aspectX, aspectY, 0,0,0, 1, 0, 0, 0, 1, 0);
+        Camera cam = new Camera(0.3, RenderResolutionX, fov, aspectX, aspectY, 0,0,0, 1, 0, 0, 0, 1, 0);
 
         cam.directionVector();
         cam.upVector();
