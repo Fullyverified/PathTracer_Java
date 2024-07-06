@@ -56,13 +56,11 @@ public class RenderSingleThreaded {
             }
         }
 
-
         drawScreenExecutor.shutdown();
 
         // final print
         drawScreen.drawFrameRGB(primaryRay, cam);
         System.out.print("-|");
-
     }
 
     public void computePrimaryRay(Camera cam, Ray[][] primaryRay, List<SceneObjects> sceneObjectsList, int i, int j) {
@@ -216,59 +214,6 @@ public class RenderSingleThreaded {
         return costheta;
     }
 
-    public void importanceSampling(Ray nthRay, SceneObjects sceneObject) {
-        // calculate the reflection direction relative to the normal
-        sceneObject.calculateNormal(nthRay);
-        double dotproduct = sceneObject.getNormalX() * nthRay.getDirX() + sceneObject.getNormalY() * nthRay.getDirY() + sceneObject.getNormalZ() * nthRay.getDirZ();
-        double reflectionX = nthRay.getDirX() - 2 * (dotproduct) * sceneObject.getNormalX();
-        double reflectionY = nthRay.getDirY() - 2 * (dotproduct) * sceneObject.getNormalY();
-        double reflectionZ = nthRay.getDirZ() - 2 * (dotproduct) * sceneObject.getNormalZ();
-
-        if (sceneObject.getRoughness() > 0) {
-            // calculate a random direction
-            Random random = new Random();
-            double randomX = random.nextDouble() * 2 - 1;
-            double randomY = random.nextDouble() * 2 - 1;
-            double randomZ = random.nextDouble() * 2 - 1;
-            // normalize it
-            double randDirMagnitude = Math.sqrt(randomX * randomX + randomY * randomY + randomZ * randomZ);
-            randomX = randomX / randDirMagnitude;
-            randomY = randomY / randDirMagnitude;
-            randomZ = randomZ / randDirMagnitude;
-
-            // bias the reflection direction with the random direction
-            // biasedDirection = (1 - roughness) * reflectionDirection + roughness * randomDirection
-            double roughness = sceneObject.getRoughness();
-            double directionX = ((1 - roughness) * reflectionX) + roughness * randomX;
-            double directionY = ((1 - roughness) * reflectionY) + roughness * randomY;
-            double directionZ = ((1 - roughness) * reflectionZ) + roughness * randomZ;
-
-            nthRay.setDirection(directionX, directionY, directionZ);
-            nthRay.updateNormalisation();
-            // check new dotproduict
-            dotproduct = sceneObject.getNormalX() * nthRay.getDirX() + sceneObject.getNormalY() * nthRay.getDirY() + sceneObject.getNormalZ() * nthRay.getDirZ();
-
-            if (dotproduct < 0) {
-                directionX = -directionX;
-                directionY = -directionY;
-                directionZ = -directionZ;
-                nthRay.setDirection(directionX, directionY, directionZ);
-                nthRay.updateNormalisation();
-            }
-
-        } else if (sceneObject.getRoughness() == 0) {
-            sceneObject.calculateNormal(nthRay);
-            dotproduct = sceneObject.getNormalX() * nthRay.getDirX() + sceneObject.getNormalY() * nthRay.getDirY() + sceneObject.getNormalZ() * nthRay.getDirZ();
-            reflectionX = nthRay.getDirX() - 2 * dotproduct * sceneObject.getNormalX();
-            reflectionY = nthRay.getDirY() - 2 * dotproduct * sceneObject.getNormalY();
-            reflectionZ = nthRay.getDirZ() - 2 * dotproduct * sceneObject.getNormalZ();
-
-            nthRay.setDirection(reflectionX, reflectionY, reflectionZ);
-            nthRay.updateNormalisation();
-        }
-        nthRay.updateOrigin(0.1); // march the ray a tiny amount to move it off the sphere
-    }
-
     public void cosineWeightedHemisphereImportanceSampling(Ray nthRay, SceneObjects sceneObject) {
 
         // calculate the reflection direction relative to the normal
@@ -345,42 +290,56 @@ public class RenderSingleThreaded {
         nthRay.updateOrigin(0.1); // march the ray a tiny amount to move it off the sphere
     }
 
-    public void randomDirection(Ray nthRay, SceneObjects sceneObject) {
-        double dotproduct = -1;
-        Random random = new Random();
-
-        nthRay.marchRay(0);
-        sceneObject.calculateNormal(nthRay);
-
-        while (dotproduct <= 0) {
-            // Generate a random direction uniformly on a sphere
-            double theta = Math.acos(2 * random.nextDouble() - 1); // polar angle
-            double phi = 2 * Math.PI * random.nextDouble(); // azimuthal angle
-
-            nthRay.setDirX(Math.sin(theta) * Math.cos(phi));
-            nthRay.setDirY(Math.sin(theta) * Math.sin(phi));
-            nthRay.setDirZ(Math.cos(theta));
-
-            // Normalize the random direction
-            nthRay.updateNormalisation();
-            // Calculate the dot product
-            dotproduct = sceneObject.getNormalX() * nthRay.getDirX() + sceneObject.getNormalY() * nthRay.getDirY() + sceneObject.getNormalZ() * nthRay.getDirZ();
-        }
-        nthRay.updateOrigin(0.15); // march the ray a tiny amount to move it off the sphere
-    }
-
-    // R = I - 2 * (I dot N) * N
-    public void reflectionBounce(Ray nthRay, SceneObjects sceneObject) {
+    public void importanceSampling(Ray nthRay, SceneObjects sceneObject) {
+        // calculate the reflection direction relative to the normal
         sceneObject.calculateNormal(nthRay);
         double dotproduct = sceneObject.getNormalX() * nthRay.getDirX() + sceneObject.getNormalY() * nthRay.getDirY() + sceneObject.getNormalZ() * nthRay.getDirZ();
         double reflectionX = nthRay.getDirX() - 2 * (dotproduct) * sceneObject.getNormalX();
         double reflectionY = nthRay.getDirY() - 2 * (dotproduct) * sceneObject.getNormalY();
         double reflectionZ = nthRay.getDirZ() - 2 * (dotproduct) * sceneObject.getNormalZ();
 
-        nthRay.setDirection(reflectionX, reflectionY, reflectionZ);
-        nthRay.updateNormalisation();
-        nthRay.updateOrigin(0.15); // march the ray a tiny amount to move it off the sphere
+        if (sceneObject.getRoughness() > 0) {
+            // calculate a random direction
+            Random random = new Random();
+            double randomX = random.nextDouble() * 2 - 1;
+            double randomY = random.nextDouble() * 2 - 1;
+            double randomZ = random.nextDouble() * 2 - 1;
+            // normalize it
+            double randDirMagnitude = Math.sqrt(randomX * randomX + randomY * randomY + randomZ * randomZ);
+            randomX = randomX / randDirMagnitude;
+            randomY = randomY / randDirMagnitude;
+            randomZ = randomZ / randDirMagnitude;
+
+            // bias the reflection direction with the random direction
+            // biasedDirection = (1 - roughness) * reflectionDirection + roughness * randomDirection
+            double roughness = sceneObject.getRoughness();
+            double directionX = ((1 - roughness) * reflectionX) + roughness * randomX;
+            double directionY = ((1 - roughness) * reflectionY) + roughness * randomY;
+            double directionZ = ((1 - roughness) * reflectionZ) + roughness * randomZ;
+
+            nthRay.setDirection(directionX, directionY, directionZ);
+            nthRay.updateNormalisation();
+            // check new dotproduict
+            dotproduct = sceneObject.getNormalX() * nthRay.getDirX() + sceneObject.getNormalY() * nthRay.getDirY() + sceneObject.getNormalZ() * nthRay.getDirZ();
+
+            if (dotproduct < 0) {
+                directionX = -directionX;
+                directionY = -directionY;
+                directionZ = -directionZ;
+                nthRay.setDirection(directionX, directionY, directionZ);
+                nthRay.updateNormalisation();
+            }
+
+        } else if (sceneObject.getRoughness() == 0) {
+            sceneObject.calculateNormal(nthRay);
+            dotproduct = sceneObject.getNormalX() * nthRay.getDirX() + sceneObject.getNormalY() * nthRay.getDirY() + sceneObject.getNormalZ() * nthRay.getDirZ();
+            reflectionX = nthRay.getDirX() - 2 * dotproduct * sceneObject.getNormalX();
+            reflectionY = nthRay.getDirY() - 2 * dotproduct * sceneObject.getNormalY();
+            reflectionZ = nthRay.getDirZ() - 2 * dotproduct * sceneObject.getNormalZ();
+
+            nthRay.setDirection(reflectionX, reflectionY, reflectionZ);
+            nthRay.updateNormalisation();
+        }
+        nthRay.updateOrigin(0.1); // march the ray a tiny amount to move it off the sphere
     }
-
-
 }
