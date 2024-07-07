@@ -171,10 +171,10 @@ public class RenderSingleThreaded {
                                 redAmplitude = ((luminanceRed[index][0] + redAmplitude) * luminanceRed[index][1]) * luminanceRed[index][2];
                             }
                             if (luminanceGreen[index][3] == 1) {
-                                blueAmplitude = ((luminanceGreen[index][0] + blueAmplitude) * luminanceGreen[index][1]) * luminanceGreen[index][2];
+                                greenAmplitude = ((luminanceGreen[index][0] + blueAmplitude) * luminanceGreen[index][1]) * luminanceGreen[index][2];
                             }
                             if (luminanceBlue[index][3] == 1) {
-                                greenAmplitude = ((luminanceBlue[index][0] + greenAmplitude) * luminanceBlue[index][1]) * luminanceBlue[index][2];
+                                blueAmplitude = ((luminanceBlue[index][0] + greenAmplitude) * luminanceBlue[index][1]) * luminanceBlue[index][2];
                             }
                         }
                     }
@@ -191,6 +191,7 @@ public class RenderSingleThreaded {
         if (currentProgress < loadingProgress) {
             currentProgress = loadingProgress;
             System.out.print("|");
+            System.out.println("current Ray: " + currentRay);
         }
     }
 
@@ -232,9 +233,16 @@ public class RenderSingleThreaded {
         double randomX = Math.sin(alpha) * Math.cos(gamma);
         double randomY = Math.sin(alpha) * Math.sin(gamma);
         double randomZ = Math.cos(alpha);
+        // normalize random direction
+        double randomMagnitude = Math.sqrt(randomX * randomX + randomY * randomY + randomZ * randomZ);
+        randomX /= randomMagnitude;
+        randomY /= randomMagnitude;
+        randomZ /= randomMagnitude;
+
         // calculate Tangent and Bitangnet vectors using arbitrary vector a
         double aX, aY, aZ;
-        if (sceneObject.getNormalX() <= sceneObject.getNormalZ()) {
+        // if the normals are exactly 0 there are problems... if statement to catch that
+        if (Math.abs(sceneObject.getNormalX()) > 0.0001 || Math.abs(sceneObject.getNormalZ()) > 0.0001) {
             aX = 0;
             aY = 1;
             aZ = 0;
@@ -249,13 +257,20 @@ public class RenderSingleThreaded {
         double tangentZ = sceneObject.getNormalX() * aY - sceneObject.getNormalY() * aX;
         // normalize
         double tangentMagnitude = Math.sqrt(tangentX * tangentX + tangentY * tangentY + tangentZ * tangentZ);
-        tangentX = tangentX / tangentMagnitude;
-        tangentY = tangentY / tangentMagnitude;
-        tangentZ = tangentZ / tangentMagnitude;
+        tangentX /= tangentMagnitude;
+        tangentY /= tangentMagnitude;
+        tangentZ /= tangentMagnitude;
+
         // bitangnet equals cross product of tangent and normal
         double bitangentX = sceneObject.getNormalY() * tangentZ - sceneObject.getNormalZ() * tangentY;
         double bitangentY = sceneObject.getNormalZ() * tangentX - sceneObject.getNormalX() * tangentZ;
         double bitangentZ = sceneObject.getNormalX() * tangentY - sceneObject.getNormalY() * tangentX;
+        // normalise bitangent
+        double bitangentMagnitude = Math.sqrt(bitangentX * bitangentX + bitangentY * bitangentY + bitangentZ * bitangentZ);
+        bitangentX /= bitangentMagnitude;
+        bitangentY /= bitangentMagnitude;
+        bitangentZ /= bitangentMagnitude;
+
         // set final sampled direction
         // x = randomX * tangentX + randomY * bitangentX + randomZ * normalX
         double directionX = randomX * tangentX + randomY * bitangentX + randomZ * sceneObject.getNormalX();
@@ -280,85 +295,6 @@ public class RenderSingleThreaded {
             directionZ = -directionZ;
 
             nthRay.setDirection(directionX, directionY, directionZ);
-            nthRay.updateNormalisation();
-
-        }
-        nthRay.updateOrigin(0.1); // march the ray a tiny amount to move it off the sphere
-    }
-
-    public void randomDirection(Ray nthRay, SceneObjects sceneObject) {
-        double dotproduct = -1;
-        Random random = new Random();
-
-        nthRay.marchRay(0);
-        sceneObject.calculateNormal(nthRay);
-
-        while (dotproduct <= 0){
-            // Generate a random direction uniformly on a sphere
-            double theta = Math.acos(2 * random.nextDouble() - 1); // polar angle
-            double phi = 2 * Math.PI * random.nextDouble(); // azimuthal angle
-
-            nthRay.setDirX(Math.sin(theta) * Math.cos(phi));
-            nthRay.setDirY(Math.sin(theta) * Math.sin(phi));
-            nthRay.setDirZ(Math.cos(theta));
-
-            // Normalize the random direction
-            nthRay.updateNormalisation();
-
-            // Calculate the dot product
-            dotproduct = sceneObject.getNormalX() * nthRay.getDirX() + sceneObject.getNormalY() * nthRay.getDirY() + sceneObject.getNormalZ() * nthRay.getDirZ();
-        }
-        nthRay.updateOrigin(0.15); // march the ray a tiny amount to move it off the sphere
-    }
-
-    public void importanceSampling(Ray nthRay, SceneObjects sceneObject) {
-        // calculate the reflection direction relative to the normal
-        sceneObject.calculateNormal(nthRay);
-        double dotproduct = sceneObject.getNormalX() * nthRay.getDirX() + sceneObject.getNormalY() * nthRay.getDirY() + sceneObject.getNormalZ() * nthRay.getDirZ();
-        double reflectionX = nthRay.getDirX() - 2 * (dotproduct) * sceneObject.getNormalX();
-        double reflectionY = nthRay.getDirY() - 2 * (dotproduct) * sceneObject.getNormalY();
-        double reflectionZ = nthRay.getDirZ() - 2 * (dotproduct) * sceneObject.getNormalZ();
-
-        if (sceneObject.getRoughness() > 0) {
-            // calculate a random direction
-            Random random = new Random();
-            double randomX = random.nextDouble() * 2 - 1;
-            double randomY = random.nextDouble() * 2 - 1;
-            double randomZ = random.nextDouble() * 2 - 1;
-            // normalize it
-            double randDirMagnitude = Math.sqrt(randomX * randomX + randomY * randomY + randomZ * randomZ);
-            randomX = randomX / randDirMagnitude;
-            randomY = randomY / randDirMagnitude;
-            randomZ = randomZ / randDirMagnitude;
-
-            // bias the reflection direction with the random direction
-            // biasedDirection = (1 - roughness) * reflectionDirection + roughness * randomDirection
-            double roughness = sceneObject.getRoughness();
-            double directionX = ((1 - roughness) * reflectionX) + roughness * randomX;
-            double directionY = ((1 - roughness) * reflectionY) + roughness * randomY;
-            double directionZ = ((1 - roughness) * reflectionZ) + roughness * randomZ;
-
-            nthRay.setDirection(directionX, directionY, directionZ);
-            nthRay.updateNormalisation();
-            // check new dotproduict
-            dotproduct = sceneObject.getNormalX() * nthRay.getDirX() + sceneObject.getNormalY() * nthRay.getDirY() + sceneObject.getNormalZ() * nthRay.getDirZ();
-
-            if (dotproduct < 0) {
-                directionX = -directionX;
-                directionY = -directionY;
-                directionZ = -directionZ;
-                nthRay.setDirection(directionX, directionY, directionZ);
-                nthRay.updateNormalisation();
-            }
-
-        } else if (sceneObject.getRoughness() == 0) {
-            sceneObject.calculateNormal(nthRay);
-            dotproduct = sceneObject.getNormalX() * nthRay.getDirX() + sceneObject.getNormalY() * nthRay.getDirY() + sceneObject.getNormalZ() * nthRay.getDirZ();
-            reflectionX = nthRay.getDirX() - 2 * dotproduct * sceneObject.getNormalX();
-            reflectionY = nthRay.getDirY() - 2 * dotproduct * sceneObject.getNormalY();
-            reflectionZ = nthRay.getDirZ() - 2 * dotproduct * sceneObject.getNormalZ();
-
-            nthRay.setDirection(reflectionX, reflectionY, reflectionZ);
             nthRay.updateNormalisation();
         }
         nthRay.updateOrigin(0.1); // march the ray a tiny amount to move it off the sphere
