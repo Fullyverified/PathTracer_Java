@@ -171,10 +171,10 @@ public class RenderSingleThreaded {
                                 redAmplitude = ((luminanceRed[index][0] + redAmplitude) * luminanceRed[index][1]) * luminanceRed[index][2];
                             }
                             if (luminanceGreen[index][3] == 1) {
-                                greenAmplitude = ((luminanceGreen[index][0] + blueAmplitude) * luminanceGreen[index][1]) * luminanceGreen[index][2];
+                                greenAmplitude = ((luminanceGreen[index][0] + greenAmplitude) * luminanceGreen[index][1]) * luminanceGreen[index][2];
                             }
                             if (luminanceBlue[index][3] == 1) {
-                                blueAmplitude = ((luminanceBlue[index][0] + greenAmplitude) * luminanceBlue[index][1]) * luminanceBlue[index][2];
+                                blueAmplitude = ((luminanceBlue[index][0] + blueAmplitude) * luminanceBlue[index][1]) * luminanceBlue[index][2];
                             }
                         }
                     }
