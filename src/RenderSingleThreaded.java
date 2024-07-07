@@ -132,6 +132,7 @@ public class RenderSingleThreaded {
                     for (int currentBounce = 0; currentBounce < numBounces && nthRay[i][j].getHit(); currentBounce++) {
                         // sample a new direction with importance sampling
                         cosineWeightedHemisphereImportanceSampling(nthRay[i][j], nthRay[i][j].getHitObject());
+                        //randomDirection(nthRay[i][j], nthRay[i][j].getHitObject());
                         //importanceSampling(nthRay[i][j], nthRay[i][j].getHitObject());
                         // add all non culled objects to a list
                         visibleObjects.clear();
@@ -224,8 +225,8 @@ public class RenderSingleThreaded {
         double alpha = random.nextDouble();
         double gamma = random.nextDouble();
         // convert to sphereical coodinates
-        alpha = Math.acos(Math.sqrt(alpha));
-        gamma = 2 * Math.PI * gamma;
+        alpha = Math.acos(Math.sqrt(alpha)); // polar angle
+        gamma = 2 * Math.PI * gamma; // azimuthal angle
 
         // create a sample vector S in tangent space
         double randomX = Math.sin(alpha) * Math.cos(gamma);
@@ -283,6 +284,31 @@ public class RenderSingleThreaded {
 
         }
         nthRay.updateOrigin(0.1); // march the ray a tiny amount to move it off the sphere
+    }
+
+    public void randomDirection(Ray nthRay, SceneObjects sceneObject) {
+        double dotproduct = -1;
+        Random random = new Random();
+
+        nthRay.marchRay(0);
+        sceneObject.calculateNormal(nthRay);
+
+        while (dotproduct <= 0){
+            // Generate a random direction uniformly on a sphere
+            double theta = Math.acos(2 * random.nextDouble() - 1); // polar angle
+            double phi = 2 * Math.PI * random.nextDouble(); // azimuthal angle
+
+            nthRay.setDirX(Math.sin(theta) * Math.cos(phi));
+            nthRay.setDirY(Math.sin(theta) * Math.sin(phi));
+            nthRay.setDirZ(Math.cos(theta));
+
+            // Normalize the random direction
+            nthRay.updateNormalisation();
+
+            // Calculate the dot product
+            dotproduct = sceneObject.getNormalX() * nthRay.getDirX() + sceneObject.getNormalY() * nthRay.getDirY() + sceneObject.getNormalZ() * nthRay.getDirZ();
+        }
+        nthRay.updateOrigin(0.15); // march the ray a tiny amount to move it off the sphere
     }
 
     public void importanceSampling(Ray nthRay, SceneObjects sceneObject) {

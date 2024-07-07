@@ -66,10 +66,7 @@ public class AABCubeCenter implements SceneObjects {
         this.reflecG = colourG;
         this.reflecB = colourB;
         this.roughness = roughness;
-
     }
-
-
 
     public void computeMinMax(Ray ray) {
 
@@ -145,34 +142,36 @@ public class AABCubeCenter implements SceneObjects {
 
     // check if the ray is intersecting the cube
     public boolean intersectionCheck(Ray ray) {
-
+        computeMinMax(ray);
         if (minX <= ray.getPosX() && maxX >= ray.getPosX() && minY <= ray.getPosY() && maxY >= ray.getPosY() && minZ <= ray.getPosZ() && maxZ >= ray.getPosZ()) {
             return true;
         } else {
             return false;
         }
-
     }
 
     // calculate the normal of the sphere and a point
     public void calculateNormal(Ray nthRay) {
-        double epsilon = 0.1;
+        double epsilon = 0.01;
+        double px = nthRay.getPosX();
+        double py = nthRay.getPosY();
+        double pz = nthRay.getPosZ();
         // x
-        if ((Math.abs(nthRay.getPosX() - minX)) < epsilon) {
+        if (Math.abs(px - minX) < epsilon) {
             setNormal(-1, 0, 0);
-        } else if ((Math.abs(nthRay.getPosX() - maxX)) < epsilon) {
+        } else if (Math.abs(px - maxX) < epsilon) {
             setNormal(1, 0, 0);
         }
         // y
-        else if ((Math.abs(nthRay.getPosY() - minY)) < epsilon) {
+        else if (Math.abs(py - minY) < epsilon) {
             setNormal(0, -1, 0);
-        } else if ((Math.abs(nthRay.getPosY() - maxY)) < epsilon) {
-            setNormal(0, -1, 0);
+        } else if (Math.abs(py - maxY) < epsilon) {
+            setNormal(0, 1, 0);
         }
         // z
-        else if ((Math.abs(nthRay.getPosZ() - minZ)) < epsilon) {
+        else if (Math.abs(pz - minZ) < epsilon) {
             setNormal(0, 0, -1);
-        } else if ((Math.abs(nthRay.getPosZ() - maxZ)) < epsilon) {
+        } else if (Math.abs(pz - maxZ) < epsilon) {
             setNormal(0, 0, 1);
         }
     }
