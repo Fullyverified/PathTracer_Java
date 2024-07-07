@@ -1,9 +1,7 @@
 I'm trying to make an Ascii Pathtracer. Nothing that hasn't been done before :)
 Global Illuminiation is here!
 
-![sphere and cube v10 10000 rays random reflections](https://github.com/Fullyverified/ASCII_PathTracer/assets/138776324/65fcac25-cea8-48f5-a6c7-6f25d58adb87)
-
-![sphere and cube v11 ](https://github.com/Fullyverified/ASCII_PathTracer/assets/138776324/08342bf5-7b4f-47ae-9566-f9235ccd9ff4)
+![Room v12 780 Rays](https://github.com/Fullyverified/ASCII_PathTracer/assets/138776324/28601d91-5cf5-4eda-934a-9929afd0e272)
 
 Current formula: sum from the last bounce to the first bounce :
 object brigthness * cosine law / * object reflectivity
