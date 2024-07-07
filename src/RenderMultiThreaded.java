@@ -16,7 +16,7 @@ public class RenderMultiThreaded {
     public RenderMultiThreaded() {
     }
 
-    public void brightnessDistribution(Camera cam, Ray[][] primaryRay) {
+    /*public void brightnessDistribution(Camera cam, Ray[][] primaryRay) {
         for (int i = 0; i < cam.getResX(); i++) {
             for (int j = 0; j < cam.getResY(); j++) {
                 if (primaryRay[i][j].getLightAmplitude() != 0) { // filter out zeros
@@ -25,7 +25,7 @@ public class RenderMultiThreaded {
             }
         }
         Collections.sort(amplitudes);
-    }
+    }*/
 
     double getQuantile(List<Double> data, double quantile) {
         int index = (int) Math.ceil(quantile * data.size()) - 1;
@@ -33,7 +33,7 @@ public class RenderMultiThreaded {
     }
 
     // ... ,,, ~~~ ::: ;;; XXX *** 000 DDD ### @@@
-    public void drawScreen(Camera cam, Ray[][] primaryRay) {
+    /*public void drawScreen(Camera cam, Ray[][] primaryRay) {
         amplitudes.add(0.0);
         double max = Collections.max(amplitudes) * cam.getISO();
         double q1 = (max * 0.08);
@@ -95,7 +95,7 @@ public class RenderMultiThreaded {
             System.out.print("---");
         }
         System.out.println("|");
-    }
+    }*/
 
     public static void threadRenderSegmentation(int res, int nThreads, int[][] boundArray) {
         int bound = res / nThreads;
@@ -162,8 +162,8 @@ public class RenderMultiThreaded {
 
 
         System.out.println("-|");
-        brightnessDistribution(cam, primaryRay);
-        drawScreen(cam, primaryRay);
+        //brightnessDistribution(cam, primaryRay);
+        //drawScreen(cam, primaryRay);
     }
 
     private List<SceneObjects> cloneSceneObjects(List<SceneObjects> originalSceneObjects) {
@@ -224,7 +224,7 @@ public class RenderMultiThreaded {
                         primaryRay[i][j].setHitObject(sceneObject1);
                         // add light amplitude
                         if (sceneObject1.getLuminance() != 0) {
-                            primaryRay[i][j].addLightAmplitude(lambertCosineLaw(primaryRay[i][j], sceneObject1) * sceneObject1.getLuminance() * sceneObject1.getReflectivity());
+                            //primaryRay[i][j].addLightAmplitude(lambertCosineLaw(primaryRay[i][j], sceneObject1) * sceneObject1.getLuminance() * sceneObject1.getReflectivity());
                         }
                     }
                     // hit is already false otherwise
@@ -290,7 +290,7 @@ public class RenderMultiThreaded {
                                 }
                             }
                         }
-                        primaryRay[i][j].addLightAmplitude(brightness / numRays);
+                        //primaryRay[i][j].addLightAmplitude(brightness / numRays);
                     }
                 }
             }
@@ -355,35 +355,6 @@ public class RenderMultiThreaded {
         // dot product of sphere normal and ray direction
         double costheta = Math.abs(sceneObject.getNormalX() * currentRay.getDirX() + sceneObject.getNormalY() * currentRay.getDirY() + sceneObject.getNormalZ() * currentRay.getDirZ());
         return costheta;
-    }
-
-    public void debugDrawScreenBrightness(Camera cam, Ray[][] primaryRay) {
-        DecimalFormat df = new DecimalFormat("#.00");
-        // iterate through each rays hit value and print the output
-        for (int i = 0; i < cam.getResX(); i++) {
-            System.out.print("------");
-        }
-        System.out.println(" ");
-        for (int j = 0; j < cam.getResY(); j++) {
-            System.out.print("|");
-            for (int i = 0; i < cam.getResX(); i++) {
-                if (primaryRay[i][j].getHit()) {
-                    if (primaryRay[i][j].getLightAmplitude() >= 10) {
-                        System.out.print(df.format(primaryRay[i][j].getLightAmplitude()) + "|");
-                    } else if (primaryRay[i][j].getLightAmplitude() >= 1.0 && primaryRay[i][j].getLightAmplitude() < 10) {
-                        System.out.print("0" + df.format(primaryRay[i][j].getLightAmplitude()) + "|");
-                    } else if (primaryRay[i][j].getLightAmplitude() < 1) {
-                        System.out.print("00" + df.format(primaryRay[i][j].getLightAmplitude()) + "|");
-                    }
-                } else {
-                    System.out.print("00.00|");
-                }
-            }
-            System.out.println(" ");
-        }
-        for (int i = 0; i < cam.getResX(); i++) {
-            System.out.print("------");
-        }
     }
 
     public void debugDrawScreenNumHits(Camera cam, Ray[][] primaryRay) {

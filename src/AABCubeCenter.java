@@ -156,7 +156,7 @@ public class AABCubeCenter implements SceneObjects {
 
     // calculate the normal of the sphere and a point
     public void calculateNormal(Ray nthRay) {
-        double epsilon = 0.05;
+        double epsilon = 0.1;
         // x
         if ((Math.abs(nthRay.getPosX() - minX)) < epsilon) {
             setNormal(-1, 0, 0);
@@ -167,7 +167,7 @@ public class AABCubeCenter implements SceneObjects {
         else if ((Math.abs(nthRay.getPosY() - minY)) < epsilon) {
             setNormal(0, -1, 0);
         } else if ((Math.abs(nthRay.getPosY() - maxY)) < epsilon) {
-            setNormal(0, 1, 0);
+            setNormal(0, -1, 0);
         }
         // z
         else if ((Math.abs(nthRay.getPosZ() - minZ)) < epsilon) {

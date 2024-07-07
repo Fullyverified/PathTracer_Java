@@ -107,12 +107,6 @@ public class RenderSingleThreaded {
                         // set ray hit to 1
                         primaryRay[i][j].setHit(true);
                         primaryRay[i][j].setHitObject(sceneObject1);
-                        // add light amplitude
-                        if (sceneObject1.getLuminance() != 0) {
-                            primaryRay[i][j].addRed(lambertCosineLaw(primaryRay[i][j], sceneObject1) * sceneObject1.getRBrightness() * sceneObject1.getReflecR());
-                            primaryRay[i][j].addGreen(lambertCosineLaw(primaryRay[i][j], sceneObject1) * sceneObject1.getGBrightness() * sceneObject1.getReflecG());
-                            primaryRay[i][j].addBlue(lambertCosineLaw(primaryRay[i][j], sceneObject1) * sceneObject1.getBBrightness() * sceneObject1.getReflecB());
-                        }
                     }
                     // hit is already false otherwise
                 }
@@ -126,9 +120,9 @@ public class RenderSingleThreaded {
             for (int i = 0; i < cam.getResX(); i++) {
                 if (primaryRay[i][j].getHit()) {
                     nthRay[i][j] = new Ray(primaryRay[i][j].getHitPointX(), primaryRay[i][j].getHitPointY(), primaryRay[i][j].getHitPointZ());
-                    double[][] luminanceRed = new double[numBounces + 1][5];
-                    double[][] luminanceGreen = new double[numBounces + 1][5];
-                    double[][] luminanceBlue = new double[numBounces + 1][5];
+                    double[][] luminanceRed = new double[numBounces + 1][4];
+                    double[][] luminanceGreen = new double[numBounces + 1][4];
+                    double[][] luminanceBlue = new double[numBounces + 1][4];
                     // BOUNCES PER RAY
                     // initialize ray starting conditions
                     nthRay[i][j].initializeRay(primaryRay[i][j]);
@@ -173,17 +167,22 @@ public class RenderSingleThreaded {
                     if (primaryRay[i][j].getHit()) {
                         for (int index = luminanceRed.length - 1; index >= 0; index--) {
                             if (luminanceRed[index][3] == 1) {
-                                redAmplitude = ((luminanceRed[index][0] + redAmplitude) * luminanceRed[index][1]) * luminanceRed[index][4];
+                                redAmplitude = ((luminanceRed[index][0] + redAmplitude) * luminanceRed[index][1]) * luminanceRed[index][2];
                             }
                             if (luminanceGreen[index][3] == 1) {
-                                blueAmplitude = ((luminanceGreen[index][0] + blueAmplitude) * luminanceGreen[index][1]) * luminanceGreen[index][4];
+                                blueAmplitude = ((luminanceGreen[index][0] + blueAmplitude) * luminanceGreen[index][1]) * luminanceGreen[index][2];
                             }
                             if (luminanceBlue[index][3] == 1) {
-                                greenAmplitude = ((luminanceBlue[index][0] + greenAmplitude) * luminanceBlue[index][1]) * luminanceBlue[index][4];
+                                greenAmplitude = ((luminanceBlue[index][0] + greenAmplitude) * luminanceBlue[index][1]) * luminanceBlue[index][2];
                             }
                         }
                     }
-                    primaryRay[i][j].addLightRGB(redAmplitude, greenAmplitude, blueAmplitude);
+                    // keep track of absolute brightness
+                    primaryRay[i][j].addLightRGBAbsolute(redAmplitude, greenAmplitude, blueAmplitude);
+                    // avg brightness = absolute / current Ray
+                    primaryRay[i][j].setAvgRed(primaryRay[i][j].getAbsoluteR() / currentRay);
+                    primaryRay[i][j].setAvgGreen(primaryRay[i][j].getAbsoluteG() / currentRay);
+                    primaryRay[i][j].setAvgBlue(primaryRay[i][j].getAbsoluteB() / currentRay);
                 }
             }
         }
@@ -198,15 +197,13 @@ public class RenderSingleThreaded {
         int pos = currentBounce + 1;
         luminanceArray[pos][0] = objectBrightness;
         luminanceArray[pos][1] = lambertCosineLaw(nthRay, sceneObject); // dot product
-        luminanceArray[pos][2] = currentBounce + 1; // which bounce
+        luminanceArray[pos][2] = objectReflectivity; // reflectivity
         luminanceArray[pos][3] = 1; // boolean hit
-        luminanceArray[pos][4] = objectReflectivity; // reflectivity
     }
 
     public double lambertCosineLaw(Ray currentRay, SceneObjects sceneObject) {
         sceneObject.calculateNormal(currentRay);
         currentRay.updateNormalisation();
-
         // dot product of sphere normal and ray direction
         double costheta = Math.abs(sceneObject.getNormalX() * currentRay.getDirX() + sceneObject.getNormalY() * currentRay.getDirY() + sceneObject.getNormalZ() * currentRay.getDirZ());
         return costheta;
@@ -222,6 +219,7 @@ public class RenderSingleThreaded {
         double reflectionZ = nthRay.getDirZ() - 2 * (dotproduct) * sceneObject.getNormalZ();
 
         // generate random direction
+        // two randoms between 0 and 1
         Random random = new Random();
         double alpha = random.nextDouble();
         double gamma = random.nextDouble();
@@ -233,8 +231,7 @@ public class RenderSingleThreaded {
         double randomX = Math.sin(alpha) * Math.cos(gamma);
         double randomY = Math.sin(alpha) * Math.sin(gamma);
         double randomZ = Math.cos(alpha);
-        //System.out.println(randomX + " " + randomY + " " + randomZ);
-        // calculate Tangent and Bitangnet vectors
+        // calculate Tangent and Bitangnet vectors using arbitrary vector a
         double aX, aY, aZ;
         if (sceneObject.getNormalX() <= sceneObject.getNormalZ()) {
             aX = 0;
@@ -245,7 +242,7 @@ public class RenderSingleThreaded {
             aY = 0;
             aZ = 0;
         }
-        // tangent equals cross product of normal N and arbituary vector a
+        // tangent equals cross product of normal N and arbitrary vector a
         double tangentX = sceneObject.getNormalY() * aZ - sceneObject.getNormalZ() * aY;
         double tangentY = sceneObject.getNormalZ() * aX - sceneObject.getNormalX() * aZ;
         double tangentZ = sceneObject.getNormalX() * aY - sceneObject.getNormalY() * aX;

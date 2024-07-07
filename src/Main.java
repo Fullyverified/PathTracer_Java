@@ -3,31 +3,30 @@ import java.util.List;
 
 public class Main {
 
-    public static int RenderResolutionX = 400;
+    public static int RenderResolutionX = 300;
     public static int aspectX = 4;
     public static int aspectY = 3;
-    public static int fov = 60;
-    public static int frameTime = 45; // Milliseconds
-    public static int raysPerPixel = 5000;
-    public static int bouncesPerRay = 4;
+    public static int fov = 90;
+    public static int frameTime = 50; // Milliseconds
+    public static int raysPerPixel = 200;
+    public static int bouncesPerRay = 20;
     public static boolean ASCIIMode = false;
 
     public static void main(String[] args) {
 
         List<SceneObjects> sceneObjectsList = new ArrayList<>();
 
-        sceneObjectsList.add(new Sphere(7, 2.5, 2.5, 1, 1,1,1,0.8)); // top left
-        sceneObjectsList.add(new Sphere(7, 2.5, 0, 1, 1,1,1,0.8)); // top
-        sceneObjectsList.add(new Sphere(7, 2.5, -2.5, 1, 1,1,1,0.8)); // top right
-        sceneObjectsList.add(new Sphere(7, 0, -2.5, 1, 1,1,1,0.8)); // right
-        sceneObjectsList.add(new Sphere(7, -2.5, -2.5, 1, 1,1,1,0.8)); // bottom right
-        sceneObjectsList.add(new Sphere(7, -2.5, 0, 1, 1,1,1,0.8)); // bottom
-        sceneObjectsList.add(new Sphere(7, -2.5, 2.5, 1, 1,1,1,0.8)); // bottom left
-        sceneObjectsList.add(new Sphere(7, 0, 2.5, 1, 1,1,1,0.8)); // left
+        sceneObjectsList.add(new AABCubeCenter(10,-3, 0,14,1,7,1,1,1, 0.5)); // floor
+        sceneObjectsList.add(new AABCubeCenter(10,3,0,14,1,7,1,1,1, 0.5)); // roof
 
-        sceneObjectsList.add(new SphereLight(7, 0,0, 1,40,40,40,1,1,1,0.5));
+        sceneObjectsList.add(new AABCubeCenter(8,0,0,1,6,7,1,1,1,0.5)); // back wall
 
-        Camera cam = new Camera(0.3, RenderResolutionX, fov, aspectX, aspectY, 0,0,0, 1, 0, 0, 0, 1, 0);
+        //sceneObjectsList.add(new AABCubeCenter(9,3,3,14,12,1,1,1,1,0.5)); // left wall
+        //sceneObjectsList.add(new AABCubeCenter(9,3,-3,14,12,1,1,1,1,0.5)); // right wall
+
+        sceneObjectsList.add(new SphereLight(-2,0,0,1,40,1,0.5)); // sphere behind camera
+
+        Camera cam = new Camera(1, RenderResolutionX, fov, aspectX, aspectY, 0,0,0, 1, 0, 0, 0, 1, 0);
 
         cam.directionVector();
         cam.upVector();

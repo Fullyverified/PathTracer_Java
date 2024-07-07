@@ -10,9 +10,9 @@ public class Ray {
     private boolean hit = false;
     private double px, py, pixelIndexX, pixelIndexY, pixelPosX, pixelPosY;
     private int collidedObject;
-    private double lightAmplitude = 0;
 
-    private double R, G, B = 0;
+    private double avgR = 0, avgG = 0, avgB = 0;
+    private double absoluteR = 0, absoluteG = 0, absoluteB = 0;
 
     private SceneObjects hitObject;
     private long numHits = 0;
@@ -110,23 +110,17 @@ public class Ray {
 
     // get collidedObject
     public SceneObjects getHitObject() {return this.hitObject;}
+    // get brightness
+    public double getAvgRed() {return this.avgR;}
+    public double getAvgGreen() {return this.avgG;}
+    public double getAvgBlue() {return this.avgB;}
 
-    public double getLightAmplitude() {return this.lightAmplitude;}
-
-    public double getRed() {
-        return this.R;
-    }
-    public double getGreen() {
-        return this.G;
-    }
-    public double getBlue() {
-        return this.B;
-    }
+    public double getAbsoluteR() {return this.absoluteR;}
+    public double getAbsoluteG() {return this.absoluteG;}
+    public double getAbsoluteB() {return this.absoluteB;}
 
     public int getHitObjectID(){return this.collidedObject;}
-
     public long getNumHits() {return this.numHits;}
-
     public void addNumHits() {this.numHits++;}
 
     // setter
@@ -135,24 +129,22 @@ public class Ray {
     public void setPosY(double posY) {this.posY = posY;}
     public void setPosZ(double posZ) {this.posZ = posZ;}
     public void setPos(double posX, double posY, double posZ) {this.posX = posX; this.posY = posY; this.posZ = posZ;}
-
+    // origin
     public void setOriginX(double oX) {this.oX = oX;}
     public void setOriginY(double oY) {this.oY = oY;}
     public void setOriginZ(double oZ) {this.oZ = oZ;}
     public void setOrigin(double oX, double oY, double oZ) {this.oX = oX; this.oY = oY; this.oZ = oZ;}
-
     // direction
     public void setDirX(double dirX) {this.dirX = dirX;}
     public void setDirY(double dirY) {this.dirY = dirY;}
     public void setDirZ(double dirZ) {this.dirZ = dirZ;}
     public void setDirection(double dirX, double dirY, double dirZ) {this.dirX = dirX; this.dirY = dirY; this.dirZ = dirZ;}
-
     // hitpoint
     public void setHitPointX(double pointX) {this.hitPointX = pointX;}
     public void setHitPointY(double pointY) {this.hitPointY = pointY;}
     public void setHitPointZ(double pointZ) {this.hitPointZ = pointZ;}
     public void setHitPoint(double pointX, double pointY, double pointZ) {this.hitPointX = pointX; this.hitPointY = pointY; this.hitPointZ = pointZ;}
-
+    // boolean hit
     public void setHit(boolean hit){this.hit = hit;}
     // set current pixel
     public void setPixelX(int px) {this.px = px;}
@@ -163,29 +155,18 @@ public class Ray {
     // set pixelpos
     public void setPixelPosX(double px) {this.pixelPosX = px;}
     public void setPixelPosY(double py) {this.pixelPosY = py;}
-
     // collidedObjectID
-
     public void setHitObject(SceneObjects hitObject) {this.hitObject = hitObject;}
     public void setHitObjectID(int obj) {this.collidedObject = obj;}
     //set brightness
-    public void addLightAmplitude(double luminance) {
-        this.lightAmplitude = this.lightAmplitude + luminance;
+    public void addLightRGBAbsolute(double R, double G, double B) {
+        this.absoluteR = this.absoluteR + R;
+        this.absoluteG = this.absoluteG + G;
+        this.absoluteB = this.absoluteB + B;
     }
-    public void addLightRGB(double R, double G, double B) {
-        this.R = this.R + R;
-        this.G = this.G + G;
-        this.B = this.B + B;
-    }
-    public void addRed(double red) {
-        this.R = red;
-    }
-    public void addGreen(double green) {
-        this.G = green;
-    }
-    public void addBlue(double blue) {
-        this.B = blue;
-    }
+    public void setAvgRed(double red) {this.avgR = red;}
+    public void setAvgGreen(double green) {this.avgG = green;}
+    public void setAvgBlue(double blue) {this.avgB = blue;}
 
 
 }

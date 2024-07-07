@@ -23,11 +23,14 @@ public class DrawScreen extends JPanel {
     private int internalWidth, internalHeight;
     private BufferedImage image;
     private JFrame window = new JFrame("Path Tracer");
+    private double brightnessFactor = 0;
 
     private float lineSpacing = 1f;
     private int fontSize = 12;
     private boolean ASCII = true;
     private JTextPane areaASCII;
+
+    private long framesDrawn = 0;
 
     public DrawScreen(int width, int height, boolean ASCII) {
         this.ASCII = ASCII;
@@ -50,8 +53,7 @@ public class DrawScreen extends JPanel {
             window.add(this);
             window.setSize(outputWidth, outputHeight);
             window.setVisible(true);
-        }
-        else if (ASCII == true) {
+        } else if (ASCII == true) {
             areaASCII = new JTextPane();
             setLayout(new BorderLayout());
             int fontSize = (int) (8 * scalingFactor);
@@ -91,14 +93,14 @@ public class DrawScreen extends JPanel {
 
         for (int i = 0; i < internalWidth; i++) {
             for (int j = 0; j < internalHeight; j++) {
-                if (primaryRay[i][j].getRed() != 0) { // filter out zeros
-                    amplitudesRed.add(primaryRay[i][j].getRed());
+                if (primaryRay[i][j].getAvgRed() != 0) { // filter out zeros
+                    amplitudesRed.add(primaryRay[i][j].getAvgRed());
                 }
-                if (primaryRay[i][j].getGreen() != 0) { // filter out zeros
-                    amplitudesGreen.add(primaryRay[i][j].getGreen());
+                if (primaryRay[i][j].getAvgBlue() != 0) { // filter out zeros
+                    amplitudesGreen.add(primaryRay[i][j].getAvgGreen());
                 }
-                if (primaryRay[i][j].getBlue() != 0) { // filter out zeros
-                    amplitudesBlue.add(primaryRay[i][j].getBlue());
+                if (primaryRay[i][j].getAvgGreen() != 0) { // filter out zeros
+                    amplitudesBlue.add(primaryRay[i][j].getAvgBlue());
                 }
             }
         }
@@ -113,17 +115,24 @@ public class DrawScreen extends JPanel {
     public void drawFrameRGB(Ray[][] primaryRay, Camera cam) {
 
         if (ASCII == false) {
-            double factor = 255 / (maxAmplitudeColour(primaryRay) * cam.getISO()); // convert absolute brightness to 8 bit colour space
+            framesDrawn++;
+            brightnessFactor = 255 / (maxAmplitudeColour(primaryRay) * cam.getISO()); // convert absolute brightness to 8 bit colour space
             for (int y = 0; y < internalHeight; y++) {
                 for (int x = 0; x < internalWidth; x++) {
 
                     // convert brightness of red green and blue to 8 bit colour space
-                    int red = (int) (primaryRay[x][y].getRed() * factor);
-                    if (red > 255) {red = 255;}
-                    int green = (int) (primaryRay[x][y].getGreen() * factor);
-                    if (green > 255) {green = 255;}
-                    int blue = (int) (primaryRay[x][y].getBlue() * factor);
-                    if (blue > 255) {blue = 255;}
+                    int red = (int) (primaryRay[x][y].getAvgRed() * brightnessFactor);
+                    if (red > 255) {
+                        red = 255;
+                    }
+                    int green = (int) (primaryRay[x][y].getAvgGreen() * brightnessFactor);
+                    if (green > 255) {
+                        green = 255;
+                    }
+                    int blue = (int) (primaryRay[x][y].getAvgBlue() * brightnessFactor);
+                    if (blue > 255) {
+                        blue = 255;
+                    }
 
                     // first 8 bits are alpha, next 8 red, next 8 green, final 8 blue
                     int rgb = (red << 16) | (green << 8) | blue;
@@ -136,8 +145,7 @@ public class DrawScreen extends JPanel {
                 }
             }
             repaint(); // update image
-        }
-        else if (ASCII == true) {
+        } else if (ASCII == true) {
             // ASCII CODE HERE
             /*StringBuilder stringBuffer = new StringBuilder();
 
