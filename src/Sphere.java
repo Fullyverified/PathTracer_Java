@@ -3,9 +3,9 @@ public class Sphere implements SceneObjects {
     private double centerx, centerOriginX;
     private double centery, centerOriginY;
     private double centerz, centerOriginZ;
-    private double sradius;
+    private double sradius = 1;
+    double xradius, yradius, zradius;
     private double a, b, c, discriminant, sqrtDiscriminant;
-    private double distanceToC, distanceToR;
     private static int numSpheres = 0;
     private int sphereID = 0;
     private double normalx, normaly, normalz;
@@ -15,11 +15,14 @@ public class Sphere implements SceneObjects {
     //Equation of a sphere: (x - cx)^2 + (y - cy)^2 + (z - cz)^2 = r^2
 
     //Constructor
-    public Sphere(double centerx, double centery, double centerz, double sradius, double reflectivity, double roughness) {
+    public Sphere(double centerx, double centery, double centerz, double xRad, double yRad, double zRad, double reflectivity, double roughness) {
         this.centerx = centerx;
         this.centery = centery;
         this.centerz = centerz;
-        this.sradius = sradius;
+        this.xradius = xRad;
+        this.yradius = yRad;
+        this.zradius = zRad;
+
         this.reflectivity = reflectivity;
         this.sphereID = numSpheres;
         numSpheres++;
@@ -30,11 +33,14 @@ public class Sphere implements SceneObjects {
         this.roughness = roughness;
     }
 
-    public Sphere(double centerx, double centery, double centerz, double sradius, double colourR, double colourG, double colourB, double roughness) {
+    public Sphere(double centerx, double centery, double centerz, double xRad, double yRad, double zRad, double colourR, double colourG, double colourB, double roughness) {
         this.centerx = centerx;
         this.centery = centery;
         this.centerz = centerz;
-        this.sradius = sradius;
+        this.xradius = xRad;
+        this.yradius = yRad;
+        this.zradius = zRad;
+
         this.reflectivity = reflectivity;
         this.sphereID = numSpheres;
         numSpheres++;
@@ -60,15 +66,19 @@ public class Sphere implements SceneObjects {
         centerOriginY = ray.getPosY() - this.centery;
         centerOriginZ = ray.getPosZ() - this.centerz;
 
+        // scale factor along each axis
+
+        double invXR = 1.0 / (xradius * xradius);
+        double invYR = 1.0 / (yradius * yradius);
+        double invZR = 1.0 / (zradius * zradius);
+
         // calculate values of a, b, c for the quadratic equation
         // a = the dot product of normx, normy, normz - should always equal 1
-        this.a = (ray.getDirX() * ray.getDirX()) + (ray.getDirY() * ray.getDirY() + (ray.getDirZ() * ray.getDirZ()));
-        //this.a = 1;
-
+        this.a = (ray.getDirX() * ray.getDirX() * invXR) + (ray.getDirY() * ray.getDirY() * invYR) + (ray.getDirZ() * ray.getDirZ() * invZR);
         // b = 2 * (the dot product of the centerorigin vector by the direction vector)
-        this.b = 2 * ((centerOriginX * ray.getDirX()) + (centerOriginY * ray.getDirY()) + (centerOriginZ * ray.getDirZ()));
+        this.b = 2 * ((centerOriginX * ray.getDirX() * invXR) + (centerOriginY * ray.getDirY() * invYR) + (centerOriginZ * ray.getDirZ() * invZR));
         // c = the dot product of centerorigin by itself, - the radius^2 of the sphere
-        this.c = ((centerOriginX * centerOriginX) + (centerOriginY * centerOriginY) + (centerOriginZ * centerOriginZ) - (this.sradius * this.sradius));
+        this.c = ((centerOriginX * centerOriginX * invXR) + (centerOriginY * centerOriginY * invYR) + (centerOriginZ * centerOriginZ * invZR) - 1);
 
         // calculate the discriminant | b^2 - 2ac
         this.discriminant = (b * b) - (4 * (a * c));
@@ -79,7 +89,6 @@ public class Sphere implements SceneObjects {
             //System.out.println("----------------------------------------");
             return false;
         } else {
-
             sqrtDiscriminant = Math.sqrt(discriminant);
             double sqrt1 = (-b - sqrtDiscriminant) / (2 * a);
             double sqrt2 = (-b + sqrtDiscriminant) / (2 * a);
@@ -98,8 +107,13 @@ public class Sphere implements SceneObjects {
     public boolean intersectionCheck(Ray ray) {
 
         // distance of the ray to the center of the sphere
-        this.distanceToC = Math.sqrt(Math.pow((ray.getPosX() - this.centerx), 2) + Math.pow((ray.getPosY() - this.centery), 2) + Math.pow((ray.getPosZ() - this.centerz), 2));
-        this.distanceToR = this.distanceToC - this.sradius;
+
+        double scaledX = (ray.getPosX() - this.centerx) / xradius;
+        double scaledY = (ray.getPosY() - this.centery) / yradius;
+        double scaledZ = (ray.getPosZ() - this.centerz) / zradius;
+
+        double distanceToC = Math.sqrt(scaledX * scaledX + scaledY * scaledY + scaledZ * scaledZ);
+        double distanceToR = distanceToC - 1; // radii are scaled to 1
 
         // check if we have hit the sphere yet
         if (distanceToC > sradius) {
