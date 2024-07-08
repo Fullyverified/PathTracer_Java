@@ -146,10 +146,10 @@ public class DrawScreen extends JPanel {
             }
             repaint(); // update image
         } else if (ASCII == true) {
-            // ASCII CODE HERE
-            /*StringBuilder stringBuffer = new StringBuilder();
+            /*// ASCII CODE HERE
+            StringBuilder stringBuffer = new StringBuilder();
 
-            double max = maxBrightness(primaryRay);
+            double max = maxAmplitudeColour(primaryRay);
             double q1 = (max * 0.08);
             double q2 = (max * 0.16);
             double q3 = (max * 0.24);

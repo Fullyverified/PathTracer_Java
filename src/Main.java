@@ -3,7 +3,7 @@ import java.util.List;
 
 public class Main {
 
-    public static int RenderResolutionX = 500;
+    public static int RenderResolutionX = 70;
     public static int aspectX = 4;
     public static int aspectY = 4;
     public static int fov = 60;
@@ -24,7 +24,9 @@ public class Main {
         sceneObjectsList.add(new AABCubeCenter(10,3,3,14,12,1,1,0,0,0.75)); // left wall
         sceneObjectsList.add(new AABCubeCenter(10,3,-3,14,12,1,0,1,0,0.75)); // right wall
 
-        sceneObjectsList.add(new SphereLight(5,2.5,0,1,0.1,1,40,1,0.75)); // sphere behind camera
+        sceneObjectsList.add(new SphereLight(5,2.5,0,1,0.1,1,40,1,0.75)); // oval at ceiling
+
+        sceneObjectsList.add(new Sphere(5,-2,0,0.8,0.8, 0.8,1,1,1,0));
 
         Camera cam = new Camera(0.075, RenderResolutionX, fov, aspectX, aspectY, -2,0,0, 1, 0, 0, 0, 1, 0);
 
