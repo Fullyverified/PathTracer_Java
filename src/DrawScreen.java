@@ -1,8 +1,4 @@
 import javax.swing.*;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -11,7 +7,6 @@ import java.util.List;
 
 public class DrawScreen extends JPanel {
 
-    List<Double> amplitudes = new ArrayList<>();
     List<Double> amplitudesRed = new ArrayList<>();
     List<Double> amplitudesGreen = new ArrayList<>();
     List<Double> amplitudesBlue = new ArrayList<>();
@@ -44,7 +39,6 @@ public class DrawScreen extends JPanel {
         outputWidth = (int) (internalWidth * scalingFactor);
         outputHeight = (int) (internalHeight * scalingFactor);
 
-
         // initialize the canvas with specified width and height
 
         if (ASCII == false) {
@@ -55,9 +49,9 @@ public class DrawScreen extends JPanel {
         } else if (ASCII == true) {
             areaASCII = new JTextPane();
             setLayout(new BorderLayout());
-            int fontSize = (int) (scalingFactor * 0.75);
+            int fontSize = (int) (scalingFactor * 0.85);
             areaASCII.setFont(new Font("Monospaced", Font.PLAIN, fontSize));
-            areaASCII.setForeground(Color.WHITE);
+            areaASCII.setForeground(Color.getHSBColor((float)0.3,(float)0.37,(float)0.61)); // matrix green
             areaASCII.setBackground(Color.BLACK);
             add(new JScrollPane(areaASCII), BorderLayout.CENTER);
             window.add(this);
