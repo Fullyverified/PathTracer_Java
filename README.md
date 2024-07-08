@@ -1,7 +1,7 @@
 I'm trying to make an Ascii Pathtracer. Nothing that hasn't been done before :)
 Global Illuminiation is here!
 
-![Room v12 780 Rays](https://github.com/Fullyverified/ASCII_PathTracer/assets/138776324/28601d91-5cf5-4eda-934a-9929afd0e272)
+![room v12 330 Rays](https://github.com/Fullyverified/ASCII_PathTracer/assets/138776324/03ef3728-516a-456f-b467-85f879029c48)
 
 Current formula: sum from the last bounce to the first bounce :
 object brigthness * cosine law / * object reflectivity
