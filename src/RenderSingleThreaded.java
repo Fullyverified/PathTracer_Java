@@ -34,6 +34,7 @@ public class RenderSingleThreaded {
                 computePrimaryRay(cam, primaryRay, sceneObjectsList, i, j);
             }
         }
+        drawScreen.drawFrameRGB(primaryRay, cam);
 
         System.out.println("Finished Primary Rays");
         System.out.print("|-");
@@ -43,8 +44,7 @@ public class RenderSingleThreaded {
         System.out.println("-|");
         System.out.print("|-");
 
-        drawScreenExecutor.scheduleAtFixedRate(screenUpdateTask, 50, frameTime, TimeUnit.MILLISECONDS);
-
+        drawScreenExecutor.scheduleAtFixedRate(screenUpdateTask, 10, frameTime, TimeUnit.MILLISECONDS);
         // sample a ray for every pixel, then move to the next ray
         for (int currentRay = 1; currentRay < numRays; currentRay++) {
             marchIntersectionLogic(primaryRay, nthRay, sceneObjectsList, numRays, currentRay, numBounces, cam);
@@ -132,8 +132,6 @@ public class RenderSingleThreaded {
                     for (int currentBounce = 0; currentBounce < numBounces && nthRay[i][j].getHit(); currentBounce++) {
                         // sample a new direction with importance sampling
                         cosineWeightedHemisphereImportanceSampling(nthRay[i][j], nthRay[i][j].getHitObject());
-                        //randomDirection(nthRay[i][j], nthRay[i][j].getHitObject());
-                        //importanceSampling(nthRay[i][j], nthRay[i][j].getHitObject());
                         // add all non culled objects to a list
                         visibleObjects.clear();
                         for (SceneObjects sceneObject1 : sceneObjectsList) {
@@ -144,22 +142,24 @@ public class RenderSingleThreaded {
                         nthRay[i][j].setHit(false);
                         double distance = 0;
                         // march ray and check intersections
-                        while (distance <= 25 && !nthRay[i][j].getHit() && !visibleObjects.isEmpty()) { // redundant to check !visibleObjects.isEmpty() every time but the code is cleaner
-                            // march the ray
-                            nthRay[i][j].marchRay(distance);
-                            // CHECK INTERSECTIONS for non-culled objects
-                            for (SceneObjects sceneObject1 : visibleObjects) {
-                                if (sceneObject1.intersectionCheck(nthRay[i][j])) {
-                                    primaryRay[i][j].addNumHits(); // debug
-                                    nthRay[i][j].updateHitProperties(sceneObject1);
-                                    // data structure for storing object luminance, dot product and bounce depth, and boolean hit
-                                    storeHitDataRGB(luminanceRed, nthRay[i][j], currentBounce, sceneObject1, sceneObject1.getRBrightness(), sceneObject1.getReflecR());
-                                    storeHitDataRGB(luminanceGreen, nthRay[i][j], currentBounce, sceneObject1, sceneObject1.getGBrightness(), sceneObject1.getReflecG());
-                                    storeHitDataRGB(luminanceBlue, nthRay[i][j], currentBounce, sceneObject1, sceneObject1.getBBrightness(), sceneObject1.getReflecB());
+                        //if (!visibleObjects.isEmpty()) {
+                            while (distance <= 25 && !nthRay[i][j].getHit() && !visibleObjects.isEmpty()) {
+                                // march the ray
+                                nthRay[i][j].marchRay(distance);
+                                // CHECK INTERSECTIONS for non-culled objects
+                                for (SceneObjects sceneObject1 : visibleObjects) {
+                                    if (sceneObject1.intersectionCheck(nthRay[i][j])) {
+                                        primaryRay[i][j].addNumHits(); // debug
+                                        nthRay[i][j].updateHitProperties(sceneObject1);
+                                        // data structure for storing object luminance, dot product and bounce depth, and boolean hit
+                                        storeHitDataRGB(luminanceRed, nthRay[i][j], currentBounce, sceneObject1, sceneObject1.getRBrightness(), sceneObject1.getReflecR());
+                                        storeHitDataRGB(luminanceGreen, nthRay[i][j], currentBounce, sceneObject1, sceneObject1.getGBrightness(), sceneObject1.getReflecG());
+                                        storeHitDataRGB(luminanceBlue, nthRay[i][j], currentBounce, sceneObject1, sceneObject1.getBBrightness(), sceneObject1.getReflecB());
+                                    }
                                 }
+                                distance += 0.1;
                             }
-                            distance += 0.1;
-                        }
+                        //}
                     }
 
                     double redAmplitude = 0;
