@@ -1,4 +1,5 @@
 I'm trying to make an Ascii Pathtracer. Nothing that hasn't been done before :)
+Unfortunately along the way I forgot about the ASCII part.
 Global Illuminiation is here!
 
 ![room v12 330 Rays](https://github.com/Fullyverified/ASCII_PathTracer/assets/138776324/03ef3728-516a-456f-b467-85f879029c48)
