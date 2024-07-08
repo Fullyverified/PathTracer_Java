@@ -3,14 +3,14 @@ import java.util.List;
 
 public class Main {
 
-    public static int RenderResolutionX = 70;
+    public static int RenderResolutionX = 100;
     public static int aspectX = 4;
     public static int aspectY = 4;
     public static int fov = 60;
-    public static int frameTime = 100; // Milliseconds
+    public static int frameTime = 1000; // Milliseconds
     public static int raysPerPixel = 3000;
     public static int bouncesPerRay = 8;
-    public static boolean ASCIIMode = false;
+    public static boolean ASCIIMode = true;
 
     public static void main(String[] args) {
 

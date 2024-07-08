@@ -16,7 +16,6 @@ public class DrawScreen extends JPanel {
     List<Double> amplitudesGreen = new ArrayList<>();
     List<Double> amplitudesBlue = new ArrayList<>();
 
-
     private double screenWidth, screenHeight;
     private double scalingFactor;
     private int outputWidth, outputHeight;
@@ -56,8 +55,8 @@ public class DrawScreen extends JPanel {
         } else if (ASCII == true) {
             areaASCII = new JTextPane();
             setLayout(new BorderLayout());
-            int fontSize = (int) (8 * scalingFactor);
-            areaASCII.setFont(new Font("Monospaced", Font.PLAIN, 9));
+            int fontSize = (int) (scalingFactor * 0.75);
+            areaASCII.setFont(new Font("Monospaced", Font.PLAIN, fontSize));
             areaASCII.setForeground(Color.WHITE);
             areaASCII.setBackground(Color.BLACK);
             add(new JScrollPane(areaASCII), BorderLayout.CENTER);
@@ -146,10 +145,10 @@ public class DrawScreen extends JPanel {
             }
             repaint(); // update image
         } else if (ASCII == true) {
-            /*// ASCII CODE HERE
+            // ASCII CODE HERE
             StringBuilder stringBuffer = new StringBuilder();
 
-            double max = maxAmplitudeColour(primaryRay);
+            double max = maxAmplitudeColour(primaryRay) * cam.getISO();
             double q1 = (max * 0.08);
             double q2 = (max * 0.16);
             double q3 = (max * 0.24);
@@ -166,40 +165,46 @@ public class DrawScreen extends JPanel {
             // internal resolution
             for (int y = 0; y < internalHeight; y++) {
                 for (int x = 0; x < internalWidth; x++) {
-                    if (primaryRay[x][y].getLightAmplitude() >= q12) {
+
+                    double red = primaryRay[x][y].getAvgRed();
+                    double green = primaryRay[x][y].getAvgGreen();
+                    double blue = primaryRay[x][y].getAvgBlue();
+
+                    double amplitude = Math.max(Math.max(red, blue), green);
+
+                    if (amplitude >= q12) {
                         stringBuffer.append("@@@");
-                    } else if (primaryRay[x][y].getLightAmplitude() >= q11) {
+                    } else if (amplitude >= q11) {
                         stringBuffer.append("DDD");
-                    } else if (primaryRay[x][y].getLightAmplitude() >= q10) {
+                    } else if (amplitude >= q10) {
                         stringBuffer.append("000");
-                    } else if (primaryRay[x][y].getLightAmplitude() >= q9) {
+                    } else if (amplitude >= q9) {
                         stringBuffer.append("UUU");
-                    } else if (primaryRay[x][y].getLightAmplitude() >= q8) {
+                    } else if (amplitude >= q8) {
                         stringBuffer.append("###");
-                    } else if (primaryRay[x][y].getLightAmplitude() >= q7) {
+                    } else if (amplitude >= q7) {
                         stringBuffer.append("ZZZ");
-                    } else if (primaryRay[x][y].getLightAmplitude() >= q6) {
+                    } else if (amplitude >= q6) {
                         stringBuffer.append("***");
-                    } else if (primaryRay[x][y].getLightAmplitude() >= q5) {
+                    } else if (amplitude >= q5) {
                         stringBuffer.append("xxx");
-                    } else if (primaryRay[x][y].getLightAmplitude() >= q4) {
+                    } else if (amplitude >= q4) {
                         stringBuffer.append("~~~");
-                    } else if (primaryRay[x][y].getLightAmplitude() >= q3) {
+                    } else if (amplitude >= q3) {
                         stringBuffer.append(";;;");
-                    } else if (primaryRay[x][y].getLightAmplitude() >= q2) {
+                    } else if (amplitude >= q2) {
                         stringBuffer.append(":::");
-                    } else if (primaryRay[x][y].getLightAmplitude() >= q1) {
+                    } else if (amplitude >= q1) {
                         stringBuffer.append(",,,");
-                    } else if (primaryRay[x][y].getLightAmplitude() > 0) {
+                    } else if (amplitude > 0) {
                         stringBuffer.append("...");
-                    } else if (primaryRay[x][y].getLightAmplitude() == 0) {
+                    } else if (amplitude == 0) {
                         stringBuffer.append("   ");
                     }
                 }
                 stringBuffer.append("\n");
             }
-            textArea.setText(stringBuffer.toString()); // update ASCII output
-            ((CardLayout) cardPanel.getLayout()).show(cardPanel, "ASCII"); */
+            areaASCII.setText(stringBuffer.toString()); // update ASCII output
         }
     }
 
