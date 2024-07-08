@@ -5,6 +5,7 @@ Global Illuminiation is here!
 ![room v12 330 Rays](https://github.com/Fullyverified/ASCII_PathTracer/assets/138776324/03ef3728-516a-456f-b467-85f879029c48)
 
 ![room v12 ASCII](https://github.com/Fullyverified/ASCII_PathTracer/assets/138776324/568bba31-920e-4c78-964b-1adfdcdeecdf)
+Downsampling makes ASCII looks funky. Just full screen it :)
 
 Current formula: sum from the last bounce to the first bounce :
 object brigthness * cosine law / * object reflectivity
