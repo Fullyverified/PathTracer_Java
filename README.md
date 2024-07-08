@@ -35,4 +35,4 @@ TODO LIST OF THINGS TODO:
 1. Implement BVH Traversal
 2. Implement Multithreading
 3. Add local rotation for objects
-4. 
+4. Implement a basic denoiser (average of neighbouring pixels with a constrast threshold for edge detection?)
