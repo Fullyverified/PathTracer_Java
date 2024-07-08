@@ -17,19 +17,21 @@ Done:
 8. Store the intersection location as part of the ray object.
 9. Create more than one ray, such that each ray is a pixel of the camera.
 10. Print (render) the final output :)
-11. Spawn a new ray at the intersection towards the direction of each lightsource to test for shadows
+11. Spawn a new ray at the intersection with a random bounce direction
 12. Create a lookup table for values of brightness and their corresponding character: . . , : ; * X # @
 13. Change the order of operations so that the first bounce, second bounce, third bounce etc is calculated for a pixel, then move onto the next pixel.
     Instead of doing for the first bounce for each pixel, then moving onto the second bounce etc.
     This is to truly make each pixel an independent entity to enable multi-threading in the future.
 14. Completely reorganised the render thread. Method now works for an arbitrary number of bounces.
 15. Cubes!
+16. Add the possibility to output actual pixel values instead of ACSCII
+17. Refresh the screen as rays continue to be calculated
+18. Change ray bounce direction to be biased by a roughness parameter so that specular lighting becomes possible
+19. Implemented colour in the form of RGB (0 -> 255)
+20. Implemented cosine weighted hemisphere importance sampling
 
 TODO LIST OF THINGS TODO:
-1. Add the possibility to output actual pixel values instead of ACSCII
-2. Change ray bounce direction to be biased so that specular lighting becomes possible
-3. Add colour
-4. Multi-threading
-
-Known Bugs:
-No specular lighting (whoops)
+1. Implement BVH Traversal
+2. Implement Multithreading
+3. Add local rotation for objects
+4. 
