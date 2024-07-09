@@ -9,6 +9,8 @@ import java.util.concurrent.TimeUnit;
 
 public class RenderMultiThreaded {
 
+    // DOES NOT WORK
+
     public int progress = 0;
     List<Double> amplitudes = new ArrayList<>();
 
@@ -223,7 +225,7 @@ public class RenderMultiThreaded {
                         primaryRay[i][j].setHit(true);
                         primaryRay[i][j].setHitObject(sceneObject1);
                         // add light amplitude
-                        if (sceneObject1.getLuminance() != 0) {
+                        if (sceneObject1.getReflecR() != 0) {
                             //primaryRay[i][j].addLightAmplitude(lambertCosineLaw(primaryRay[i][j], sceneObject1) * sceneObject1.getLuminance() * sceneObject1.getReflectivity());
                         }
                     }
@@ -299,7 +301,7 @@ public class RenderMultiThreaded {
 
     public synchronized void storeHitData(double[][] luminanceArray, Ray nthRay, int currentBounce, SceneObjects sceneObject){
         int pos = currentBounce + 1;
-        luminanceArray[pos][0] = sceneObject.getLuminance(); // object luminance
+        //luminanceArray[pos][0] = sceneObject.getLuminance(); // object luminance
         luminanceArray[pos][1] = lambertCosineLaw(nthRay, sceneObject); // dot product
         luminanceArray[pos][2] = currentBounce + 1; // which bounce
         luminanceArray[pos][3] = 1; // boolean hit

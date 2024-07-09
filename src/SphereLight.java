@@ -6,7 +6,6 @@ public class SphereLight implements SceneObjects {
     private double sradius = 1;
     double xradius, yradius, zradius;
     private double a, b, c, discriminant, sqrtDiscriminant;
-    private double distanceToC, distanceToR;
     private static int numPointLights = 100;
     private int pointLightID = 0;
     private double normalx, normaly, normalz;
@@ -58,44 +57,33 @@ public class SphereLight implements SceneObjects {
         this.roughness = roughness;
     }
 
-    // p = o + td
-    // p new ray position
-    // o ray origin
-    // t tscalar (amount to march the ray by)
-    // d direction vector
-
-    // initial check to see if the ray will or will not hit an object (for performance)
     public boolean objectCulling(Ray ray) {
         // calculate the vector from the spheres center to the origin of the ray
         // oc = o - c
-        centerOriginX = ray.getPosX() - this.centerx;
-        centerOriginY = ray.getPosY() - this.centery;
-        centerOriginZ = ray.getPosZ() - this.centerz;
+        double centerOriginX = ray.getPosX() - this.centerx;
+        double centerOriginY = ray.getPosY() - this.centery;
+        double centerOriginZ = ray.getPosZ() - this.centerz;
 
         // scale factor along each axis
-
         double invXR = 1.0 / (xradius * xradius);
         double invYR = 1.0 / (yradius * yradius);
         double invZR = 1.0 / (zradius * zradius);
 
         // calculate values of a, b, c for the quadratic equation
         // a = the dot product of normx, normy, normz - should always equal 1
-        this.a = (ray.getDirX() * ray.getDirX() * invXR) + (ray.getDirY() * ray.getDirY() * invYR) + (ray.getDirZ() * ray.getDirZ() * invZR);
+        double a = (ray.getDirX() * ray.getDirX() * invXR) + (ray.getDirY() * ray.getDirY() * invYR) + (ray.getDirZ() * ray.getDirZ() * invZR);
         // b = 2 * (the dot product of the centerorigin vector by the direction vector)
-        this.b = 2 * ((centerOriginX * ray.getDirX() * invXR) + (centerOriginY * ray.getDirY() * invYR) + (centerOriginZ * ray.getDirZ() * invZR));
+        double b = 2 * ((centerOriginX * ray.getDirX() * invXR) + (centerOriginY * ray.getDirY() * invYR) + (centerOriginZ * ray.getDirZ() * invZR));
         // c = the dot product of centerorigin by itself, - the radius^2 of the sphere
-        this.c = ((centerOriginX * centerOriginX * invXR) + (centerOriginY * centerOriginY * invYR) + (centerOriginZ * centerOriginZ * invZR) - 1);
+        double c = ((centerOriginX * centerOriginX * invXR) + (centerOriginY * centerOriginY * invYR) + (centerOriginZ * centerOriginZ * invZR) - 1);
 
         // calculate the discriminant | b^2 - 2ac
-        this.discriminant = (b * b) - (4 * (a * c));
-        //System.out.println("Discriminant: " + this.discriminant);
+        double discriminant = (b * b) - (4 * (a * c));
 
-        if (this.discriminant < 0) {
-            //System.out.println("No intersection. x: ");
-            //System.out.println("----------------------------------------");
+        if (discriminant < 0) {
             return false;
         } else {
-            sqrtDiscriminant = Math.sqrt(discriminant);
+            double sqrtDiscriminant = Math.sqrt(discriminant);
             double sqrt1 = (-b - sqrtDiscriminant) / (2 * a);
             double sqrt2 = (-b + sqrtDiscriminant) / (2 * a);
 
@@ -108,39 +96,25 @@ public class SphereLight implements SceneObjects {
         }
     }
 
-    // check the distance between the current ray and the sphere
-    // distance = sqrt(rayposxyz^2 - spherecenterxyz^2))
+    // this is a weird hack idk why it works. the real ellipsoid equation refuses to work
     public boolean intersectionCheck(Ray ray)
     {
         // distance of the ray to the center of the sphere
-        this.distanceToC = Math.sqrt(Math.pow((ray.getPosX() - this.centerx),2) + Math.pow((ray.getPosY() - this.centery),2) + Math.pow((ray.getPosZ() - this.centerz),2));
-        this.distanceToR = this.distanceToC - this.sradius;
+        double sradius = 1;
+        double scaledX = (ray.getPosX() - this.centerx) / xradius;
+        double scaledY = (ray.getPosY() - this.centery) / yradius;
+        double scaledZ = (ray.getPosZ() - this.centerz) / zradius;
 
+        double distanceToC = Math.sqrt(scaledX * scaledX + scaledY * scaledY + scaledZ * scaledZ);
         // check if we have hit the sphere yet
-        if (distanceToC > sradius)
-        {
-            //System.out.println("Not intersected yet. x: " + ray.getPosX() + " y: " + ray.getPosY() + " z: " + ray.getPosZ());
-            return false;
-        }
-        else if (distanceToC == sradius)
-        {
-            //System.out.println("Perfect intersection. x: " + ray.getPosX() + " y: " + ray.getPosY() + " z: " + ray.getPosZ());
-            return true;
-        }
-        else if (distanceToC < sradius)
-        {
-            //System.out.println("Ray inside sphere. x: " + ray.getPosX() + " y: " + ray.getPosY() + " z: " + ray.getPosZ());
-            return true;
-        }
-        else {System.out.println("Something is wrong");}
-        return false;
+        return distanceToC <= sradius;
     }
 
     // calculate the normal of the sphere and a point
-    public void calculateNormal(Ray nthRay) {
-        normalx = nthRay.getPosX() - this.centerx;
-        normaly = nthRay.getPosY() - this.centery;
-        normalz = nthRay.getPosZ() - this.centerz;
+    public void calculateNormal(Ray ray) {
+        normalx = 2 * (ray.getPosX() - centerx) / (xradius * xradius);
+        normaly = 2 * (ray.getPosY() - centery) / (yradius * yradius);
+        normalz = 2 * (ray.getPosZ() - centerz) / (zradius * zradius);
         double magnitude = Math.sqrt((normalx * normalx) + (normaly * normaly) + (normalz * normalz));
         if (magnitude != 0) {
             this.normalx = normalx / magnitude;
@@ -148,10 +122,27 @@ public class SphereLight implements SceneObjects {
             this.normalz = normalz / magnitude;
         }
         if (centerx == 0 && centery == 0 && centerz == 0) {
-            normalx = nthRay.getPosX() * -1;
-            normaly = nthRay.getPosY() * -1;
-            normalz = nthRay.getPosZ() * -1;
+            normalx = -ray.getPosX() / (xradius * xradius);;
+            normaly = -ray.getPosY() / (yradius * yradius);;
+            normalz = -ray.getPosZ() / (zradius * zradius);;
         }
+    }
+
+    public double[] getBounds() {
+
+        double epsilon = 0;
+        double[] bounds = new double[6];
+
+        bounds[0] = this.centerx - xradius - epsilon;
+        bounds[1] = this.centerx + xradius + epsilon;
+
+        bounds[2] = this.centery - yradius - epsilon;
+        bounds[3] = this.centery + yradius + epsilon;
+
+        bounds[4] = this.centerz - zradius - epsilon;
+        bounds[5] = this.centerz + zradius + epsilon;
+
+        return bounds;
     }
 
     // get sphere ID

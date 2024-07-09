@@ -3,8 +3,6 @@ public class AABCubeBounds implements SceneObjects {
     private double minX, maxX;
     private double minY, maxY;
     private double minZ, maxZ;
-    private double centreX, centreY, centreZ;
-    private double xlength, ylength, zlength;
     private double tminX, tminY, tminZ;
     private double tmaxX, tmaxY, tmaxZ;
     private double tNear = 0, tFar = 0;
@@ -14,9 +12,8 @@ public class AABCubeBounds implements SceneObjects {
     private double luminance, R, G, B = 0;
     double reflectivity, reflecR, reflecB, reflecG, roughness = 1;
 
-    //Equation of a sphere: (x - cx)^2 + (y - cy)^2 + (z - cz)^2 = r^2
 
-    //Constructor
+    // constructor
     public AABCubeBounds(double minX, double maxX, double minY, double maxY, double minZ, double maxZ, double reflectivity, double roughness) {
         this.minX = minX;
         this.maxX = maxX;
@@ -158,6 +155,21 @@ public class AABCubeBounds implements SceneObjects {
         }
     }
 
+    public double[] getBounds() {
+        double[] bounds = new double[6];
+
+        bounds[0] = minX;
+        bounds[1] = maxX;
+
+        bounds[2] = minY;
+        bounds[3] = maxY;
+
+        bounds[4] = minZ;
+        bounds[5] = maxZ;
+
+        return bounds;
+    }
+
     // get each the normalised normal
     public double getNormalX() {
         return this.normalx;
@@ -177,10 +189,13 @@ public class AABCubeBounds implements SceneObjects {
         this.normalz = z;
     }
 
-    public void setPos(double x, double y, double z){
-        this.centreX = x;
-        this.centreY = y;
-        this.centreZ = z;
+    public void setPos(double xMin, double xMax, double yMin, double yMax, double zMin, double zMax){
+        this.minX = xMin;
+        this.maxX = xMax;
+        this.minY = yMin;
+        this.maxY = yMax;
+        this.minZ = zMin;
+        this.maxZ = zMax;
     }
 
     // get sphere ID

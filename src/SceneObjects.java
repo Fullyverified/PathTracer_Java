@@ -7,13 +7,11 @@ public interface SceneObjects {
     public double getPosX();
     public double getPosY();
     public double getPosZ();
-    public double getLuminance();
     public void calculateNormal(Ray nthRay);
     public double getNormalX();
     public double getNormalY();
     public double getNormalZ();
     public double getReflectivity();
-    public void setPos(double x, double y, double z);
 
     public double getRBrightness();
     public double getGBrightness();
@@ -23,5 +21,7 @@ public interface SceneObjects {
     public double getReflecB();
 
     public double getRoughness();
+
+    public double[] getBounds();
 
 }
