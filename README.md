@@ -2,8 +2,8 @@ I'm trying to make an Ascii Pathtracer. Nothing that hasn't been done before :)
 Unfortunately along the way I forgot about the ASCII part.
 Global Illuminiation and Bounding Volume Heirarchys (BVH) are now implemented!
 
-Primary Rays: ~21 times faster
-Secondary Rays: 1.3 times faster
+1. Primary Rays: ~21 times faster
+2. Secondary Rays: 1.3 times faster
 
 ![room v12 330 Rays hires](https://github.com/Fullyverified/ASCII_PathTracer/assets/138776324/cd02ea24-a896-431b-acf6-585b488c2c8f)
 
