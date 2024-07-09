@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RenderSingleThreaded {
 
+    public long startTime, endTime, elapsedTime;
     public List<SceneObjects> visibleObjects = new ArrayList<>();
     private int loadingProgress, currentProgress = 0;
     private String loadingString = "";
@@ -32,11 +33,15 @@ public class RenderSingleThreaded {
         };
         DrawScreen drawScreen = new DrawScreen(cam.getResX(), cam.getResY(), ASCII);
 
+        startTime = System.nanoTime();
         for (int j = 0; j < cam.getResY(); j++) {
             for (int i = 0; i < cam.getResX(); i++) {
                 computePrimaryRay(cam, primaryRay, sceneObjectsList, i, j);
             }
         }
+        endTime = System.nanoTime();
+        elapsedTime = endTime - startTime;
+        System.out.println("Primary Ray time: " + elapsedTime / 1_000_000 + "ms");
         drawScreen.drawFrameRGB(primaryRay, cam);
 
         System.out.println("Finished Primary Rays");
@@ -48,7 +53,7 @@ public class RenderSingleThreaded {
         System.out.print("|-");
 
         drawScreenExecutor.scheduleAtFixedRate(screenUpdateTask, 10, frameTime, TimeUnit.MILLISECONDS);
-        // sample a ray for every pixel, then move to the next ray
+        startTime = System.nanoTime();
         for (int currentRay = 1; currentRay < numRays; currentRay++) {
             marchIntersectionLogic(primaryRay, nthRay, sceneObjectsList, numRays, currentRay, numBounces, cam);
             if (updateScreen.get()) {
@@ -56,6 +61,9 @@ public class RenderSingleThreaded {
                 updateScreen.set(false);
             }
         }
+        endTime = System.nanoTime();
+        elapsedTime = endTime - startTime;
+        System.out.println(numRays + " Secondary Ray Time: " + elapsedTime / 1_000_000 + "ms");
 
         drawScreenExecutor.shutdown();
 
@@ -160,7 +168,7 @@ public class RenderSingleThreaded {
                                         storeHitDataRGB(luminanceBlue, nthRay[i][j], currentBounce, sceneObject1, sceneObject1.getBBrightness(), sceneObject1.getReflecB());
                                     }
                                 }
-                                distance += 0.1;
+                                distance += secondaryRayStep;
                             }
                         }
                     }

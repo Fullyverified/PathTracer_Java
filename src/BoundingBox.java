@@ -31,8 +31,10 @@ public class BoundingBox {
 
     public void computeMinMax(Ray ray) {
 
-        // (cubecorner - ray origin) / ray direction
-        // if the direction is negative they may need to be flipped
+        // precalculate inverse of directions
+        double invDirX = 1.0 / ray.getDirX();
+        double invDirY = 1.0 / ray.getDirY();
+        double invDirZ = 1.0 / ray.getDirZ();
 
         double tmp;
         if (ray.getDirX() == 0) {
@@ -44,8 +46,8 @@ public class BoundingBox {
                 tmaxX = Double.POSITIVE_INFINITY;
             }
         } else {
-            tminX = (minX - ray.getPosX()) / ray.getDirX();
-            tmaxX = (maxX - ray.getPosX()) / ray.getDirX();
+            tminX = (minX - ray.getPosX()) * invDirX;
+            tmaxX = (maxX - ray.getPosX()) * invDirX;
             if (tminX > tmaxX) {
                 tmp = tmaxX;
                 tmaxX = tminX;
@@ -62,8 +64,8 @@ public class BoundingBox {
                 tmaxY = Double.POSITIVE_INFINITY;
             }
         } else {
-            tminY = (minY - ray.getPosY()) / ray.getDirY();
-            tmaxY = (maxY - ray.getPosY()) / ray.getDirY();
+            tminY = (minY - ray.getPosY()) * invDirY;
+            tmaxY = (maxY - ray.getPosY()) * invDirY;
             if (tminY > tmaxY) {
                 tmp = tmaxY;
                 tmaxY = tminY;
@@ -80,8 +82,8 @@ public class BoundingBox {
                 tmaxZ = Double.POSITIVE_INFINITY;
             }
         } else {
-            tminZ = (minZ - ray.getPosZ()) / ray.getDirZ();
-            tmaxZ = (maxZ - ray.getPosZ()) / ray.getDirZ();
+            tminZ = (minZ - ray.getPosZ()) * invDirZ;
+            tmaxZ = (maxZ - ray.getPosZ()) * invDirZ;
             if (tminZ > tmaxZ) {
                 tmp = tmaxZ;
                 tmaxZ = tminZ;
@@ -95,10 +97,7 @@ public class BoundingBox {
         computeMinMax(ray);
         tNear = Math.max(Math.max(tminX, tminY), tminZ);
         tFar = Math.min(Math.min(tmaxX, tmaxY), tmaxZ);
-        if (tNear > tFar || tFar < 0) {
-            return false; // no intersection
-        }
-        return true; // intersection
+        return tNear <= tFar && tFar >= 0;
     }
 
     // check if the ray is intersecting the cube

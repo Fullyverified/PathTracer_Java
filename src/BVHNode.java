@@ -63,9 +63,15 @@ public class BVHNode {
         return (hitLeft != null) ? hitLeft : hitRight;
     }
 
-    // getter
+    // getters
+
+    // bounding box
     public BoundingBox getBoundingBox() {
         return this.boundingBox;
+    }
+    // get box area
+    public double getArea() {
+        return boundingBox.getArea();
     }
     // get left
     public BVHNode getLeft() {
@@ -77,5 +83,15 @@ public class BVHNode {
     }
     public SceneObjects getSceneObject() {
         return sceneObject;
+    }
+    // get center of position
+    public double getX() {
+        return this.sceneObject.getPosX();
+    }
+    public double getY() {
+        return this.sceneObject.getPosY();
+    }
+    public double getZ() {
+        return this.sceneObject.getPosZ();
     }
 }

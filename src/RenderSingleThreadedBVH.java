@@ -1,14 +1,13 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.Arrays;
 
 public class RenderSingleThreadedBVH {
 
-
+    public long startTime, endTime, elapsedTime;
     public List<BVHNode> BVHNodes = new ArrayList<>();
     private int loadingProgress, currentProgress = 0;
     private String loadingString = "";
@@ -21,45 +20,13 @@ public class RenderSingleThreadedBVH {
     public void constructBVH(List<SceneObjects> sceneObjectsList) {
 
         // create list leaf nodes
-        double epsilon = 0;
         for (SceneObjects sceneObject : sceneObjectsList) {
             BoundingBox boundingBox = new BoundingBox(
-                    sceneObject.getBounds()[0] - epsilon, sceneObject.getBounds()[1] + epsilon,
-                    sceneObject.getBounds()[2] - epsilon, sceneObject.getBounds()[3] + epsilon,
-                    sceneObject.getBounds()[4] - epsilon, sceneObject.getBounds()[5] + epsilon);
+                    sceneObject.getBounds()[0], sceneObject.getBounds()[1],
+                    sceneObject.getBounds()[2], sceneObject.getBounds()[3],
+                    sceneObject.getBounds()[4], sceneObject.getBounds()[5]);
             BVHNodes.add(new BVHNode(boundingBox, sceneObject));
         }
-
-        double minX = Double.POSITIVE_INFINITY, maxX = Double.NEGATIVE_INFINITY;
-        double minY = Double.POSITIVE_INFINITY, maxY = Double.NEGATIVE_INFINITY;
-        double minZ = Double.POSITIVE_INFINITY, maxZ = Double.NEGATIVE_INFINITY;
-
-        // determine bounds of all sceneObjects
-        for (SceneObjects sceneObject : sceneObjectsList) {
-            if (minX > sceneObject.getBounds()[0]) {
-                minX = sceneObject.getBounds()[0];
-            }
-            if (maxX < sceneObject.getBounds()[1]) {
-                maxX = sceneObject.getBounds()[1];
-            }
-
-            if (minY > sceneObject.getBounds()[2]) {
-                minY = sceneObject.getBounds()[2];
-            }
-            if (maxY < sceneObject.getBounds()[3]) {
-                maxY = sceneObject.getBounds()[3];
-            }
-
-            if (minZ > sceneObject.getBounds()[4]) {
-                minZ = sceneObject.getBounds()[4];
-            }
-            if (maxZ < sceneObject.getBounds()[5]) {
-                maxZ = sceneObject.getBounds()[5];
-            }
-        }
-        double extentX = maxX - minX;
-        double extentY = maxY - minY;
-        double extentZ = maxZ - minZ;
 
         while (BVHNodes.size() > 1) {
             double cost = 0, bestCost = Double.POSITIVE_INFINITY;
@@ -69,8 +36,7 @@ public class RenderSingleThreadedBVH {
             for (int i = 0; i < BVHNodes.size(); i++) {
                 for (int j = i + 1; j < BVHNodes.size(); j++) {
                     BoundingBox combinedBox = new BoundingBox(BVHNodes.get(i), BVHNodes.get(j));
-                    cost = combinedBox.getArea() * (BVHNodes.get(i).getNumChildren() + BVHNodes.get(i).getNumChildren());
-
+                    cost = (combinedBox.getArea() / (BVHNodes.get(i).getArea() + BVHNodes.get(j).getArea())) * (BVHNodes.get(i).getNumChildren() + BVHNodes.get(i).getNumChildren());
                     if (cost < bestCost) {
                         bestCost = cost;
                         bestLeft = BVHNodes.get(i);
@@ -94,7 +60,6 @@ public class RenderSingleThreadedBVH {
 
         RenderSingleThreadedBVH.primaryRayStep = primaryRayStep;
         RenderSingleThreadedBVH.secondaryRayStep = secondaryRayStep;
-
         constructBVH(sceneObjectsList);
         BVHNode BVHRootNode = BVHNodes.getFirst();
         Ray[][] primaryRay = new Ray[cam.getResX()][cam.getResY()];
@@ -108,22 +73,36 @@ public class RenderSingleThreadedBVH {
             updateScreen.set(true);
         };
 
+        startTime = System.nanoTime();
         for (int j = 0; j < cam.getResY(); j++) {
             for (int i = 0; i < cam.getResX(); i++) {
                 computePrimaryRay(cam, primaryRay, i, j, BVHRootNode);
             }
         }
+        endTime = System.nanoTime();
+        elapsedTime = endTime - startTime;
+        System.out.println("Primary Ray time: " + elapsedTime / 1_000_000 + "ms");
         drawScreen.drawFrameRGB(primaryRay, cam);
         loadingBar();
 
         drawScreenExecutor.scheduleAtFixedRate(screenUpdateTask, 10, frameTime, TimeUnit.MILLISECONDS);
+        startTime = System.nanoTime();
+
+        // reuse arrays
+        double[][] luminanceRed = new double[numBounces + 1][4];
+        double[][] luminanceGreen = new double[numBounces + 1][4];
+        double[][] luminanceBlue = new double[numBounces + 1][4];
         for (int currentRay = 1; currentRay < numRays; currentRay++) {
-            marchIntersectionLogic(primaryRay, nthRay, BVHRootNode, numRays, currentRay, numBounces, cam);
+            marchIntersectionLogic(primaryRay, nthRay, BVHRootNode, numRays, currentRay, numBounces, cam, luminanceRed, luminanceGreen, luminanceBlue);
             if (updateScreen.get()) {
                 drawScreen.drawFrameRGB(primaryRay, cam);
                 updateScreen.set(false);
             }
         }
+        endTime = System.nanoTime();
+        elapsedTime = endTime - startTime;
+        System.out.println(numRays + " Secondary Ray Time: " + elapsedTime / 1_000_000 + "ms");
+
         drawScreenExecutor.shutdown();
 
         // final print
@@ -159,7 +138,7 @@ public class RenderSingleThreadedBVH {
             // march the ray to the start of the leaf node bounds
             double distance = BVHDistanceClose;
             while (distance <= BVHDistanceFar && !primaryRay[i][j].getHit()) {
-                primaryRay[i][j].marchRay(distance - 0.5); // march ray
+                primaryRay[i][j].marchRay(distance - 0.05); // march ray
                 if (BVHSceneObject.intersectionCheck(primaryRay[i][j])) {
                     primaryRay[i][j].setHitPoint(primaryRay[i][j].getPosX(), primaryRay[i][j].getPosY(), primaryRay[i][j].getPosZ()); // get the position of the intersection
                     primaryRay[i][j].setHit(true);
@@ -171,14 +150,14 @@ public class RenderSingleThreadedBVH {
         }
     }
 
-    public void marchIntersectionLogic(Ray[][] primaryRay, Ray[][] nthRay, BVHNode rootNode, int numRays, int currentRay, int numBounces, Camera cam) {
+    public void marchIntersectionLogic(Ray[][] primaryRay, Ray[][] nthRay, BVHNode rootNode, int numRays, int currentRay, int numBounces, Camera cam, double [][] luminanceRed, double[][] luminanceGreen, double[][] luminanceBlue) {
         for (int j = 0; j < cam.getResY(); j++) {
             for (int i = 0; i < cam.getResX(); i++) {
                 if (primaryRay[i][j].getHit()) {
                     nthRay[i][j] = new Ray(primaryRay[i][j].getHitPointX(), primaryRay[i][j].getHitPointY(), primaryRay[i][j].getHitPointZ());
-                    double[][] luminanceRed = new double[numBounces + 1][4];
-                    double[][] luminanceGreen = new double[numBounces + 1][4];
-                    double[][] luminanceBlue = new double[numBounces + 1][4];
+                    clearArray(luminanceRed);
+                    clearArray(luminanceGreen);
+                    clearArray(luminanceBlue);
                     // BOUNCES PER RAY
                     // initialize ray starting conditions
                     nthRay[i][j].initializeRay(primaryRay[i][j]);
@@ -196,7 +175,7 @@ public class RenderSingleThreadedBVH {
                         // march ray and check intersections
                         if (BVHDistanceClose != -1 && BVHDistanceFar != -1 && BVHSceneObject != null) {
                             while (distance <= BVHDistanceFar && !nthRay[i][j].getHit()) {
-                                nthRay[i][j].marchRay(distance - 0.5); // march the ray to the start of the leaf node bounds
+                                nthRay[i][j].marchRay(distance - 0.05); // march the ray to the start of the leaf node bounds
                                 if (BVHSceneObject.intersectionCheck(nthRay[i][j])) {
                                     nthRay[i][j].updateHitProperties(BVHSceneObject);
                                     // data structure for storing object luminance, dot product and bounce depth, and boolean hit
@@ -355,5 +334,11 @@ public class RenderSingleThreadedBVH {
         }
         System.out.println("-|");
         System.out.print("|-");
+    }
+
+    public void clearArray(double[][] array) {
+        for (double[] row : array) {
+            Arrays.fill(row, 0.0);
+        }
     }
 }
