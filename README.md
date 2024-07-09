@@ -2,13 +2,10 @@ I'm trying to make an Ascii Pathtracer. Nothing that hasn't been done before :)
 Unfortunately along the way I forgot about the ASCII part.
 Global Illuminiation is here!
 
-![room v12 330 Rays](https://github.com/Fullyverified/ASCII_PathTracer/assets/138776324/03ef3728-516a-456f-b467-85f879029c48)
+![room v12 330 Rays hires](https://github.com/Fullyverified/ASCII_PathTracer/assets/138776324/cd02ea24-a896-431b-acf6-585b488c2c8f)
 
-![room v12 ASCII](https://github.com/Fullyverified/ASCII_PathTracer/assets/138776324/568bba31-920e-4c78-964b-1adfdcdeecdf)
-Downsampling makes ASCII looks funky. Just full screen it :)
-
-Current formula: sum from the last bounce to the first bounce :
-object brigthness * cosine law / * object reflectivity
+![room v12 ASCII](https://github.com/Fullyverified/ASCII_PathTracer/assets/138776324/ff3a5337-c5ff-42c6-b8fa-b449b0a4eb01)
+Downsampling makes text look weird. Fullscreen it :)
 
 Done:
 1. Create ray and sphere objects.
