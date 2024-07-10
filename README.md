@@ -2,7 +2,7 @@ I'm trying to make an Ascii Pathtracer. Nothing that hasn't been done before :)
 Unfortunately along the way I forgot about the ASCII part.
 Global Illuminiation and Bounding Volume Heirarchys (BVH) are now implemented!
 
-BVH is approximately a speed of:
+BVH is approximately a speed up of:
 1. Primary Rays: ~22 times faster
 2. Secondary Rays: 2 times faster
 - Strongly depends on the ray step size (precision) and distance between objects. For bigger scene it could easily be 20 or 40 times faster.
