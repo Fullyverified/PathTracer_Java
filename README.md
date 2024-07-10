@@ -34,8 +34,12 @@ Done:
 19. Implemented colour in the form of RGB (0 -> 255)
 20. Implemented cosine weighted hemisphere importance sampling
 21. BVH (bounding volume hierarchy) now implemented!
+22. Implemented basic denoiser. Takes weighted average of neirhbouring pixels. Not amazing by any stretch.
 
 TODO LIST OF THINGS TODO:
-1. Implement Multithreading
+1. Add controls for camera or objects
 2. Add local rotation for objects
-3. Implement a basic denoiser (average of neighbouring pixels with a constrast threshold for edge detection?)
+3. Ability to import objects defined by vertices.
+4. Computational binary solid geometry
+
+I have attempted multithreading several times now, and found it's either way slower or just doesn't work. Probably beyond the capability of a first year xD
