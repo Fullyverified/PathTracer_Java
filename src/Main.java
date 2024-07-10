@@ -3,16 +3,18 @@ import java.util.List;
 
 public class Main {
 
-    public static int RenderResolutionX = 600;
-    public static int aspectX = 4;
-    public static int aspectY = 4;
+    public static int RenderResolutionX = 400;
+    public static int aspectX = 1;
+    public static int aspectY = 1;
     public static int fov = 53;
     public static int frameTime = 45; // Milliseconds
-    public static int raysPerPixel = 100;
+    public static int raysPerPixel = 25;
     public static int bouncesPerRay = 8;
     public static boolean ASCIIMode = false;
     public static double primaryRayStep = 0.01;
-    public static double secondaryRayStep = 0.01;
+    public static double secondaryRayStep = 0.1;
+    public static boolean denoise = false;
+    public static double denoiseWeight = 0.75;
 
     public static void main(String[] args) {
 
@@ -38,8 +40,11 @@ public class Main {
         cam.rightVector();
         cam.imagePlane();
 
-        RenderSingleThreadedBVH renderSingleThreaded = new RenderSingleThreadedBVH();
-        //RenderSingleThreaded renderSingleThreaded = new RenderSingleThreaded();
-        renderSingleThreaded.computePixels(sceneObjectsList, cam, raysPerPixel, bouncesPerRay, frameTime, ASCIIMode, primaryRayStep, secondaryRayStep);
+        RenderSingleThreaded renderSingleThreaded = new RenderSingleThreaded();
+        RenderSingleThreadedBVH renderSingleThreadedBVH = new RenderSingleThreadedBVH();
+
+        //renderSingleThreaded.computePixels(sceneObjectsList, cam, raysPerPixel, bouncesPerRay);
+        renderSingleThreadedBVH.computePixels(sceneObjectsList, cam, raysPerPixel, bouncesPerRay);
+
     }
 }

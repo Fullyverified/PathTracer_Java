@@ -22,6 +22,4 @@ public interface SceneObjects {
 
     public double getRoughness();
 
-    public double[] getBounds();
-
-}
+    public double[] getBounds();}

@@ -31,6 +31,7 @@ public class Ray {
     // update magnitude and normalised directions vectors
     public void updateNormalisation()
     {
+       // division trick doesn't help here
         this.dirMagnitude = Math.sqrt(this.dirX*this.dirX + this.dirY*this.dirY + this.dirZ*this.dirZ);
         this.dirX = (this.dirX / this.dirMagnitude);
         this.dirY = (this.dirY / this.dirMagnitude);

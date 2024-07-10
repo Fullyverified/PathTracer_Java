@@ -1,22 +1,24 @@
 import java.util.*;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.Arrays;
 
-public class RenderSingleThreadedBVH {
+public class RenderMultiThreadedBVH {
 
     public long startTime, endTime, elapsedTime;
-    public List<BVHNode> BVHNodes = new ArrayList<>();
+    public List<BVHNodeMultiThreaded> BVHNodes = new ArrayList<>();
     private int loadingProgress, currentProgress = 0;
     private String loadingString = "";
     public static double primaryRayStep = Main.primaryRayStep;
     public static double secondaryRayStep = Main.secondaryRayStep;
-    public int hascounted = 0;
-    public int checks = 0;
 
-    public RenderSingleThreadedBVH() {
+    int numThreads = Runtime.getRuntime().availableProcessors();
+    ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+
+    public RenderMultiThreadedBVH() {
     }
 
     public void constructBVH(List<SceneObjects> sceneObjectsList) {
@@ -27,13 +29,13 @@ public class RenderSingleThreadedBVH {
                     sceneObject.getBounds()[0], sceneObject.getBounds()[1],
                     sceneObject.getBounds()[2], sceneObject.getBounds()[3],
                     sceneObject.getBounds()[4], sceneObject.getBounds()[5]);
-            BVHNodes.add(new BVHNode(boundingBox, sceneObject));
+            BVHNodes.add(new BVHNodeMultiThreaded(boundingBox, sceneObject));
         }
 
         while (BVHNodes.size() > 1) {
             double cost = 0, bestCost = Double.POSITIVE_INFINITY;
-            BVHNode bestLeft = null;
-            BVHNode bestRight = null;
+            BVHNodeMultiThreaded bestLeft = null;
+            BVHNodeMultiThreaded bestRight = null;
 
             for (int i = 0; i < BVHNodes.size(); i++) {
                 for (int j = i + 1; j < BVHNodes.size(); j++) {
@@ -48,7 +50,7 @@ public class RenderSingleThreadedBVH {
             }
             // create a new bvh.BVHNode that has the smallest combined area
             BoundingBox parentBox = new BoundingBox(bestLeft, bestRight);
-            BVHNode parentNode = new BVHNode(parentBox, bestLeft, bestRight);
+            BVHNodeMultiThreaded parentNode = new BVHNodeMultiThreaded(parentBox, bestLeft, bestRight);
             BVHNodes.remove(bestLeft);
             BVHNodes.remove(bestRight);
             BVHNodes.add(parentNode);
@@ -59,6 +61,10 @@ public class RenderSingleThreadedBVH {
     }
 
     public void computePixels(List<SceneObjects> sceneObjectsList, Camera cam, int numRays, int numBounces) {
+        System.out.println("Avalialbe Threads: " + numThreads);
+
+        constructBVH(sceneObjectsList);
+        BVHNodeMultiThreaded BVHRootNode = BVHNodes.getFirst();
         Ray[][] primaryRay = new Ray[cam.getResX()][cam.getResY()];
         Ray[][] nthRay = new Ray[cam.getResX()][cam.getResY()];
         DrawScreen drawScreen = new DrawScreen(cam.getResX(), cam.getResY());
@@ -70,11 +76,6 @@ public class RenderSingleThreadedBVH {
             updateScreen.set(true);
         };
 
-
-        /////////////////
-        // while loop for adding controls here
-        constructBVH(sceneObjectsList);
-        BVHNode BVHRootNode = BVHNodes.getFirst();
         startTime = System.nanoTime();
         for (int j = 0; j < cam.getResY(); j++) {
             for (int i = 0; i < cam.getResX(); i++) {
@@ -104,8 +105,8 @@ public class RenderSingleThreadedBVH {
         endTime = System.nanoTime();
         elapsedTime = endTime - startTime;
         System.out.println(numRays + " Secondary Ray Time: " + elapsedTime / 1_000_000 + "ms");
-        //////////////////////////
 
+        executor.shutdown();
         drawScreenExecutor.shutdown();
 
         // final print
@@ -113,7 +114,7 @@ public class RenderSingleThreadedBVH {
         System.out.print("-|");
     }
 
-    public void computePrimaryRay(Camera cam, Ray[][] primaryRay, int i, int j, BVHNode rootNode) {
+    public void computePrimaryRay(Camera cam, Ray[][] primaryRay, int i, int j, BVHNodeMultiThreaded rootNode) {
         primaryRay[i][j] = new Ray(cam.getPosX(), cam.getPosY(), cam.getPosZ());
         // update the rays index to the current pixel
         primaryRay[i][j].setPixelX(i);
@@ -132,10 +133,13 @@ public class RenderSingleThreadedBVH {
         primaryRay[i][j].updateNormalisation(); // update vector normalisation
         primaryRay[i][j].marchRay(0);
 
-        BVHNode leafNode = rootNode.searchBVHTree(primaryRay[i][j]);
+        //BVHNodeMultiThreaded leafNode = rootNode.searchBVHTree(primaryRay[i][j], executor, 0, 8) == null ? null : rootNode.searchBVHTree(primaryRay[i][j], executor, 0, 8);
+        BVHNodeMultiThreaded leafNode = rootNode.searchBVHTree(primaryRay[i][j], executor, 0, 8);
+
         double BVHDistanceClose = leafNode != null ? leafNode.getIntersectionDistance(primaryRay[i][j])[0] : -1;
         double BVHDistanceFar = leafNode != null ? leafNode.getIntersectionDistance(primaryRay[i][j])[1] : -1;
         SceneObjects BVHSceneObject = leafNode != null ? leafNode.getSceneObject() : null;
+
         if (BVHDistanceClose != -1 && BVHDistanceFar != -1 && BVHSceneObject != null) {
             // march the ray to the start of the leaf node bounds
             double distance = BVHDistanceClose;
@@ -152,7 +156,7 @@ public class RenderSingleThreadedBVH {
         }
     }
 
-    public void marchIntersectionLogic(Ray[][] primaryRay, Ray[][] nthRay, BVHNode rootNode, int numRays, int currentRay, int numBounces, Camera cam, double [][] luminanceRed, double[][] luminanceGreen, double[][] luminanceBlue) {
+    public void marchIntersectionLogic(Ray[][] primaryRay, Ray[][] nthRay, BVHNodeMultiThreaded rootNode, int numRays, int currentRay, int numBounces, Camera cam, double [][] luminanceRed, double[][] luminanceGreen, double[][] luminanceBlue) {
         for (int j = 0; j < cam.getResY(); j++) {
             for (int i = 0; i < cam.getResX(); i++) {
                 if (primaryRay[i][j].getHit()) {
@@ -168,7 +172,10 @@ public class RenderSingleThreadedBVH {
                     storeHitDataRGB(luminanceBlue, nthRay[i][j], -1, nthRay[i][j].getHitObject(), nthRay[i][j].getHitObject().getBBrightness(), nthRay[i][j].getHitObject().getReflecB());
                     for (int currentBounce = 0; currentBounce < numBounces && nthRay[i][j].getHit(); currentBounce++) {
                         cosineWeightedHemisphereImportanceSampling(nthRay[i][j], nthRay[i][j].getHitObject()); // sample a new direction with cosine weighted hemisphere importance sampling
-                        BVHNode leafNode = rootNode.searchBVHTree(nthRay[i][j]);
+                        //BVHNodeMultiThreaded leafNode = rootNode.searchBVHTree(nthRay[i][j], executor, 0, 8) == null ? null : rootNode.searchBVHTree(nthRay[i][j], executor, 0 ,8);
+
+                        BVHNodeMultiThreaded leafNode = rootNode.searchBVHTree(nthRay[i][j], executor, 0, 8);
+
                         double BVHDistanceClose = leafNode != null ? leafNode.getIntersectionDistance(nthRay[i][j])[0] : -1;
                         double BVHDistanceFar = leafNode != null ? leafNode.getIntersectionDistance(nthRay[i][j])[1] : -1;
                         SceneObjects BVHSceneObject = leafNode != null ? leafNode.getSceneObject() : null;
@@ -189,6 +196,7 @@ public class RenderSingleThreadedBVH {
                             }
                         }
                     }
+
                     double redAmplitude = 0;
                     double blueAmplitude = 0;
                     double greenAmplitude = 0;
@@ -261,13 +269,10 @@ public class RenderSingleThreadedBVH {
         double randomY = Math.sin(alpha) * Math.sin(gamma);
         double randomZ = Math.cos(alpha);
         // normalize random direction
-        // division trick is slightly faster
         double randomMagnitude = Math.sqrt(randomX * randomX + randomY * randomY + randomZ * randomZ);
-        randomMagnitude = 1 / randomMagnitude;
-        randomX *= randomMagnitude;
-        randomY *= randomMagnitude;
-        randomZ *= randomMagnitude;
-
+        randomX /= randomMagnitude;
+        randomY /= randomMagnitude;
+        randomZ /= randomMagnitude;
 
         // calculate Tangent and Bitangnet vectors using arbitrary vector a
         double aX, aY, aZ;
@@ -286,18 +291,20 @@ public class RenderSingleThreadedBVH {
         double tangentY = sceneObject.getNormalZ() * aX - sceneObject.getNormalX() * aZ;
         double tangentZ = sceneObject.getNormalX() * aY - sceneObject.getNormalY() * aX;
         // normalize
-        // division trick is slightly faster
         double tangentMagnitude = Math.sqrt(tangentX * tangentX + tangentY * tangentY + tangentZ * tangentZ);
-        tangentMagnitude = 1 / tangentMagnitude;
-        tangentX *= tangentMagnitude;
-        tangentY *= tangentMagnitude;
-        tangentZ *= tangentMagnitude;
+        tangentX /= tangentMagnitude;
+        tangentY /= tangentMagnitude;
+        tangentZ /= tangentMagnitude;
 
         // bitangnet equals cross product of tangent and normal
         double bitangentX = sceneObject.getNormalY() * tangentZ - sceneObject.getNormalZ() * tangentY;
         double bitangentY = sceneObject.getNormalZ() * tangentX - sceneObject.getNormalX() * tangentZ;
         double bitangentZ = sceneObject.getNormalX() * tangentY - sceneObject.getNormalY() * tangentX;
-        // already normalised
+        // normalise bitangent
+        double bitangentMagnitude = Math.sqrt(bitangentX * bitangentX + bitangentY * bitangentY + bitangentZ * bitangentZ);
+        bitangentX /= bitangentMagnitude;
+        bitangentY /= bitangentMagnitude;
+        bitangentZ /= bitangentMagnitude;
 
         // set final sampled direction
         // x = randomX * tangentX + randomY * bitangentX + randomZ * normalX
@@ -325,7 +332,26 @@ public class RenderSingleThreadedBVH {
             nthRay.setDirection(directionX, directionY, directionZ);
             nthRay.updateNormalisation();
         }
-        nthRay.updateOrigin(0.1); // march the ray a tiny amount to move it off the object
+        nthRay.updateOrigin(0.1); // march the ray a tiny amount to move it off the sphere
+    }
+
+    public static void threadRenderSegmentation(int res, int nThreads, int[][] boundArray) {
+        int bound = res / nThreads;
+        int lower = 0, upper = 0;
+        for (int i = 0; i < nThreads; i++) {
+            if (i != nThreads - 1) {
+                lower = i * bound;
+                boundArray[i][0] = lower;
+                upper = ((i + 1) * bound) - 1;
+                boundArray[i][1] = upper;
+            }
+            if (i == nThreads - 1) {
+                lower = i * bound;
+                boundArray[i][0] = lower - 1;
+                upper = res;
+                boundArray[i][1] = upper - 1;
+            }
+        }
     }
 
     public void loadingBar() {

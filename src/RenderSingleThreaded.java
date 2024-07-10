@@ -12,16 +12,13 @@ public class RenderSingleThreaded {
     public List<SceneObjects> visibleObjects = new ArrayList<>();
     private int loadingProgress, currentProgress = 0;
     private String loadingString = "";
-    public static double primaryRayStep;
-    public static double secondaryRayStep;
+    public static double primaryRayStep = Main.primaryRayStep;
+    public static double secondaryRayStep = Main.secondaryRayStep;
 
     public RenderSingleThreaded() {
     }
 
-    public void computePixels(List<SceneObjects> sceneObjectsList, Camera cam, int numRays, int numBounces, long frameTime, boolean ASCII, double primaryRayStep, double secondaryRayStep) {
-        RenderSingleThreaded.primaryRayStep = primaryRayStep;
-        RenderSingleThreaded.secondaryRayStep = secondaryRayStep;
-
+    public void computePixels(List<SceneObjects> sceneObjectsList, Camera cam, int numRays, int numBounces) {
         Ray[][] primaryRay = new Ray[cam.getResX()][cam.getResY()];
         Ray[][] nthRay = new Ray[cam.getResX()][cam.getResY()];
 
@@ -31,7 +28,7 @@ public class RenderSingleThreaded {
         Runnable screenUpdateTask = () -> {
             updateScreen.set(true);
         };
-        DrawScreen drawScreen = new DrawScreen(cam.getResX(), cam.getResY(), ASCII);
+        DrawScreen drawScreen = new DrawScreen(cam.getResX(), cam.getResY());
 
         startTime = System.nanoTime();
         for (int j = 0; j < cam.getResY(); j++) {
@@ -52,7 +49,7 @@ public class RenderSingleThreaded {
         System.out.println("-|");
         System.out.print("|-");
 
-        drawScreenExecutor.scheduleAtFixedRate(screenUpdateTask, 10, frameTime, TimeUnit.MILLISECONDS);
+        drawScreenExecutor.scheduleAtFixedRate(screenUpdateTask, 10, Main.frameTime, TimeUnit.MILLISECONDS);
         startTime = System.nanoTime();
         for (int currentRay = 1; currentRay < numRays; currentRay++) {
             marchIntersectionLogic(primaryRay, nthRay, sceneObjectsList, numRays, currentRay, numBounces, cam);
@@ -172,7 +169,6 @@ public class RenderSingleThreaded {
                             }
                         }
                     }
-
                     double redAmplitude = 0;
                     double blueAmplitude = 0;
                     double greenAmplitude = 0;

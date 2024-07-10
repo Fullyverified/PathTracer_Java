@@ -11,12 +11,13 @@ public class DrawScreen extends JPanel {
     List<Double> amplitudesGreen = new ArrayList<>();
     List<Double> amplitudesBlue = new ArrayList<>();
 
+    private boolean denoise;
     private double screenWidth, screenHeight;
     private double scalingFactor;
     private int outputWidth, outputHeight;
     private int internalWidth, internalHeight;
     private BufferedImage image;
-    private JFrame window = new JFrame("Path Tracer");
+    private JFrame window = new JFrame("Path Tracer - " + "Resolution: " + Main.RenderResolutionX + "x" + (Main.RenderResolutionX / ((double) Main.aspectX/ (double) Main.aspectY)) + " - Rays: " + Main.raysPerPixel + " - Bounces: " + Main.bouncesPerRay + " - Ray Step Size: " + Main.secondaryRayStep + " - Denoising: " + Main.denoise);
     private double brightnessFactor = 0;
 
     private float lineSpacing = 1f;
@@ -26,8 +27,7 @@ public class DrawScreen extends JPanel {
 
     private long framesDrawn = 0;
 
-    public DrawScreen(int width, int height, boolean ASCII) {
-        this.ASCII = ASCII;
+    public DrawScreen(int width, int height) {
         internalWidth = width;
         internalHeight = height;
 
@@ -41,12 +41,12 @@ public class DrawScreen extends JPanel {
 
         // initialize the canvas with specified width and height
 
-        if (ASCII == false) {
+        if (Main.ASCIIMode == false) {
             image = new BufferedImage(outputWidth + 5, outputHeight, BufferedImage.TYPE_INT_RGB);
             window.add(this);
             window.setSize(outputWidth, outputHeight);
             window.setVisible(true);
-        } else if (ASCII == true) {
+        } else if (Main.ASCIIMode == true) {
             areaASCII = new JTextPane();
             setLayout(new BorderLayout());
             int fontSize = (int) (scalingFactor * 0.85);
@@ -107,22 +107,29 @@ public class DrawScreen extends JPanel {
 
     public void drawFrameRGB(Ray[][] primaryRay, Camera cam) {
 
-        if (ASCII == false) {
+        if (Main.ASCIIMode == false) {
             framesDrawn++;
             brightnessFactor = 255 / (maxAmplitudeColour(primaryRay) * cam.getISO()); // convert absolute brightness to 8 bit colour space
             for (int y = 0; y < internalHeight; y++) {
                 for (int x = 0; x < internalWidth; x++) {
-
-                    // convert brightness of red green and blue to 8 bit colour space
-                    int red = (int) (primaryRay[x][y].getAvgRed() * brightnessFactor);
+                    int red, green, blue;
+                    if (Main.denoise == true) {
+                        double[] RGB = denoise(x, y, primaryRay, brightnessFactor);
+                        red = (int) RGB[0];
+                        green = (int) RGB[1];
+                        blue = (int) RGB[2];
+                        }
+                    else {
+                        red = (int) (primaryRay[x][y].getAvgRed() * brightnessFactor);
+                        green = (int) (primaryRay[x][y].getAvgGreen() * brightnessFactor);
+                        blue = (int) (primaryRay[x][y].getAvgBlue() * brightnessFactor);
+                    }
                     if (red > 255) {
                         red = 255;
                     }
-                    int green = (int) (primaryRay[x][y].getAvgGreen() * brightnessFactor);
                     if (green > 255) {
                         green = 255;
                     }
-                    int blue = (int) (primaryRay[x][y].getAvgBlue() * brightnessFactor);
                     if (blue > 255) {
                         blue = 255;
                     }
@@ -138,7 +145,8 @@ public class DrawScreen extends JPanel {
                 }
             }
             repaint(); // update image
-        } else if (ASCII == true) {
+        }
+        else if (Main.ASCIIMode == true) {
             // ASCII CODE HERE
             StringBuilder stringBuffer = new StringBuilder();
 
@@ -200,6 +208,49 @@ public class DrawScreen extends JPanel {
             }
             areaASCII.setText(stringBuffer.toString()); // update ASCII output
         }
+    }
+
+    public double[] denoise(int x, int y, Ray[][] primaryRay, double brightnessFactor) {
+        double primaryWeight = Main.denoiseWeight;
+        double secondaryWeight = 1 - primaryWeight;
+        double[] RGB = new double[3];
+        if (x != 0 && y != 0 && x != internalWidth-1 && y != internalHeight-1) {
+            double primaryRed = primaryRay[x][y].getAvgRed();
+            double upRed = primaryRay[x][y + 1].getAvgRed();
+            double downRed = primaryRay[x][y - 1].getAvgRed();
+            double leftRed = primaryRay[x - 1][y].getAvgRed();
+            double rightRed = primaryRay[x + 1][y].getAvgRed();
+            double avgRed = (upRed + downRed + leftRed + rightRed) / 4;
+            primaryRed = (primaryRed * primaryWeight) + (avgRed * secondaryWeight);
+            primaryRed *= brightnessFactor;
+            RGB[0] = primaryRed;
+
+            double primaryGreen = primaryRay[x][y].getAvgGreen();
+            double upGreen = primaryRay[x][y + 1].getAvgGreen();
+            double downGreen = primaryRay[x][y - 1].getAvgGreen();
+            double leftGreen = primaryRay[x - 1][y].getAvgGreen();
+            double rightGreen = primaryRay[x + 1][y].getAvgGreen();
+            double avgGreen = (upGreen + downGreen + leftGreen + rightGreen) / 4;
+            primaryGreen = (primaryGreen * primaryWeight) + (avgGreen * secondaryWeight);
+            primaryGreen *= brightnessFactor;
+            RGB[1] = primaryGreen;
+
+            double primaryBlue = primaryRay[x][y].getAvgBlue();
+            double upBlue = primaryRay[x][y + 1].getAvgBlue();
+            double downBlue = primaryRay[x][y - 1].getAvgBlue();
+            double leftBlue = primaryRay[x - 1][y].getAvgBlue();
+            double rightBlue = primaryRay[x + 1][y].getAvgBlue();
+            double avgBlue = (upBlue + downBlue + leftBlue + rightBlue) / 4;
+            primaryBlue = (primaryBlue * primaryWeight) + (avgBlue * secondaryWeight);
+            primaryBlue *= brightnessFactor;
+            RGB[2] = primaryBlue;
+        }
+        else {
+            RGB[0] = primaryRay[x][y].getAvgRed() * brightnessFactor;
+            RGB[1] = primaryRay[x][y].getAvgGreen() * brightnessFactor;
+            RGB[2] = primaryRay[x][y].getAvgBlue() * brightnessFactor;
+        }
+        return RGB;
     }
 
     @Override
