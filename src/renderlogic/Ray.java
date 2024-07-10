@@ -1,9 +1,5 @@
 package renderlogic;
 
-import bvh.*;
-import sceneobjects.*;
-import renderlogic.*;
-
 import sceneobjects.SceneObjects;
 
 public class Ray {
@@ -51,7 +47,7 @@ public class Ray {
     // o ray origin
     // t tscalar (amount to march the ray by)
     // d direction vector
-    public void marchRay(double distance)
+    public void march(double distance)
     {
         this.posX = oX + (distance * dirX);
         this.posY = oY + (distance * dirY);
@@ -73,7 +69,7 @@ public class Ray {
         // initialise ray pos
         setOrigin(primaryRay.getHitPointX(), primaryRay.getHitPointY(), primaryRay.getHitPointZ());
         // give the ray a direction
-        marchRay(0);
+        march(0);
         setHitPoint(primaryRay.getHitPointX(), primaryRay.getHitPointY(), primaryRay.getHitPointZ());
         setHitObject(primaryRay.getHitObject());
         setDirection(primaryRay.getDirX(), primaryRay.getDirY(), primaryRay.getDirZ());

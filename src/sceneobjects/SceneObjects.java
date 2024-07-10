@@ -1,7 +1,5 @@
 package sceneobjects;
 
-import bvh.*;
-import sceneobjects.*;
 import renderlogic.*;
 
 public interface SceneObjects {
@@ -27,5 +25,10 @@ public interface SceneObjects {
     public double getReflecB();
 
     public double getRoughness();
+    public boolean getTransparent();
+    public double getRefractiveIndex();
 
-    public double[] getBounds();}
+    public double[] getBounds();
+    public double[] distanceToEntryExit(Ray ray);
+
+}

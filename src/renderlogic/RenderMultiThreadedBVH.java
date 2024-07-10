@@ -136,7 +136,7 @@ public class RenderMultiThreadedBVH {
         primaryRay[i][j].setDirY(cam.getNormDirY() + cam.getNormRightY() * primaryRay[i][j].getPixelPosX() + cam.getNormUpY() * primaryRay[i][j].getPixelPosY());
         primaryRay[i][j].setDirZ(cam.getNormDirZ() + cam.getNormRightZ() * primaryRay[i][j].getPixelPosX() + cam.getNormUpZ() * primaryRay[i][j].getPixelPosY());
         primaryRay[i][j].updateNormalisation(); // update vector normalisation
-        primaryRay[i][j].marchRay(0);
+        primaryRay[i][j].march(0);
 
         //bvh.BVHNodeMultiThreaded leafNode = rootNode.searchBVHTree(primaryRay[i][j], executor, 0, 8) == null ? null : rootNode.searchBVHTree(primaryRay[i][j], executor, 0, 8);
         BVHNodeMultiThreaded leafNode = rootNode.searchBVHTree(primaryRay[i][j], executor, 0, 8);
@@ -149,7 +149,7 @@ public class RenderMultiThreadedBVH {
             // march the ray to the start of the leaf node bounds
             double distance = BVHDistanceClose;
             while (distance <= BVHDistanceFar && !primaryRay[i][j].getHit()) {
-                primaryRay[i][j].marchRay(distance - 0.05); // march ray
+                primaryRay[i][j].march(distance - 0.05); // march ray
                 if (BVHSceneObject.intersectionCheck(primaryRay[i][j])) {
                     primaryRay[i][j].setHitPoint(primaryRay[i][j].getPosX(), primaryRay[i][j].getPosY(), primaryRay[i][j].getPosZ()); // get the position of the intersection
                     primaryRay[i][j].setHit(true);
@@ -189,7 +189,7 @@ public class RenderMultiThreadedBVH {
                         // march ray and check intersections
                         if (BVHDistanceClose != -1 && BVHDistanceFar != -1 && BVHSceneObject != null) {
                             while (distance <= BVHDistanceFar && !nthRay[i][j].getHit()) {
-                                nthRay[i][j].marchRay(distance - 0.05); // march the ray to the start of the leaf node bounds
+                                nthRay[i][j].march(distance - 0.05); // march the ray to the start of the leaf node bounds
                                 if (BVHSceneObject.intersectionCheck(nthRay[i][j])) {
                                     nthRay[i][j].updateHitProperties(BVHSceneObject);
                                     // data structure for storing object luminance, dot product and bounce depth, and boolean hit

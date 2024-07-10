@@ -260,5 +260,12 @@ public class AABCubeCenter implements SceneObjects {
     public double getReflecB() {return this.reflecB;}
 
     public double getRoughness() {return this.roughness;}
+    public boolean getTransparent() {return false;}
+    public double getRefractiveIndex() {return 1;}
+
+    public double[] distanceToEntryExit(Ray ray) {
+        double[] distance = new double[2];
+        return distance;
+    }
 
 }
