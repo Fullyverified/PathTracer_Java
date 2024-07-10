@@ -5,7 +5,7 @@ Global Illuminiation and Bounding Volume Heirarchys (BVH) are now implemented!
 BVH is approximately a speed of:
 1. Primary Rays: ~22 times faster
 2. Secondary Rays: 2 times faster
-Strongly depends on the ray step size (precision)
+- Strongly depends on the ray step size (precision) and distance between objects. For bigger scene it could easily be 20 or 40 times faster.
 
 ![room v12 330 Rays hires](https://github.com/Fullyverified/ASCII_PathTracer/assets/138776324/cd02ea24-a896-431b-acf6-585b488c2c8f)
 
