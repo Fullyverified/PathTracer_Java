@@ -1,3 +1,9 @@
+package sceneobjects;
+
+import bvh.*;
+import sceneobjects.*;
+import renderlogic.*;
+
 public interface SceneObjects {
 
     // sceneObjects implement methods here so they can be automatically looped

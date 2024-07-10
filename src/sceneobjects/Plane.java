@@ -1,3 +1,8 @@
+package sceneobjects;
+
+import bvh.*;
+import sceneobjects.*;
+import renderlogic.*;
 
 public class Plane{
 

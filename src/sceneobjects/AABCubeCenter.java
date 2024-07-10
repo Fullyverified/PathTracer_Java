@@ -1,3 +1,9 @@
+package sceneobjects;
+
+import bvh.*;
+import sceneobjects.*;
+import renderlogic.*;
+
 public class AABCubeCenter implements SceneObjects {
 
     private double minX, maxX;

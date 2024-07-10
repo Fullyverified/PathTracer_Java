@@ -1,3 +1,11 @@
+package renderlogic;
+
+import bvh.*;
+import sceneobjects.*;
+import renderlogic.*;
+
+import sceneobjects.SceneObjects;
+
 public class Ray {
     private double oX, dirX;
     private double oY, dirY;

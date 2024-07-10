@@ -1,9 +1,13 @@
+package renderlogic;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import sceneobjects.*;
 
 public class DrawScreen extends JPanel {
 
@@ -17,7 +21,7 @@ public class DrawScreen extends JPanel {
     private int outputWidth, outputHeight;
     private int internalWidth, internalHeight;
     private BufferedImage image;
-    private JFrame window = new JFrame("Path Tracer - " + "Resolution: " + Main.RenderResolutionX + "x" + (Main.RenderResolutionX / ((double) Main.aspectX/ (double) Main.aspectY)) + " - Rays: " + Main.raysPerPixel + " - Bounces: " + Main.bouncesPerRay + " - Ray Step Size: " + Main.secondaryRayStep + " - Denoising: " + Main.denoise);
+    private JFrame window = new JFrame("Path Tracer - " + "Resolution: " + Main.RenderResolutionX + "x" + (Main.RenderResolutionX / ((double) Main.aspectX/ (double) Main.aspectY)) + " - Rays: " + Main.raysPerPixel + " - Bounces: " + Main.bouncesPerRay + " - renderlogic.Ray Step Size: " + Main.secondaryRayStep + " - Denoising: " + Main.denoise);
     private double brightnessFactor = 0;
 
     private float lineSpacing = 1f;

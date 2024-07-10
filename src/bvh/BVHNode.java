@@ -1,3 +1,8 @@
+package bvh;
+
+import bvh.*;
+import sceneobjects.*;
+import renderlogic.*;
 public class BVHNode {
 
     private boolean hitLeft, hitRight;

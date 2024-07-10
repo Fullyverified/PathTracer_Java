@@ -1,60 +1,57 @@
-public class SphereLight implements SceneObjects {
+package sceneobjects;
 
-    private double centerx, centerOriginX;
-    private double centery, centerOriginY;
-    private double centerz, centerOriginZ;
-    private double sradius = 1;
-    double xradius, yradius, zradius;
-    private double a, b, c, discriminant, sqrtDiscriminant;
-    private static int numPointLights = 100;
-    private int pointLightID = 0;
+import bvh.*;
+import sceneobjects.*;
+import renderlogic.*;
+
+public class Sphere implements SceneObjects {
+
+    private double centerx, centery, centerz;
+    private double xradius, yradius, zradius;
+    private static int numSpheres = 0;
+    private int sphereID = 0;
     private double normalx, normaly, normalz;
-    double reflectivity, reflecR, reflecB, reflecG, roughness = 1;
+    private double reflectivity, reflecR, reflecB, reflecG, roughness = 1;
     private double luminance, R, G, B = 0;
-
 
     //Equation of a sphere: (x - cx)^2 + (y - cy)^2 + (z - cz)^2 = r^2
 
     //Constructor
-    public SphereLight(double centerx, double centery, double centerz, double xRad, double yRad, double zRad, double luminance, double reflectivity, double roughness) {
+    public Sphere(double centerx, double centery, double centerz, double xRad, double yRad, double zRad, double reflectivity, double roughness) {
         this.centerx = centerx;
         this.centery = centery;
         this.centerz = centerz;
         this.xradius = xRad;
         this.yradius = yRad;
         this.zradius = zRad;
-        this.luminance = luminance;
+
         this.reflectivity = reflectivity;
-        this.pointLightID = numPointLights;
-        numPointLights++;
+        this.sphereID = numSpheres;
+        numSpheres++;
 
         this.reflecR = reflectivity;
         this.reflecG = reflectivity;
         this.reflecB = reflectivity;
-        this.R = luminance;
-        this.G = luminance;
-        this.B = luminance;
         this.roughness = roughness;
     }
 
-    public SphereLight(double centerx, double centery, double centerz, double xRad, double yRad, double zRad, double redBrightness, double greenBrightness, double blueBrightness, double redReflectivity, double greenReflectivity, double blueReflectivity, double roughness) {
+    public Sphere(double centerx, double centery, double centerz, double xRad, double yRad, double zRad, double colourR, double colourG, double colourB, double roughness) {
         this.centerx = centerx;
         this.centery = centery;
         this.centerz = centerz;
         this.xradius = xRad;
         this.yradius = yRad;
         this.zradius = zRad;
-        this.R = redBrightness;
-        this.G = greenBrightness;
-        this.B = blueBrightness;
-        this.reflectivity = reflectivity;
-        this.pointLightID = numPointLights;
-        numPointLights++;
 
-        this.reflecR = redReflectivity;
-        this.reflecG = greenReflectivity;
-        this.reflecB = blueReflectivity;
+        this.reflectivity = reflectivity;
+        this.sphereID = numSpheres;
+        numSpheres++;
+
+        this.reflecR = colourR;
+        this.reflecG = colourG;
+        this.reflecB = colourB;
         this.roughness = roughness;
+
     }
 
     public boolean objectCulling(Ray ray) {
@@ -145,45 +142,77 @@ public class SphereLight implements SceneObjects {
         return bounds;
     }
 
+
+    // get each the normalised normal
+    public double getNormalX() {
+        return this.normalx;
+    }
+
+    public double getNormalY() {
+        return this.normaly;
+    }
+
+    public double getNormalZ() {
+        return this.normalz;
+    }
+
     // get sphere ID
-    public int getObjectID()
-    {
-        return this.pointLightID;
+    public int getObjectID() {
+        return this.sphereID;
     }
 
-    public double getReflectivity() {
-        return this.reflectivity;
+    public double getPosX() {
+        return this.centerx;
     }
-    public double getLuminance() {return this.luminance;}
 
-    public double getRBrightness() {return this.R;}
-    public double getGBrightness() {return this.G;}
-    public double getBBrightness() {return this.B;}
+    public double getPosY() {
+        return this.centery;
+    }
 
-    public double getReflecR() {return this.reflecR;}
-    public double getReflecG() {return this.reflecG;}
-    public double getReflecB() {return this.reflecB;}
+    public double getPosZ() {
+        return this.centerz;
+    }
 
-    public void setLuminance(double luminance) {this.luminance = luminance;}
-
-    public double getPosX()
-    {return this.centerx;}
-    public double getPosY()
-    {return this.centery;}
-    public double getPosZ()
-    {return this.centerz;}
-
-    public void setPos(double x, double y, double z){
+    public void setPos(double x, double y, double z) {
         this.centerx = x;
         this.centery = y;
         this.centerz = z;
     }
 
-    // get each the normalised normal
-    public double getNormalX() {return this.normalx;}
-    public double getNormalY() {return this.normaly;}
-    public double getNormalZ() {return this.normalz;}
+    public double getLuminance() {
+        return this.luminance;
+    }
 
-    public double getRoughness() {return this.roughness;}
+    public double getReflectivity() {
+        return this.reflectivity;
+    }
+
+    public double getRBrightness() {
+        return this.R;
+    }
+
+    public double getGBrightness() {
+        return this.G;
+    }
+
+    public double getBBrightness() {
+        return this.B;
+    }
+
+    public double getReflecR() {
+        return this.reflecR;
+    }
+
+    public double getReflecG() {
+        return this.reflecG;
+    }
+
+    public double getReflecB() {
+        return this.reflecB;
+    }
+
+    public double getRoughness() {
+        return this.roughness;
+    }
 
 }

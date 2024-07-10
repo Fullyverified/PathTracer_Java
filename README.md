@@ -16,7 +16,7 @@ Done:
 1. Create ray and sphere objects.
 2. Give the ray a positon and a direction vector.
 3. Normalise the direction vector.
-4. Discard the sphere if the Ray has no intersection points.
+4. Discard the sphere if the renderlogic.Ray has no intersection points.
 5. If the ray will intersect, march the ray until it intersects.
 6. Add an interface that runs intersectionCheck() for each object added to the scene.
 7. End the ray if it finds an intersection

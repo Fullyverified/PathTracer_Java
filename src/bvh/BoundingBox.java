@@ -1,62 +1,58 @@
-public class AABCubeBounds implements SceneObjects {
+package bvh;
 
-    private double minX, maxX;
-    private double minY, maxY;
-    private double minZ, maxZ;
-    private double tminX, tminY, tminZ;
-    private double tmaxX, tmaxY, tmaxZ;
-    private double tNear = 0, tFar = 0;
-    private static int numCubes = 200;
-    private int cubeID = 0;
+import bvh.*;
+import sceneobjects.*;
+import renderlogic.*;
+
+public class BoundingBox {
+
+    private double minX = 0, maxX = 0;
+    private double minY = 0, maxY = 0;
+    private double minZ = 0, maxZ = 0;
     private double normalx, normaly, normalz;
-    private double luminance, R, G, B = 0;
-    double reflectivity, reflecR, reflecB, reflecG, roughness = 1;
-
+    private double[] minMax = new double[6];
 
     // constructor
-    public AABCubeBounds(double minX, double maxX, double minY, double maxY, double minZ, double maxZ, double reflectivity, double roughness) {
+    public BoundingBox(double minX, double maxX, double minY, double maxY, double minZ, double maxZ) {
         this.minX = minX;
         this.maxX = maxX;
         this.minY = minY;
         this.maxY = maxY;
         this.minZ = minZ;
         this.maxZ = maxZ;
-        this.reflectivity = reflectivity;
-
-        this.cubeID = numCubes;
-        numCubes++;
-
-        this.reflecR = reflectivity;
-        this.reflecG = reflectivity;
-        this.reflecB = reflectivity;
-        this.roughness = roughness;
     }
 
-    public AABCubeBounds(double minX, double maxX, double minY, double maxY, double minZ, double maxZ, double colourR, double colourG, double colourB, double roughness) {
-        this.minX = minX;
-        this.maxX = maxX;
-        this.minY = minY;
-        this.maxY = maxY;
-        this.minZ = minZ;
-        this.maxZ = maxZ;
-
-        this.cubeID = numCubes;
-        numCubes++;
-
-        this.reflecR = colourR;
-        this.reflecG = colourG;
-        this.reflecB = colourB;
-        this.roughness = roughness;
+    // constructor for combining two bounding boxes
+    public BoundingBox(BVHNode left, BVHNode right) {
+        minX = Math.min(left.getBoundingBox().getBounds()[0], right.getBoundingBox().getBounds()[0]);
+        maxX = Math.max(left.getBoundingBox().getBounds()[1], right.getBoundingBox().getBounds()[1]);
+        minY = Math.min(left.getBoundingBox().getBounds()[2], right.getBoundingBox().getBounds()[2]);
+        maxY = Math.max(left.getBoundingBox().getBounds()[3], right.getBoundingBox().getBounds()[3]);
+        minZ = Math.min(left.getBoundingBox().getBounds()[4], right.getBoundingBox().getBounds()[4]);
+        maxZ = Math.max(left.getBoundingBox().getBounds()[5], right.getBoundingBox().getBounds()[5]);
     }
 
-    public void computeMinMax(Ray ray) {
+    // contrsuctor for multithreaded version
+    public BoundingBox(BVHNodeMultiThreaded left, BVHNodeMultiThreaded right) {
+        minX = Math.min(left.getBoundingBox().getBounds()[0], right.getBoundingBox().getBounds()[0]);
+        maxX = Math.max(left.getBoundingBox().getBounds()[1], right.getBoundingBox().getBounds()[1]);
+        minY = Math.min(left.getBoundingBox().getBounds()[2], right.getBoundingBox().getBounds()[2]);
+        maxY = Math.max(left.getBoundingBox().getBounds()[3], right.getBoundingBox().getBounds()[3]);
+        minZ = Math.min(left.getBoundingBox().getBounds()[4], right.getBoundingBox().getBounds()[4]);
+        maxZ = Math.max(left.getBoundingBox().getBounds()[5], right.getBoundingBox().getBounds()[5]);
+    }
+
+
+    public double[] computeMinMax(Ray ray) {
 
         // precalculate inverse of directions
         double invDirX = 1.0 / ray.getDirX();
         double invDirY = 1.0 / ray.getDirY();
         double invDirZ = 1.0 / ray.getDirZ();
 
-        double tmp;
+        //double[] minMax = new double[6];
+        double tminX, tmaxX, tminY, tmaxY, tminZ, tmaxZ, tmp;
+
         if (ray.getDirX() == 0) {
             if (ray.getPosX() < minX || ray.getPosX() > maxX) {
                 tminX = Double.POSITIVE_INFINITY; // No intersection possible on this axis
@@ -110,19 +106,26 @@ public class AABCubeBounds implements SceneObjects {
                 tminZ = tmp;
             }
         }
+
+        minMax[0] = tminX;
+        minMax[1] = tmaxX;
+        minMax[2] = tminY;
+        minMax[3] = tmaxY;
+        minMax[4] = tminZ;
+        minMax[5] = tmaxZ;
+        return minMax;
     }
 
     // initial check to see if the ray will or will not hit the cube (for performance)
     public boolean objectCulling(Ray ray) {
-        computeMinMax(ray);
-        tNear = Math.max(Math.max(tminX, tminY), tminZ);
-        tFar = Math.min(Math.min(tmaxX, tmaxY), tmaxZ);
+        double[] minMax = computeMinMax(ray);
+        double tNear = Math.max(Math.max(minMax[0], minMax[2]), minMax[4]);
+        double tFar = Math.min(Math.min(minMax[1], minMax[3]), minMax[5]);
         return tNear <= tFar && tFar >= 0;
     }
 
     // check if the ray is intersecting the cube
     public boolean intersectionCheck(Ray ray) {
-
         if (minX <= ray.getPosX() && maxX >= ray.getPosX() && minY <= ray.getPosY() && maxY >= ray.getPosY() && minZ <= ray.getPosZ() && maxZ >= ray.getPosZ()) {
             return true;
         } else {
@@ -169,6 +172,24 @@ public class AABCubeBounds implements SceneObjects {
         return bounds;
     }
 
+    public double getArea() {
+        double extentX = maxX - minX;
+        double extentY = maxY - minY;
+        double extentZ = maxZ - minZ;
+        return extentX * extentY * extentZ;
+    }
+
+    public double[] getIntersectionDistance(Ray ray) {
+        //double[] minMax = computeMinMax(ray); // dont recalculate this
+        double tNear = Math.max(Math.max(minMax[0], minMax[2]), minMax[4]);
+        double tFar = Math.min(Math.min(minMax[1], minMax[3]), minMax[5]);
+        if (tNear > tFar || tFar < 0) {
+           return new double[]{-1, -1}; // no intersection
+        }
+        // if tNear < 0, return tFar, else return tNear
+        return new double[]{tNear, tFar};
+    }
+
     // get each the normalised normal
     public double getNormalX() {
         return this.normalx;
@@ -188,7 +209,7 @@ public class AABCubeBounds implements SceneObjects {
         this.normalz = z;
     }
 
-    public void setPos(double xMin, double xMax, double yMin, double yMax, double zMin, double zMax){
+    public void setBounds(double xMin, double xMax, double yMin, double yMax, double zMin, double zMax) {
         this.minX = xMin;
         this.maxX = xMax;
         this.minY = yMin;
@@ -196,39 +217,4 @@ public class AABCubeBounds implements SceneObjects {
         this.minZ = zMin;
         this.maxZ = zMax;
     }
-
-    // get sphere ID
-    public int getObjectID() {
-        return this.cubeID;
-    }
-
-    public double getPosX() {
-        return this.minX;
-    }
-
-    public double getPosY() {
-        return this.minY;
-    }
-
-    public double getPosZ() {
-        return this.minZ;
-    }
-
-
-    public double getLuminance() {
-        return this.luminance;
-    }
-    public double getReflectivity() {
-        return this.reflectivity;
-    }
-
-    public double getRBrightness() {return this.R;}
-    public double getGBrightness() {return this.G;}
-    public double getBBrightness() {return this.B;}
-
-    public double getReflecR() {return this.reflecR;}
-    public double getReflecG() {return this.reflecG;}
-    public double getReflecB() {return this.reflecB;}
-
-    public double getRoughness() {return this.roughness;}
 }

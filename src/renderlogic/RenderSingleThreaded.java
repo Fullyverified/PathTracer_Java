@@ -1,3 +1,7 @@
+package renderlogic;
+
+import sceneobjects.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -38,7 +42,7 @@ public class RenderSingleThreaded {
         }
         endTime = System.nanoTime();
         elapsedTime = endTime - startTime;
-        System.out.println("Primary Ray time: " + elapsedTime / 1_000_000 + "ms");
+        System.out.println("Primary renderlogic.Ray time: " + elapsedTime / 1_000_000 + "ms");
         drawScreen.drawFrameRGB(primaryRay, cam);
 
         System.out.println("Finished Primary Rays");
@@ -60,7 +64,7 @@ public class RenderSingleThreaded {
         }
         endTime = System.nanoTime();
         elapsedTime = endTime - startTime;
-        System.out.println(numRays + " Secondary Ray Time: " + elapsedTime / 1_000_000 + "ms");
+        System.out.println(numRays + " Secondary renderlogic.Ray Time: " + elapsedTime / 1_000_000 + "ms");
 
         drawScreenExecutor.shutdown();
 
@@ -187,7 +191,7 @@ public class RenderSingleThreaded {
                     }
                     // keep track of absolute brightness
                     primaryRay[i][j].addLightRGBAbsolute(redAmplitude, greenAmplitude, blueAmplitude);
-                    // avg brightness = absolute / current Ray
+                    // avg brightness = absolute / current renderlogic.Ray
                     primaryRay[i][j].setAvgRed(primaryRay[i][j].getAbsoluteR() / currentRay);
                     primaryRay[i][j].setAvgGreen(primaryRay[i][j].getAbsoluteG() / currentRay);
                     primaryRay[i][j].setAvgBlue(primaryRay[i][j].getAbsoluteB() / currentRay);
@@ -198,7 +202,7 @@ public class RenderSingleThreaded {
         if (currentProgress < loadingProgress) {
             currentProgress = loadingProgress;
             System.out.print("|");
-            System.out.println("current Ray: " + currentRay);
+            System.out.println("current renderlogic.Ray: " + currentRay);
         }
     }
 

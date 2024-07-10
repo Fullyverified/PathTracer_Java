@@ -1,3 +1,5 @@
+package sceneobjects;
+
 import java.lang.Math;
 
 public class Camera{

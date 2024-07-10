@@ -1,5 +1,10 @@
+package bvh;
+
+import bvh.*;
+import sceneobjects.*;
+import renderlogic.*;
+
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class BVHNodeMultiThreaded {
 

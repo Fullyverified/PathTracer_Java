@@ -1,3 +1,7 @@
+package renderlogic;
+
+import sceneobjects.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +16,7 @@ public class Main {
     public static int bouncesPerRay = 8;
     public static boolean ASCIIMode = false;
     public static double primaryRayStep = 0.01;
-    public static double secondaryRayStep = 0.1;
+    public static double secondaryRayStep = 0.01;
     public static boolean denoise = false;
     public static double denoiseWeight = 0.75;
 
@@ -43,8 +47,8 @@ public class Main {
         RenderSingleThreaded renderSingleThreaded = new RenderSingleThreaded();
         RenderSingleThreadedBVH renderSingleThreadedBVH = new RenderSingleThreadedBVH();
 
-        //renderSingleThreaded.computePixels(sceneObjectsList, cam, raysPerPixel, bouncesPerRay);
-        renderSingleThreadedBVH.computePixels(sceneObjectsList, cam, raysPerPixel, bouncesPerRay);
+        renderSingleThreaded.computePixels(sceneObjectsList, cam, raysPerPixel, bouncesPerRay);
+        //renderSingleThreadedBVH.computePixels(sceneObjectsList, cam, raysPerPixel, bouncesPerRay);
 
     }
 }
