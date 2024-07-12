@@ -13,6 +13,8 @@ import java.util.Arrays;
 
 public class RenderMultiThreadedBVH {
 
+    // DOES NOT WORK \\
+
     public long startTime, endTime, elapsedTime;
     public List<BVHNodeMultiThreaded> BVHNodes = new ArrayList<>();
     private int loadingProgress, currentProgress = 0;
@@ -72,7 +74,7 @@ public class RenderMultiThreadedBVH {
         BVHNodeMultiThreaded BVHRootNode = BVHNodes.getFirst();
         Ray[][] primaryRay = new Ray[cam.getResX()][cam.getResY()];
         Ray[][] nthRay = new Ray[cam.getResX()][cam.getResY()];
-        DrawScreen drawScreen = new DrawScreen(cam.getResX(), cam.getResY());
+        DrawScreen drawScreen = new DrawScreen(cam.getResX(), cam.getResY(), cam);
 
         ScheduledExecutorService drawScreenExecutor = Executors.newScheduledThreadPool(1);
         AtomicBoolean updateScreen = new AtomicBoolean(false);
@@ -89,7 +91,7 @@ public class RenderMultiThreadedBVH {
         }
         endTime = System.nanoTime();
         elapsedTime = endTime - startTime;
-        System.out.println("Primary renderlogic.Ray time: " + elapsedTime / 1_000_000 + "ms");
+        System.out.println("Primary Ray time: " + elapsedTime / 1_000_000 + "ms");
         drawScreen.drawFrameRGB(primaryRay, cam);
         loadingBar();
 
@@ -109,7 +111,7 @@ public class RenderMultiThreadedBVH {
         }
         endTime = System.nanoTime();
         elapsedTime = endTime - startTime;
-        System.out.println(numRays + " Secondary renderlogic.Ray Time: " + elapsedTime / 1_000_000 + "ms");
+        System.out.println(numRays + " Secondary Ray Time: " + elapsedTime / 1_000_000 + "ms");
 
         executor.shutdown();
         drawScreenExecutor.shutdown();
@@ -231,7 +233,7 @@ public class RenderMultiThreadedBVH {
         if (currentProgress < loadingProgress) {
             currentProgress = loadingProgress;
             System.out.print("|");
-            System.out.println("current renderlogic.Ray: " + currentRay);
+            System.out.println("current Ray: " + currentRay);
         }
     }
 

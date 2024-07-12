@@ -11,6 +11,8 @@ public class Camera{
     private double fOV, planeWidth, planeHeight;
     private double aspectRatioX, aspectRatioY, resX, resY;
     private double ISO = 1;
+    private double movementSpeed = 0;
+    private boolean camUpdate = false;
 
     public static void main(String[] args) {}
 
@@ -34,6 +36,44 @@ public class Camera{
         this.resY = this.resX / (this.aspectRatioX / this.aspectRatioY);
         // round the vertical resolution of the camera up to fix an array index out of bounds error
         this.resY = Math.ceil(this.resY);
+        directionVector();
+        upVector();
+        rightVector();
+        imagePlane();
+    }
+
+    public void moveForward() {
+        this.posX = posX + movementSpeed * dirX;
+        this.posY = posY + movementSpeed * dirY;
+        this.posZ = posZ + movementSpeed * dirZ;
+        camUpdate = true;
+    }
+
+    public void moveBackward() {
+        this.posX = posX + movementSpeed * -dirX;
+        this.posY = posY + movementSpeed * -dirY;
+        this.posZ = posZ + movementSpeed * -dirZ;
+        camUpdate = true;
+    }
+
+    public void strafeLeft() {
+        this.posZ = posZ + movementSpeed;
+        camUpdate = true;
+    }
+
+    public void strafeRight() {
+        this.posZ = posZ - movementSpeed;
+        camUpdate = true;
+    }
+
+    public void strafeUp() {
+        this.posY = posY + movementSpeed;
+        camUpdate = true;
+    }
+
+    public void strafeDown() {
+        this.posZ = posZ - movementSpeed;
+        camUpdate = true;
     }
 
     public void directionVector()
@@ -123,7 +163,7 @@ public class Camera{
     public double getCamHeight() {return this.planeHeight;}
 
     public double getISO() {return this.ISO;}
-
+    public boolean getMoved() {return this.camUpdate;}
 
     // setter
     // pos
@@ -145,5 +185,6 @@ public class Camera{
     public void setFOV(int fOV) {this.fOV = fOV;}
     public void setAspectX(int aspectRatioX) {this.aspectRatioX = aspectRatioX;}
     public void setAspectY(int aspectRatioY) {this.aspectRatioY = aspectRatioY;}
+    public void setMoved(boolean update) {this.camUpdate = update;}
 
 }
