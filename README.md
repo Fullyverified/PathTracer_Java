@@ -37,11 +37,14 @@ Done:
 20. Implemented cosine weighted hemisphere importance sampling
 21. BVH (bounding volume hierarchy) now implemented!
 22. Implemented basic denoiser. Takes weighted average of neirhbouring pixels. Not amazing by any stretch.
+23. Implemented refraction. Currently only supports Sphere. Does not support roughness parameter except for total internal reflection. Will fix later.
 
 TODO LIST OF THINGS TODO:
 1. Add controls for camera or objects
 2. Add local rotation for objects
 3. Ability to import objects defined by vertices.
-4. Computational binary solid geometry
+4. Textures
+5. Rebuild in C++ with multi-threading
+6. Vulkan?
 
 I have attempted multithreading several times now, and found it's either way slower or just doesn't work. Probably beyond the capability of a first year xD
