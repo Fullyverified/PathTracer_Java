@@ -7,7 +7,7 @@ BVH is approximately a speed up of:
 2. Secondary Rays: 2 times faster
    - Strongly depends on the ray step size (precision) and distance between objects. For larger scenes it could easily be 20 or 40 times faster.
 
-![room v12 330 Rays hires](https://github.com/Fullyverified/ASCII_PathTracer/assets/138776324/cd02ea24-a896-431b-acf6-585b488c2c8f)
+![room v13 hires 2500 rays](https://github.com/user-attachments/assets/d193faab-f5e2-4a45-bfa5-da8864d12166)
 
 ![room v12 ASCII](https://github.com/Fullyverified/ASCII_PathTracer/assets/138776324/ff3a5337-c5ff-42c6-b8fa-b449b0a4eb01)
 Downsampling makes text look weird. Fullscreen it :)
