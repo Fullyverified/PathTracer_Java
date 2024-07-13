@@ -1,4 +1,4 @@
-I'm trying to make an Ascii Pathtracer. Nothing that hasn't been done before :)
+I'm trying to make an Ascii Pathtracer in JAVA. Nothing that hasn't been done before :)
 Unfortunately along the way I forgot about the ASCII part.
 Global Illuminiation and Bounding Volume Heirarchys (BVH) are now implemented!
 
