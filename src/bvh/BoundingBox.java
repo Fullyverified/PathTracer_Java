@@ -42,6 +42,14 @@ public class BoundingBox {
         maxZ = Math.max(left.getBoundingBox().getBounds()[5], right.getBoundingBox().getBounds()[5]);
     }
 
+    public void updateBoundsNode(BVHNode left, BVHNode right) {
+        minX = Math.min(left.getBoundingBox().getBounds()[0], right.getBoundingBox().getBounds()[0]);
+        maxX = Math.max(left.getBoundingBox().getBounds()[1], right.getBoundingBox().getBounds()[1]);
+        minY = Math.min(left.getBoundingBox().getBounds()[2], right.getBoundingBox().getBounds()[2]);
+        maxY = Math.max(left.getBoundingBox().getBounds()[3], right.getBoundingBox().getBounds()[3]);
+        minZ = Math.min(left.getBoundingBox().getBounds()[4], right.getBoundingBox().getBounds()[4]);
+        maxZ = Math.max(left.getBoundingBox().getBounds()[5], right.getBoundingBox().getBounds()[5]);
+    }
 
     public double[] computeMinMax(Ray ray) {
 
@@ -176,7 +184,7 @@ public class BoundingBox {
         double extentX = maxX - minX;
         double extentY = maxY - minY;
         double extentZ = maxZ - minZ;
-        return extentX * extentY * extentZ;
+        return Math.abs(extentX * extentY * extentZ);
     }
 
     public double[] getIntersectionDistance(Ray ray) {

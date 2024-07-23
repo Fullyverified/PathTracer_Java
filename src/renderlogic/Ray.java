@@ -14,6 +14,7 @@ public class Ray {
     private boolean hit = false;
     private double px, py, pixelIndexX, pixelIndexY, pixelPosX, pixelPosY;
     private int collidedObject;
+    private double normalx, normaly, normalz;
 
     private double avgR = 0, avgG = 0, avgB = 0;
     private double absoluteR = 0, absoluteG = 0, absoluteB = 0;
@@ -128,6 +129,10 @@ public class Ray {
     public long getNumHits() {return this.numHits;}
     public void addNumHits() {this.numHits++;}
 
+    public double getNormalX() {return this.normalx;}
+    public double getNormalY() {return this.normaly;}
+    public double getNormalZ() {return this.normalz;}
+
     // setter
     // pos
     public void setPosX(double posX) {this.posX = posX;}
@@ -172,6 +177,13 @@ public class Ray {
     public void setAvgRed(double red) {this.avgR = red;}
     public void setAvgGreen(double green) {this.avgG = green;}
     public void setAvgBlue(double blue) {this.avgB = blue;}
+
+    public void setNormal(double normalx, double normaly, double normalz) {
+        this.normalx = normalx;
+        this.normaly = normaly;
+        this.normalz = normalz;
+    }
+
 
 
 }

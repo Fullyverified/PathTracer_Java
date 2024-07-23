@@ -8,55 +8,37 @@ public class Main {
 
     public static int RenderResolutionX = 800;
     public static int aspectX = 4;
-    public static int aspectY = 3;
-    public static int fov = 30;
-    public static int frameTime = 100; // Milliseconds
-    public static int raysPerPixel = 1000;
+    public static int aspectY = 4;
+    public static int fov = 52;
+    public static int frameTime = 16; // Milliseconds
+    public static int raysPerPixel = 5000;
     public static int bouncesPerRay = 5;
     public static boolean ASCIIMode = false;
     public static double primaryRayStep = 0.01;
-    public static double secondaryRayStep = 0.1;
+    public static double secondaryRayStep = 0.01;
     public static boolean denoise = false;
     public static double denoiseWeight = 0.75;
     public static boolean reinhardToneMapping = false;
+    public static double ISO = 1; // up and down keys to +- 10%
 
     public static void main(String[] args) {
 
-        List<SceneObjects> sceneObjectsList = new ArrayList<>();
+        ArrayList<SceneObjects> sceneObjectsList = new ArrayList<>();
 
-        sceneObjectsList.add(new AABCubeBounds(0, 32, -1, 0, -16, 16, 1, 1, 1, 1)); // floor
-        sceneObjectsList.add(new AABCubeBounds(32, 33, 0, 15, -16, 16, 1, 1, 1, 1)); // back wall
+        sceneObjectsList.add(new AABCubeCenter(10,-3,0,14,1,7,1,1,1, 0.75)); // floor
+        sceneObjectsList.add(new AABCubeCenter(10,3,0,14,1,7,1,1,1, 0.75)); // roof
 
-        sceneObjectsList.add(new AABCubeBounds(0, 30, 0, 15, -15, -14, 1, 1, 1, 1)); // right wall
-        sceneObjectsList.add(new AABCubeBounds(0, 30, 0, 15, 14, 15, 1, 1, 1, 1)); // left wall
+        sceneObjectsList.add(new AABCubeCenter(8,0,0,1,6,7,1,1,1,0.75)); // back wall
 
-        sceneObjectsList.add(new SphereLight(10,15,11,1,1,1,40,1,0.9)); // light
+        sceneObjectsList.add(new AABCubeCenter(10,3,3,14,12,1,1,0,0,0.75)); // left wall
+        sceneObjectsList.add(new AABCubeCenter(10,3,-3,14,12,1,0,1,0,0.75)); // right wall
 
-        // back row
-        sceneObjectsList.add(new Sphere(14, 2, 6, 2.5, 2, 2, 1, 1, 1, 0.9)); // right
-        sceneObjectsList.add(new Sphere(14, 2, 0, 2.5, 2, 2, 1, 1, 1, 0.3)); // left
-        sceneObjectsList.add(new Sphere(14, 2, -6, 2.5, 2, 2, 1, 1, 1, 0.1)); // middle
+        sceneObjectsList.add(new SphereLight(5,2.5,0,1,0.1,1,40,1,0.75)); // oval at ceiling
 
-        // Colored spheres
-        sceneObjectsList.add(new Sphere(9, 1, 6, 1, 1, 1, 1, 0, 0, 0.75)); // Red sphere
-        sceneObjectsList.add(new Sphere(9, 1, 0, 1, 1, 1, 0, 0, 1, 0.75)); // Blue sphere
-        sceneObjectsList.add(new Sphere(9, 1, -6, 1, 1, 1, 0, 1, 0, 0.75)); // Green sphere
+        sceneObjectsList.add(new Sphere(5,-1.7,1,0.8,0.8, 0.8,1,1,1,1));
+        sceneObjectsList.add(new Sphere(5,-1.7,-1,0.8,0.8, 0.8,1,1,1,0));
 
-        // floor rectangles
-        sceneObjectsList.add(new AABCubeCenter(9,0.125,3,3,0.25,3,1,1,1,1));
-        sceneObjectsList.add(new AABCubeCenter(9,0.125,-3,3,0.25,3,1,1,1,1));
-
-        // spheres on rectangles
-        sceneObjectsList.add(new Sphere(9, 1.25, 3, 1, 1, 1, 1, 1, 1, 1)); // Red sphere
-        sceneObjectsList.add(new GlassSphere(9, 1.25, -3, 1, 1, 1, 1,1,1.53)); // Blue sphere
-
-        // elevated spheres
-        //sceneObjectsList.add(new GlassSphere(15, 7.5, 0, 1, 1, 1, 1,1,1.53)); // Blue sphere
-        sceneObjectsList.add(new Sphere(15, 7.5,8.5,1,1,1,1, 1,1,0)); // left
-        sceneObjectsList.add(new Sphere(15, 7.5,0,1,1,1,1, 1,1,0)); // middle
-        sceneObjectsList.add(new Sphere(15, 7.5,-8.5,1,1,1,1, 1,1,0)); // right
-
-        Camera cam = new Camera(40, RenderResolutionX, fov, aspectX, aspectY, -20, 8, 0, 1, -0.15, 0, 0, 1, 0);
+        Camera cam = new Camera(0.075, RenderResolutionX, fov, aspectX, aspectY, -2,0,0, 1, 0, 0, 0, 1, 0);
 
         RenderSingleThreadedBVH renderSingleThreadedBVH = new RenderSingleThreadedBVH();
         renderSingleThreadedBVH.computePixels(sceneObjectsList, cam, raysPerPixel, bouncesPerRay);

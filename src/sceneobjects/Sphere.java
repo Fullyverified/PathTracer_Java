@@ -72,7 +72,7 @@ public class Sphere implements SceneObjects {
         // b = 2 * (the dot product of the centerorigin vector by the direction vector)
         double b = 2 * ((centerOriginX * ray.getDirX() * invXR) + (centerOriginY * ray.getDirY() * invYR) + (centerOriginZ * ray.getDirZ() * invZR));
         // c = the dot product of centerorigin by itself, - the radius^2 of the sphere
-        double c = ((centerOriginX * centerOriginX * invXR) + (centerOriginY * centerOriginY * invYR) + (centerOriginZ * centerOriginZ * invZR) - 1);
+        double c = (centerOriginX * centerOriginX * invXR) + (centerOriginY * centerOriginY * invYR) + (centerOriginZ * centerOriginZ * invZR) - 1;
 
         // calculate the discriminant | b^2 - 2ac
         double discriminant = (b * b) - (4 * (a * c));

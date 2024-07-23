@@ -11,7 +11,6 @@ public class Camera{
     private double fOV, planeWidth, planeHeight;
     private double aspectRatioX, aspectRatioY, resX, resY;
     private double ISO = 1;
-    private double movementSpeed = 0;
     private boolean camUpdate = false;
 
     public static void main(String[] args) {}
@@ -42,38 +41,13 @@ public class Camera{
         imagePlane();
     }
 
-    public void moveForward() {
-        this.posX = posX + movementSpeed * dirX;
-        this.posY = posY + movementSpeed * dirY;
-        this.posZ = posZ + movementSpeed * dirZ;
-        camUpdate = true;
+    public void increaseISO() {
+        this.ISO = this.ISO + (this.ISO * 0.10);
+        System.out.println("ISO: " + this.ISO);
     }
-
-    public void moveBackward() {
-        this.posX = posX + movementSpeed * -dirX;
-        this.posY = posY + movementSpeed * -dirY;
-        this.posZ = posZ + movementSpeed * -dirZ;
-        camUpdate = true;
-    }
-
-    public void strafeLeft() {
-        this.posZ = posZ + movementSpeed;
-        camUpdate = true;
-    }
-
-    public void strafeRight() {
-        this.posZ = posZ - movementSpeed;
-        camUpdate = true;
-    }
-
-    public void strafeUp() {
-        this.posY = posY + movementSpeed;
-        camUpdate = true;
-    }
-
-    public void strafeDown() {
-        this.posZ = posZ - movementSpeed;
-        camUpdate = true;
+    public void decreaseISO() {
+        this.ISO = this.ISO - (this.ISO * 0.10);;
+        System.out.println("ISO: " + this.ISO);
     }
 
     public void directionVector()

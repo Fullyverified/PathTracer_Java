@@ -43,6 +43,8 @@ public class DrawScreen extends JPanel {
 
         // initialize the canvas with specified width and height
 
+        InputHandler inputHandler = new InputHandler(cam);
+
         if (Main.ASCIIMode == false) {
             image = new BufferedImage(outputWidth + 5, outputHeight, BufferedImage.TYPE_INT_RGB);
             window.add(this);
@@ -62,6 +64,9 @@ public class DrawScreen extends JPanel {
         }
         // general stuff
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        window.addKeyListener(inputHandler);
+        window.addMouseMotionListener(inputHandler);
+        window.setVisible(true);
     }
 
     public void updateResolution(int width, int height, boolean ASCII) {
@@ -103,11 +108,15 @@ public class DrawScreen extends JPanel {
         amplitudesBlue.add(0.0);
 
         // return the max of the red, green, or blue light amplitdues
-        double maxRed = Collections.max(amplitudesRed) / amplitudesRed.size();
-        double maxGreen = Collections.max(amplitudesGreen) / amplitudesGreen.size();
-        double maxBlue = Collections.max(amplitudesBlue) / amplitudesBlue.size();
+        double maxRed = Collections.max(amplitudesRed);
+        double maxGreen = Collections.max(amplitudesGreen);
+        double maxBlue = Collections.max(amplitudesBlue);
         double maxAbsolute = Math.max(maxBlue, Math.max(maxRed, maxGreen));
-        return new double[]{maxRed, maxGreen, maxBlue, maxAbsolute};}
+        //System.out.println("maxred: " + maxRed);
+        //System.out.println("maxgreen: " + maxGreen);
+        //System.out.println("maxBlue: " + maxBlue);
+        return new double[]{maxRed, maxGreen, maxBlue, maxAbsolute};
+    }
 
     public void drawFrameRGB(Ray[][] primaryRay, Camera cam) {
 
@@ -119,7 +128,7 @@ public class DrawScreen extends JPanel {
                     for (int x = 0; x < internalWidth; x++) {
                         double red, green, blue;
                         if (Main.denoise == true) {
-                            double[] RGB = denoise(x, y, primaryRay, brightnessFactor);
+                            double[] RGB = denoise(x, y, primaryRay);
                             red = RGB[0];
                             green = RGB[1];
                             blue = RGB[2];
@@ -164,27 +173,43 @@ public class DrawScreen extends JPanel {
                 }
                 repaint(); // update image
             } else if (toneMapping == false) {
-                brightnessFactor = 255 * 0.5 / (maxAmplitudeColour(primaryRay)[3] * cam.getISO()); // convert absolute brightness to 8 bit colour space
+                brightnessFactor = 255 / (maxAmplitudeColour(primaryRay)[3] * cam.getISO()); // convert absolute brightness to 8 bit colour space
+                double[] maxRGB = maxAmplitudeColour(primaryRay);
                 for (int y = 0; y < internalHeight; y++) {
                     for (int x = 0; x < internalWidth; x++) {
-                        int red, green, blue;
+                        double red, green, blue;
                         if (Main.denoise == true) {
-                            double[] RGB = denoise(x, y, primaryRay, brightnessFactor);
-                            red = (int) RGB[0];
-                            green = (int) RGB[1];
-                            blue = (int) RGB[2];
+                            double[] RGB = denoise(x, y, primaryRay);
+                            red = RGB[0];
+                            green = RGB[1];
+                            blue = RGB[2];
                         } else {
-                            red = (int) (primaryRay[x][y].getAvgRed() * brightnessFactor);
-                            green = (int) (primaryRay[x][y].getAvgGreen() * brightnessFactor);
-                            blue = (int) (primaryRay[x][y].getAvgBlue() * brightnessFactor);
+                            red = (primaryRay[x][y].getAvgRed() * brightnessFactor);
+                            green = (primaryRay[x][y].getAvgGreen() * brightnessFactor);
+                            blue = (primaryRay[x][y].getAvgBlue() * brightnessFactor);
                         }
+
+                        red *= brightnessFactor * cam.getISO();
+                        green *= brightnessFactor * cam.getISO();
+                        blue *= brightnessFactor * cam.getISO();
+
+                        /*double luminance = red + green + blue;
+                        double luminanceMapped = (Math.log10(1 + luminance)) / Math.log10(1 + maxRGB[3]);
+                        red *= luminanceMapped * 255 * cam.getISO();
+                        green *= luminanceMapped * 255 * cam.getISO();
+                        blue *= luminanceMapped * 255 * cam.getISO();*/ // logarithmic - looks bad
+
                         // clamp values between 0-255 for 8-bit colour space
                         red = Math.min(255, red);
                         green = Math.min(255, green);
                         blue = Math.min(255, blue);
 
+                        int red255 = (int) red;
+                        int green255 = (int) green;
+                        int blue255 = (int) blue;
+
                         // first 8 bits are alpha, next 8 red, next 8 green, final 8 blue
-                        int rgb = (red << 16) | (green << 8) | blue;
+                        int rgb = (red255 << 16) | (green255 << 8) | blue255;
 
                         for (int i = 0; i < scalingFactor; i++) {
                             for (int k = 0; k < scalingFactor; k++) {
@@ -266,18 +291,16 @@ public class DrawScreen extends JPanel {
         double maxRed = maxRGB[0];
         double maxGreen = maxRGB[1];
         double maxBlue = maxRGB[2];
-
         // convert RGB to pure luminance
         double luminance = 0.2126 * red + 0.7152 * green + 0.0722 * blue;
-        //luminance = red + green + blue;
+        // luminance = red + green + blue;
         double maxLuminance = 0.2126 * maxRed + 0.7152 * maxGreen + 0.0722 * maxBlue;
-        //maxLuminance = maxRed + maxGreen + maxBlue;
-        // extended reinhart tone mapping
-        double mappedLuminance = (luminance * (1 + (luminance / (maxLuminance * maxLuminance)))) / (1 + luminance);
-        return mappedLuminance;
+        // maxLuminance = maxRed + maxGreen + maxBlue;
+        // return mapped luminance
+        return (luminance * (1 + (luminance / (maxLuminance * maxLuminance)))) / (1 + luminance);
     }
 
-    public double[] denoise(int x, int y, Ray[][] primaryRay, double brightnessFactor) {
+    public double[] denoise(int x, int y, Ray[][] primaryRay) {
         double primaryWeight = Main.denoiseWeight;
         double secondaryWeight = 1 - primaryWeight;
         double[] RGB = new double[3];
@@ -289,7 +312,6 @@ public class DrawScreen extends JPanel {
             double rightRed = primaryRay[x + 1][y].getAvgRed();
             double avgRed = (upRed + downRed + leftRed + rightRed) / 4;
             primaryRed = (primaryRed * primaryWeight) + (avgRed * secondaryWeight);
-            primaryRed *= brightnessFactor;
             RGB[0] = primaryRed;
 
             double primaryGreen = primaryRay[x][y].getAvgGreen();
@@ -299,7 +321,6 @@ public class DrawScreen extends JPanel {
             double rightGreen = primaryRay[x + 1][y].getAvgGreen();
             double avgGreen = (upGreen + downGreen + leftGreen + rightGreen) / 4;
             primaryGreen = (primaryGreen * primaryWeight) + (avgGreen * secondaryWeight);
-            primaryGreen *= brightnessFactor;
             RGB[1] = primaryGreen;
 
             double primaryBlue = primaryRay[x][y].getAvgBlue();
@@ -309,12 +330,11 @@ public class DrawScreen extends JPanel {
             double rightBlue = primaryRay[x + 1][y].getAvgBlue();
             double avgBlue = (upBlue + downBlue + leftBlue + rightBlue) / 4;
             primaryBlue = (primaryBlue * primaryWeight) + (avgBlue * secondaryWeight);
-            primaryBlue *= brightnessFactor;
             RGB[2] = primaryBlue;
         } else {
-            RGB[0] = primaryRay[x][y].getAvgRed() * brightnessFactor;
-            RGB[1] = primaryRay[x][y].getAvgGreen() * brightnessFactor;
-            RGB[2] = primaryRay[x][y].getAvgBlue() * brightnessFactor;
+            RGB[0] = primaryRay[x][y].getAvgRed();
+            RGB[1] = primaryRay[x][y].getAvgGreen();
+            RGB[2] = primaryRay[x][y].getAvgBlue();
         }
         return RGB;
     }

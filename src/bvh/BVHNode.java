@@ -5,7 +5,6 @@ import sceneobjects.*;
 import renderlogic.*;
 public class BVHNode {
 
-    private boolean hitLeft, hitRight;
     private BVHNode nodeLeft, nodeRight;
     private BoundingBox boundingBox;
     SceneObjects sceneObject;
@@ -21,6 +20,14 @@ public class BVHNode {
         this.boundingBox = boundingBox;
         this.nodeLeft = left;
         this.nodeRight = right;
+    }
+
+    // copy constructor
+    public BVHNode(BVHNode original){
+        this.boundingBox = original.boundingBox;
+        this.sceneObject = original.sceneObject;
+        this.nodeLeft = original.nodeLeft;
+        this.nodeRight = original.nodeRight;
     }
 
     // get total number of children belonging to a node
@@ -65,6 +72,7 @@ public class BVHNode {
         // if only one is null, return the other
         return (hitLeft != null) ? hitLeft : hitRight;
     }
+
 
     // getters
 

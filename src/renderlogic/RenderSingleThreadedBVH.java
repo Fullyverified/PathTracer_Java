@@ -3,7 +3,6 @@ package renderlogic;
 import bvh.*;
 import sceneobjects.*;
 
-
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -14,7 +13,7 @@ import java.util.Arrays;
 public class RenderSingleThreadedBVH {
 
     public long startTime, endTime, elapsedTime;
-    public List<BVHNode> BVHNodes = new ArrayList<>();
+    public BVHNode[] BVHNodes;
     private int loadingProgress, currentProgress = 0;
     private String loadingString = "";
     public static double primaryRayStep = Main.primaryRayStep;
@@ -25,46 +24,83 @@ public class RenderSingleThreadedBVH {
     public RenderSingleThreadedBVH() {
     }
 
-    public void constructBVH(List<SceneObjects> sceneObjectsList) {
+    public void constructBVH(ArrayList<SceneObjects> sceneObjectsList) {
+        startTime = System.nanoTime();
 
-        // create list leaf nodes
+        // create leaf nodes
+        BVHNodes = new BVHNode[sceneObjectsList.size()];
+        int n = 0;
         for (SceneObjects sceneObject : sceneObjectsList) {
             BoundingBox boundingBox = new BoundingBox(
                     sceneObject.getBounds()[0], sceneObject.getBounds()[1],
                     sceneObject.getBounds()[2], sceneObject.getBounds()[3],
                     sceneObject.getBounds()[4], sceneObject.getBounds()[5]);
-            BVHNodes.add(new BVHNode(boundingBox, sceneObject));
+            BVHNodes[n] = new BVHNode(boundingBox, sceneObject);
+            n++;
         }
+        System.out.println("Number of leaf nodes: " + BVHNodes.length);
 
-        while (BVHNodes.size() > 1) {
+        endTime = System.nanoTime();
+        elapsedTime = endTime - startTime;
+
+        while (BVHNodes.length > 1) {
             double cost = 0, bestCost = Double.POSITIVE_INFINITY;
             BVHNode bestLeft = null;
             BVHNode bestRight = null;
+            BoundingBox combinedBox;
+            int indexLeft = 0, indexRight = 0;
 
-            for (int i = 0; i < BVHNodes.size(); i++) {
-                for (int j = i + 1; j < BVHNodes.size(); j++) {
-                    BoundingBox combinedBox = new BoundingBox(BVHNodes.get(i), BVHNodes.get(j));
-                    cost = (combinedBox.getArea() / (BVHNodes.get(i).getArea() + BVHNodes.get(j).getArea())) * (BVHNodes.get(i).getNumChildren() + BVHNodes.get(i).getNumChildren());
+            for (int i = 0; i < BVHNodes.length; i++) {
+                for (int j = i + 1; j < BVHNodes.length; j++) {
+                    combinedBox = new BoundingBox(BVHNodes[i], BVHNodes[j]); // making a new one everytime is slightly faster than reusing (?)
+                    cost = (combinedBox.getArea() / (BVHNodes[i].getArea() + BVHNodes[j].getArea())) * (BVHNodes[i].getNumChildren() + BVHNodes[j].getNumChildren());
                     if (cost < bestCost) {
                         bestCost = cost;
-                        bestLeft = BVHNodes.get(i);
-                        bestRight = BVHNodes.get(j);
+                        bestLeft = BVHNodes[i];
+                        bestRight = BVHNodes[j];
+                        indexLeft = i;
+                        indexRight = j;
                     }
                 }
             }
-            // create a new bvh.bvh.BVHNode that has the smallest combined area
+            // create a new BVHNode that has the smallest combined area
             BoundingBox parentBox = new BoundingBox(bestLeft, bestRight);
             BVHNode parentNode = new BVHNode(parentBox, bestLeft, bestRight);
-            BVHNodes.remove(bestLeft);
-            BVHNodes.remove(bestRight);
-            BVHNodes.add(parentNode);
+            // erase node from array
+            int k = 0;
+            BVHNode[] TMPNodes = new BVHNode[BVHNodes.length - 1];
+            for (int i = 0; i < BVHNodes.length; i++) {
+                if (i != indexLeft && i != indexRight) {
+                    TMPNodes[i - k] = BVHNodes[i];
+                }
+                else {k++;} // for each item K we removed, step back the index by K
+            }
+            BVHNodes = TMPNodes;
+            BVHNodes[BVHNodes.length-1] = parentNode;
         }
 
-        System.out.println("BVHNodes size: " + BVHNodes.size());
-        System.out.println("RootNode numChildren: " + BVHNodes.get(0).getNumChildren());
+        endTime = System.nanoTime();
+        elapsedTime = endTime - startTime;
+        System.out.println("Finished tree creation: " + elapsedTime  / 1_000 + "us");
+        //System.out.println("BVHNodes size: " + BVHNodes.size());
+        System.out.println("RootNode numChildren: " + BVHNodes[0].getNumChildren());
+
+        // performance profiling
+        /*Ray ray1 = new Ray(0.1,0.1,0.1);
+        ray1.setDirection(1,0.1,0.1);
+        ray1.updateNormalisation();
+        ray1.updateOrigin(0);
+        boolean hit = true;
+
+        System.out.println("Searching BVH");
+        long startTime2 = System.nanoTime();
+        BVHNode leafNode = BVHNodes2[0].searchBVHTree(ray1);
+        long endTime2 = System.nanoTime();
+        long elapsedTime2 = endTime2 - startTime2;
+        System.out.println("Finished tree traversal: " + elapsedTime2 + "ns");*/
     }
 
-    public void computePixels(List<SceneObjects> sceneObjectsList, Camera cam, int numRays, int numBounces) {
+    public void computePixels(ArrayList<SceneObjects> sceneObjectsList, Camera cam, int numRays, int numBounces) {
         Ray[][] primaryRay = new Ray[cam.getResX()][cam.getResY()];
         Ray[][] nthRay = new Ray[cam.getResX()][cam.getResY()];
         DrawScreen drawScreen = new DrawScreen(cam.getResX(), cam.getResY(), cam);
@@ -76,7 +112,7 @@ public class RenderSingleThreadedBVH {
             updateScreen.set(true);
         };
         constructBVH(sceneObjectsList);
-        BVHNode BVHRootNode = BVHNodes.getFirst();
+        BVHNode BVHRootNode = BVHNodes[0];
 
         startTime = System.nanoTime();
         for (int j = 0; j < cam.getResY(); j++) {
@@ -440,4 +476,5 @@ public class RenderSingleThreadedBVH {
             Arrays.fill(row, 0.0);
         }
     }
+
 }
