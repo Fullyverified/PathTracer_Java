@@ -1,6 +1,7 @@
 I'm trying to make a Pathtracer in Java. Nothing that hasn't been done before :)
-Unfortunately along the way I forgot about the ASCII part.
 Global Illuminiation and Bounding Volume Heirarchys (BVH) are now implemented!
+
+This project has no dependencies. If you clone it you should be able to built it easily.
 
 BVH is approximately a speed up of:
 1. Primary Rays: ~22 times faster
