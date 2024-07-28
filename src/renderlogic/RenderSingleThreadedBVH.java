@@ -286,6 +286,7 @@ public class RenderSingleThreadedBVH {
 
     public void cosineWeightedHemisphereImportanceSampling(Ray ray, SceneObjects sceneObject, boolean flipNormal) {
         // boolean flip normal - if inside the object the normal needs to be inverted
+        sceneObject.calculateNormal(ray);
         double normalx, normaly, normalz;
         if (flipNormal) {
             normalx = -sceneObject.getNormalX();
@@ -298,11 +299,10 @@ public class RenderSingleThreadedBVH {
         }
 
         // calculate the reflection direction relative to the normal
-        sceneObject.calculateNormal(ray);
         double dotproduct = normalx * ray.getDirX() + normaly * ray.getDirY() + normalz * ray.getDirZ();
-        double reflectionX = ray.getDirX() - 2 * (dotproduct) * normalx;
-        double reflectionY = ray.getDirY() - 2 * (dotproduct) * normaly;
-        double reflectionZ = ray.getDirZ() - 2 * (dotproduct) * normalz;
+        double reflectionX = ray.getDirX() - 2 * dotproduct * normalx;
+        double reflectionY = ray.getDirY() - 2 * dotproduct * normaly;
+        double reflectionZ = ray.getDirZ() - 2 * dotproduct * normalz;
 
         // generate random direction
         // two randoms between 0 and 1
@@ -382,7 +382,6 @@ public class RenderSingleThreadedBVH {
             ray.updateNormalisation();
         }
         ray.updateOrigin(0.1); // march the ray a tiny amount to move it off the sphere
-
     }
 
     public void refractionDirection(Ray ray, SceneObjects sceneObject) {
