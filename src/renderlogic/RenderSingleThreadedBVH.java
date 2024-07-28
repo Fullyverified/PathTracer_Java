@@ -120,12 +120,14 @@ public class RenderSingleThreadedBVH {
                 computePrimaryRay(cam, primaryRay, i, j, BVHRootNode);
             }
         }
+
+
         endTime = System.nanoTime();
         elapsedTime = endTime - startTime;
         System.out.println("Primary Ray time: " + elapsedTime / 1_000_000 + "ms");
+
         drawScreen.drawFrameRGB(primaryRay, cam);
         loadingBar();
-
         drawScreenExecutor.scheduleAtFixedRate(screenUpdateTask, 10, Main.frameTime, TimeUnit.MILLISECONDS);
         startTime = System.nanoTime();
 
@@ -460,7 +462,6 @@ public class RenderSingleThreadedBVH {
         return new double[]{theta, phi};
     }
 
-
     public void loadingBar() {
         System.out.println("Finished Primary Rays");
         System.out.print("|-");
@@ -477,4 +478,20 @@ public class RenderSingleThreadedBVH {
         }
     }
 
+    public static int[] threadedRenderSegmentation(int step, int res, int numThreads) {
+        int pixelsPerThread = res / numThreads; // basic number of nodes per thread
+        int start = -1;
+        int end = -1;
+        if (step == 0) {
+            start = 0;
+        } else {
+            start = step * pixelsPerThread + 2;
+        }
+
+        if (step < numThreads - 1) {
+            end = (step + 1) * pixelsPerThread + 1;
+        }
+        else {end = res - 1;}
+        return new int[] {start, end};
+    }
 }
