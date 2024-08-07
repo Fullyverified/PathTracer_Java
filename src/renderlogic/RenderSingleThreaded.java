@@ -326,9 +326,8 @@ public class RenderSingleThreaded {
     }
 
     public void refractionDirection(Ray ray, SceneObjects sceneObject) {
-
         // refraction for transparent objects
-        double n1 = 1.0003; // Refractive index of air
+        double n1 = 1.0003; // refractive index of air
         double n2 = sceneObject.getRefractiveIndex();
         // cosine of incident angle
         double cosTheta1 = -(sceneObject.getNormalX() * ray.getDirX() + sceneObject.getNormalY() * ray.getDirY() + sceneObject.getNormalZ() * ray.getDirZ()); // cos(theta_1) is the negative of the dot product because normal may be pointing inwards
@@ -339,6 +338,7 @@ public class RenderSingleThreaded {
             // Total internal reflection - bounce off object
             cosineWeightedHemisphereImportanceSampling(ray, sceneObject, false);
         } else {
+            sceneObject.calculateNormal(ray);
             // Valid refraction into next medium
             double cosTheta2 = Math.sqrt(1.0 - sinTheta2 * sinTheta2);
             double refractedX = ray.getDirX() * (n1 / n2) + ((n1 / n2) * cosTheta1 - cosTheta2) * sceneObject.getNormalX();
@@ -348,24 +348,27 @@ public class RenderSingleThreaded {
             ray.updateNormalisation();
             ray.updateOrigin(sceneObject.distanceToEntryExit(ray)[1]); // march the ray to the other side of the object
             // compute new refraction for ray exit (from object to air)
-            n1 = sceneObject.getRefractiveIndex(); // Refractive index of air
+            n1 = sceneObject.getRefractiveIndex();
             n2 = 1.0003;
             // cosine of incident angle
+            sceneObject.calculateNormal(ray);
             cosTheta1 = (sceneObject.getNormalX() * ray.getDirX() + sceneObject.getNormalY() * ray.getDirY() + sceneObject.getNormalZ() * ray.getDirZ()); // cos(theta_1) is the negative of the dot product because normal may be pointing inwards
             sinTheta1 = Math.sqrt(1.0 - cosTheta1 * cosTheta1);
             sinTheta2 = (n1 / n2) * sinTheta1;
             if (sinTheta2 >= 1) {
-                while (sinTheta2 >= 1){
+                while (sinTheta2 >= 1) {
                     cosineWeightedHemisphereImportanceSampling(ray, sceneObject, true);
                     ray.updateOrigin(-0.1); // undo the march from the previous method
                     ray.updateOrigin(sceneObject.distanceToEntryExit(ray)[1]); // march the ray to the other side of the object
                     // recalculate the sin of the angle to work out if the ray still has total internal reflection or not
+                    sceneObject.calculateNormal(ray);
                     cosTheta1 = (sceneObject.getNormalX() * ray.getDirX() + sceneObject.getNormalY() * ray.getDirY() + sceneObject.getNormalZ() * ray.getDirZ()); // cos(theta_1) is the negative of the dot product because normal may be pointing inwards
                     sinTheta1 = Math.sqrt(1.0 - cosTheta1 * cosTheta1);
                     sinTheta2 = (n1 / n2) * sinTheta1;
                 }
             } else {
                 // Valid refraction out of object
+                sceneObject.calculateNormal(ray);
                 cosTheta2 = Math.sqrt(1.0 - sinTheta2 * sinTheta2);
                 refractedX = ray.getDirX() * (n1 / n2) + ((n1 / n2) * cosTheta1 - cosTheta2) * sceneObject.getNormalX();
                 refractedY = ray.getDirY() * (n1 / n2) + ((n1 / n2) * cosTheta1 - cosTheta2) * sceneObject.getNormalY();

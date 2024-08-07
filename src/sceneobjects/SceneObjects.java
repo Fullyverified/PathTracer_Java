@@ -5,30 +5,30 @@ import renderlogic.*;
 public interface SceneObjects {
 
     // sceneObjects implement methods here so they can be automatically looped
-    public boolean objectCulling(Ray ray);
-    public boolean intersectionCheck(Ray ray);
-    public int getObjectID();
-    public double getPosX();
-    public double getPosY();
-    public double getPosZ();
-    public void calculateNormal(Ray nthRay);
-    public double getNormalX();
-    public double getNormalY();
-    public double getNormalZ();
-    public double getReflectivity();
+    boolean objectCulling(Ray ray);
+    boolean intersectionCheck(Ray ray);
+    int getObjectID();
+    double getPosX();
+    double getPosY();
+    double getPosZ();
+    void calculateNormal(Ray nthRay);
+    double getNormalX();
+    double getNormalY();
+    double getNormalZ();
+    double getReflectivity();
 
-    public double getRBrightness();
-    public double getGBrightness();
-    public double getBBrightness();
-    public double getReflecR();
-    public double getReflecG();
-    public double getReflecB();
+    double getRBrightness();
+    double getGBrightness();
+    double getBBrightness();
+    double getReflecR();
+    double getReflecG();
+    double getReflecB();
 
-    public double getRoughness();
-    public boolean getTransparent();
-    public double getRefractiveIndex();
+    double getRoughness();
+    boolean getTransparent();
+    double getRefractiveIndex();
 
-    public double[] getBounds();
-    public double[] distanceToEntryExit(Ray ray);
-
+    double[] getBounds();
+    double[] distanceToEntryExit(Ray ray);
+    void printType();
 }

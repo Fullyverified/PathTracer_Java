@@ -222,4 +222,7 @@ public class Sphere implements SceneObjects {
         double[] distance = new double[2];
         return distance;
     }
+    public void printType() {
+        System.out.println("Type: Sphere");
+    }
 }

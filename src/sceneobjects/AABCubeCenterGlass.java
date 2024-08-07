@@ -276,4 +276,8 @@ public class AABCubeCenterGlass implements SceneObjects {
         return distance;
     }
 
+    public void printType() {
+        System.out.println("Type: AABCubeCenterGlass");
+    }
+
 }

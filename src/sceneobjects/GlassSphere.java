@@ -259,5 +259,7 @@ public class GlassSphere implements SceneObjects {
     public double getRefractiveIndex() {
         return this.refractiveIndex;
     }
-
+    public void printType() {
+        System.out.println("Type: GlassSphere");
+    }
 }

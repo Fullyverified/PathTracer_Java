@@ -18,8 +18,6 @@ public class RenderSingleThreadedBVH {
     private String loadingString = "";
     public static double primaryRayStep = Main.primaryRayStep;
     public static double secondaryRayStep = Main.secondaryRayStep;
-    public int hascounted = 0;
-    public int checks = 0;
 
     public RenderSingleThreadedBVH() {
     }
@@ -72,16 +70,17 @@ public class RenderSingleThreadedBVH {
             for (int i = 0; i < BVHNodes.length; i++) {
                 if (i != indexLeft && i != indexRight) {
                     TMPNodes[i - k] = BVHNodes[i];
-                }
-                else {k++;} // for each item K we removed, step back the index by K
+                } else {
+                    k++;
+                } // for each item K we removed, step back the index by K
             }
             BVHNodes = TMPNodes;
-            BVHNodes[BVHNodes.length-1] = parentNode;
+            BVHNodes[BVHNodes.length - 1] = parentNode;
         }
 
         endTime = System.nanoTime();
         elapsedTime = endTime - startTime;
-        System.out.println("Finished tree creation: " + elapsedTime  / 1_000 + "us");
+        System.out.println("Finished tree creation: " + elapsedTime / 1_000 + "us");
         //System.out.println("BVHNodes size: " + BVHNodes.size());
         System.out.println("RootNode numChildren: " + BVHNodes[0].getNumChildren());
 
@@ -120,7 +119,6 @@ public class RenderSingleThreadedBVH {
                 computePrimaryRay(cam, primaryRay, i, j, BVHRootNode);
             }
         }
-
 
         endTime = System.nanoTime();
         elapsedTime = endTime - startTime;
@@ -172,12 +170,14 @@ public class RenderSingleThreadedBVH {
         primaryRay[i][j].setDirZ(cam.getNormDirZ() + cam.getNormRightZ() * primaryRay[i][j].getPixelPosX() + cam.getNormUpZ() * primaryRay[i][j].getPixelPosY());
         primaryRay[i][j].updateNormalisation(); // update vector normalisation
         primaryRay[i][j].march(0);
-
         BVHNode leafNode = rootNode.searchBVHTree(primaryRay[i][j]);
-        double BVHDistanceClose = leafNode != null ? leafNode.getIntersectionDistance(primaryRay[i][j])[0] : -1;
-        double BVHDistanceFar = leafNode != null ? leafNode.getIntersectionDistance(primaryRay[i][j])[1] : -1;
-        SceneObjects BVHSceneObject = leafNode != null ? leafNode.getSceneObject() : null;
-        if (BVHDistanceClose != -1 && BVHDistanceFar != -1 && BVHSceneObject != null) {
+        if (leafNode != null) {
+            double[] BVHDistance = leafNode.getIntersectionDistance(primaryRay[i][j]);
+            double BVHDistanceClose = BVHDistance[0];
+            double BVHDistanceFar = BVHDistance[1];
+            SceneObjects BVHSceneObject = leafNode.getSceneObject();
+            double[] bounds = BVHSceneObject.getBounds();
+
             // march the ray to the start of the leaf node bounds
             double distance = BVHDistanceClose;
             while (distance <= BVHDistanceFar && !primaryRay[i][j].getHit()) {
@@ -215,8 +215,9 @@ public class RenderSingleThreadedBVH {
                             cosineWeightedHemisphereImportanceSampling(nthRay[i][j], nthRay[i][j].getHitObject(), false);
                         }
                         BVHNode leafNode = rootNode.searchBVHTree(nthRay[i][j]);
-                        double BVHDistanceClose = leafNode != null ? leafNode.getIntersectionDistance(nthRay[i][j])[0] : -1;
-                        double BVHDistanceFar = leafNode != null ? leafNode.getIntersectionDistance(nthRay[i][j])[1] : -1;
+                        double[] BVHDistance = leafNode != null ? leafNode.getIntersectionDistance(primaryRay[i][j]) : new double[]{-1.0, -1.0};
+                        double BVHDistanceClose = BVHDistance[0];
+                        double BVHDistanceFar = BVHDistance[1];
                         SceneObjects BVHSceneObject = leafNode != null ? leafNode.getSceneObject() : null;
                         nthRay[i][j].setHit(false);
                         double distance = BVHDistanceClose;
@@ -374,9 +375,9 @@ public class RenderSingleThreadedBVH {
         // check new dot product - invert if necessary
         dotproduct = normalx * ray.getDirX() + normaly * ray.getDirY() + normalz * ray.getDirZ();
         if (dotproduct < 0) {
-            directionX = -directionX;
-            directionY = -directionY;
-            directionZ = -directionZ;
+            directionX = directionX * -1;
+            directionY = directionY * -1;
+            directionZ = directionZ * -1;
 
             ray.setDirection(directionX, directionY, directionZ);
             ray.updateNormalisation();
@@ -492,8 +493,9 @@ public class RenderSingleThreadedBVH {
 
         if (step < numThreads - 1) {
             end = (step + 1) * pixelsPerThread + 1;
+        } else {
+            end = res - 1;
         }
-        else {end = res - 1;}
-        return new int[] {start, end};
+        return new int[]{start, end};
     }
 }

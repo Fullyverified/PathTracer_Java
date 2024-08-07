@@ -195,7 +195,7 @@ public class BoundingBox {
            return new double[]{-1, -1}; // no intersection
         }
         // if tNear < 0, return tFar, else return tNear
-        return new double[]{tNear, tFar};
+        return new double[]{Math.abs(tNear), Math.abs(tFar)};
     }
 
     // get each the normalised normal
