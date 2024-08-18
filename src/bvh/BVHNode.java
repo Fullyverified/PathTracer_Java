@@ -49,7 +49,7 @@ public class BVHNode {
     }
 
     public BVHNode searchBVHTree(Ray ray) {
-        // if the ray does not intersect with the nodes bounding box return -1
+        // ray does not intersect with the nodes bounding box
         if (!boundingBox.objectCulling(ray)) {
             return null;
         }
@@ -63,10 +63,24 @@ public class BVHNode {
         BVHNode hitRight = nodeRight == null ? null : nodeRight.searchBVHTree(ray);
 
         // determine which child has the closest intersection, if any
-        if (hitLeft != null && hitRight != null) {
-            return (hitLeft.getIntersectionDistance(ray)[0] < hitRight.getIntersectionDistance(ray)[0]) ? hitLeft : hitRight;
+        if (hitLeft != null && hitRight != null) { // both nodes exist
+            /*System.out.println("hitleft: " + hitLeft.getIntersectionDistance(ray)[0]);
+            System.out.println("hitright: " + hitRight.getIntersectionDistance(ray)[0]);*/
+            double leftDistance = hitLeft.getIntersectionDistance(ray)[0];
+            double rightDistance = hitRight.getIntersectionDistance(ray)[0];
+            if (leftDistance < 0 && rightDistance < 0) { // both objects are behind the ray
+                return null;
+            }
+            if (leftDistance < 0) {
+                return hitRight;
+            }
+            if (rightDistance < 0) {
+                return hitLeft;
+            }
+            return (leftDistance < rightDistance) ? hitLeft : hitRight;
         }
-        if (hitLeft == null && hitRight == null) {
+
+        if (hitLeft == null && hitRight == null) { // both nodes are null
             return null;
         }
         // if only one is null, return the other

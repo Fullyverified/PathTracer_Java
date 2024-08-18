@@ -148,8 +148,9 @@ public class RenderSingleThreadedBVH {
         drawScreenExecutor.shutdown();
 
         // final print
-        drawScreen.drawFrameRGB(primaryRay, cam);
-        System.out.print("-|");
+        while (true) {
+            drawScreen.drawFrameRGB(primaryRay, cam);
+        }
     }
 
     public void computePrimaryRay(Camera cam, Ray[][] primaryRay, int i, int j, BVHNode rootNode) {
@@ -215,14 +216,15 @@ public class RenderSingleThreadedBVH {
                             cosineWeightedHemisphereImportanceSampling(nthRay[i][j], nthRay[i][j].getHitObject(), false);
                         }
                         BVHNode leafNode = rootNode.searchBVHTree(nthRay[i][j]);
-                        double[] BVHDistance = leafNode != null ? leafNode.getIntersectionDistance(primaryRay[i][j]) : new double[]{-1.0, -1.0};
+                        double[] BVHDistance = leafNode != null ? leafNode.getIntersectionDistance(nthRay[i][j]) : new double[]{-1.0, -1.0};
                         double BVHDistanceClose = BVHDistance[0];
                         double BVHDistanceFar = BVHDistance[1];
                         SceneObjects BVHSceneObject = leafNode != null ? leafNode.getSceneObject() : null;
                         nthRay[i][j].setHit(false);
                         double distance = BVHDistanceClose;
                         // march ray and check intersections
-                        if (BVHDistanceClose != -1 && BVHDistanceFar != -1 && BVHSceneObject != null) {
+                        //if (BVHDistanceClose != -1 && BVHDistanceFar != -1 && BVHSceneObject != null) {
+                        if (BVHDistanceClose != Double.POSITIVE_INFINITY && BVHDistanceFar != Double.POSITIVE_INFINITY && BVHSceneObject != null) {
                             while (distance <= BVHDistanceFar && !nthRay[i][j].getHit()) {
                                 nthRay[i][j].march(distance - 0.05); // march the ray to the start of the leaf node bounds
                                 if (BVHSceneObject.intersectionCheck(nthRay[i][j])) {
@@ -264,8 +266,8 @@ public class RenderSingleThreadedBVH {
         loadingProgress = (int) (((float) currentRay / numRays) * 100); // loading bar
         if (currentProgress < loadingProgress) {
             currentProgress = loadingProgress;
-            System.out.print("|");
-            System.out.println("current Ray: " + currentRay);
+            //System.out.print("|");
+            //System.out.println("current Ray: " + currentRay);
         }
     }
 
