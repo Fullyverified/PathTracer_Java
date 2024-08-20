@@ -64,8 +64,6 @@ public class BVHNode {
 
         // determine which child has the closest intersection, if any
         if (hitLeft != null && hitRight != null) { // both nodes exist
-            /*System.out.println("hitleft: " + hitLeft.getIntersectionDistance(ray)[0]);
-            System.out.println("hitright: " + hitRight.getIntersectionDistance(ray)[0]);*/
             double leftDistance = hitLeft.getIntersectionDistance(ray)[0];
             double rightDistance = hitRight.getIntersectionDistance(ray)[0];
             if (leftDistance < 0 && rightDistance < 0) { // both objects are behind the ray

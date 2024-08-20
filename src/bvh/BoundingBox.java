@@ -129,6 +129,7 @@ public class BoundingBox {
         double[] minMax = computeMinMax(ray);
         double tNear = Math.max(Math.max(minMax[0], minMax[2]), minMax[4]);
         double tFar = Math.min(Math.min(minMax[1], minMax[3]), minMax[5]);
+        //System.out.println("tNear: " + tNear + ", tFar: " + tFar);
         return tNear <= tFar && tFar >= 0; // tNear may be less than 0
     }
 
@@ -188,13 +189,14 @@ public class BoundingBox {
     }
 
     public double[] getIntersectionDistance(Ray ray) {
-        double[] minMax = computeMinMax(ray); // dont recalculate this
+        double[] minMax = computeMinMax(ray);
         double tNear = Math.max(Math.max(minMax[0], minMax[2]), minMax[4]);
         double tFar = Math.min(Math.min(minMax[1], minMax[3]), minMax[5]);
 
-        //System.out.println("tNear: " + tNear + " tFar: " + tFar);
         // if tNear < 0, return tFar, else return tNear
-        //return new double[]{Math.abs(tNear), Math.abs(tFar)};
+        if (tNear < 0 && tFar >= 0) {
+            return new double[]{0, tFar};
+        }
         if (tNear < 0) {
             return new double[]{tFar, tNear};
         }

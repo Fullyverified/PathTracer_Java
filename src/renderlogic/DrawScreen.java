@@ -174,7 +174,6 @@ public class DrawScreen extends JPanel {
                 repaint(); // update image
             } else if (toneMapping == false) {
                 brightnessFactor = 255 / (maxAmplitudeColour(primaryRay)[3] * cam.getISO()); // convert absolute brightness to 8 bit colour space
-                double[] maxRGB = maxAmplitudeColour(primaryRay);
                 for (int y = 0; y < internalHeight; y++) {
                     for (int x = 0; x < internalWidth; x++) {
                         double red, green, blue;

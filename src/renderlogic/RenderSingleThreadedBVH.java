@@ -93,7 +93,8 @@ public class RenderSingleThreadedBVH {
 
         System.out.println("Searching BVH");
         long startTime2 = System.nanoTime();
-        BVHNode leafNode = BVHNodes2[0].searchBVHTree(ray1);
+        BVHNode leafNode = BVHNodes[0].searchBVHTree(ray1);
+        leafNode.getSceneObject().printType();
         long endTime2 = System.nanoTime();
         long elapsedTime2 = endTime2 - startTime2;
         System.out.println("Finished tree traversal: " + elapsedTime2 + "ns");*/
@@ -224,7 +225,7 @@ public class RenderSingleThreadedBVH {
                         double distance = BVHDistanceClose;
                         // march ray and check intersections
                         //if (BVHDistanceClose != -1 && BVHDistanceFar != -1 && BVHSceneObject != null) {
-                        if (BVHDistanceClose != Double.POSITIVE_INFINITY && BVHDistanceFar != Double.POSITIVE_INFINITY && BVHSceneObject != null) {
+                        if (BVHSceneObject != null) {
                             while (distance <= BVHDistanceFar && !nthRay[i][j].getHit()) {
                                 nthRay[i][j].march(distance - 0.05); // march the ray to the start of the leaf node bounds
                                 if (BVHSceneObject.intersectionCheck(nthRay[i][j])) {
