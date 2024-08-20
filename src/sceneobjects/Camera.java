@@ -42,11 +42,11 @@ public class Camera{
     }
 
     public void increaseISO() {
-        this.ISO = this.ISO + (this.ISO * 0.10);
+        this.ISO = this.ISO - (this.ISO * 0.10);
         System.out.println("ISO: " + this.ISO);
     }
     public void decreaseISO() {
-        this.ISO = this.ISO - (this.ISO * 0.10);;
+        this.ISO = this.ISO + (this.ISO * 0.10);;
         System.out.println("ISO: " + this.ISO);
     }
 

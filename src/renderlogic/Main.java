@@ -25,7 +25,7 @@ public class Main {
 
         ArrayList<SceneObjects> sceneObjectsList = new ArrayList<>();
 
-        sceneObjectsList.add(new AABCubeCenter(10,-3,0,14,1,7,1,1,1, 0)); // floor
+        sceneObjectsList.add(new AABCubeCenter(10,-3,0,14,1,7,1,1,1, 0.75)); // floor
         sceneObjectsList.add(new AABCubeCenter(10,3,0,14,1,7,1,1,1, 0.75)); // roof
 
         sceneObjectsList.add(new AABCubeCenter(8,0,0,1,6,7,1,1,1,0.75)); // back wall
