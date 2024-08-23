@@ -155,26 +155,37 @@ public class AABCubeCenter implements SceneObjects {
 
     // calculate the normal of the sphere and a point
     public void calculateNormal(Ray nthRay) {
-        double epsilon = 0.05;
         double px = nthRay.getPosX();
         double py = nthRay.getPosY();
         double pz = nthRay.getPosZ();
+
         // x
-        if (Math.abs(px - minX) < epsilon) {
-            setNormal(-1, 0, 0);
-        } else if (Math.abs(px - maxX) < epsilon) {
-            setNormal(1, 0, 0);
-        }
+        double xmin = Math.abs(px - minX);
+        double xmax = Math.abs(px - maxX);
+
         // y
-        else if (Math.abs(py - minY) < epsilon) {
-            setNormal(0, -1, 0);
-        } else if (Math.abs(py - maxY) < epsilon) {
-            setNormal(0, 1, 0);
-        }
+        double ymin = Math.abs(py - minY);
+        double ymax = Math.abs(py - maxY);
+
         // z
-        else if (Math.abs(pz - minZ) < epsilon) {
+        double zmin = Math.abs(pz - minZ);
+        double zmax = Math.abs(pz - maxZ);
+
+        // find smallest value
+        double minDist = Math.min(xmin, Math.min(xmax, Math.min(ymin, Math.min(ymax, Math.min(zmin, zmax)))));
+
+        // set normal according the cloest face of the rays position
+        if (minDist == xmin) {
+            setNormal(-1, 0, 0);
+        } else if (minDist == xmax) {
+            setNormal(1, 0, 0);
+        } else if (minDist == ymin) {
+            setNormal(0, -1, 0);
+        } else if (minDist == ymax) {
+            setNormal(0, 1, 0);
+        } else if (minDist == zmin) {
             setNormal(0, 0, -1);
-        } else if (Math.abs(pz - maxZ) < epsilon) {
+        } else if (minDist == zmax) {
             setNormal(0, 0, 1);
         }
     }

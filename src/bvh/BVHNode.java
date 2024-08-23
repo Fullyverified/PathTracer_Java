@@ -51,13 +51,19 @@ public class BVHNode {
     public BVHNode searchBVHTree(Ray ray) {
         // ray does not intersect with the nodes bounding box
         if (!boundingBox.objectCulling(ray)) {
+            //System.out.println("Returning nullptr");
             return null;
         }
         // if sceneObject != null we are at a leaf node
+        if (sceneObject != null) {
+            //sceneObject.printType();
+        }
         if (sceneObject != null && sceneObject.objectCulling(ray)) {
+            //System.out.println("Returning this");
             return this;
         }
 
+        //System.out.println("Determining left and right nodes");
         // recursively check the left and right children
         BVHNode hitLeft = nodeLeft == null ? null : nodeLeft.searchBVHTree(ray);
         BVHNode hitRight = nodeRight == null ? null : nodeRight.searchBVHTree(ray);
@@ -67,21 +73,27 @@ public class BVHNode {
             double leftDistance = hitLeft.getIntersectionDistance(ray)[0];
             double rightDistance = hitRight.getIntersectionDistance(ray)[0];
             if (leftDistance < 0 && rightDistance < 0) { // both objects are behind the ray
+                //System.out.println("DistanceLeft < 0 && DistanceRight < 0");
                 return null;
             }
             if (leftDistance < 0) {
+                //System.out.println("DistanceLeft < 0 - return right");
                 return hitRight;
             }
             if (rightDistance < 0) {
+                //System.out.println("DistanceRight < 0 - return left");
                 return hitLeft;
             }
+            //System.out.println("Returning closest");
             return (leftDistance < rightDistance) ? hitLeft : hitRight;
         }
 
         if (hitLeft == null && hitRight == null) { // both nodes are null
+            //System.out.println("Both null");
             return null;
         }
         // if only one is null, return the other
+        //System.out.println("One null, returning other");
         return (hitLeft != null) ? hitLeft : hitRight;
     }
 

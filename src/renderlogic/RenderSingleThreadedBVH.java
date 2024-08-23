@@ -85,8 +85,8 @@ public class RenderSingleThreadedBVH {
         System.out.println("RootNode numChildren: " + BVHNodes[0].getNumChildren());
 
         // performance profiling
-        /*Ray ray1 = new Ray(0.1,0.1,0.1);
-        ray1.setDirection(1,0.1,0.1);
+        /*Ray ray1 = new Ray(4.5,-2.4,-1);
+        ray1.setDirection(0.1,0,1);
         ray1.updateNormalisation();
         ray1.updateOrigin(0);
         boolean hit = true;
@@ -94,7 +94,10 @@ public class RenderSingleThreadedBVH {
         System.out.println("Searching BVH");
         long startTime2 = System.nanoTime();
         BVHNode leafNode = BVHNodes[0].searchBVHTree(ray1);
+        System.out.println("Intersection Test");
         leafNode.getSceneObject().printType();
+        System.out.println("SceneObject Posx: " +  leafNode.getSceneObject().getPosX() + ", y: " + leafNode.getSceneObject().getPosY() + ", z: " + leafNode.getSceneObject().getPosZ());
+
         long endTime2 = System.nanoTime();
         long elapsedTime2 = endTime2 - startTime2;
         System.out.println("Finished tree traversal: " + elapsedTime2 + "ns");*/
@@ -178,7 +181,6 @@ public class RenderSingleThreadedBVH {
             double BVHDistanceClose = BVHDistance[0];
             double BVHDistanceFar = BVHDistance[1];
             SceneObjects BVHSceneObject = leafNode.getSceneObject();
-            double[] bounds = BVHSceneObject.getBounds();
 
             // march the ray to the start of the leaf node bounds
             double distance = BVHDistanceClose;

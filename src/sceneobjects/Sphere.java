@@ -66,6 +66,8 @@ public class Sphere implements SceneObjects {
         double invYR = 1.0 / (yradius * yradius);
         double invZR = 1.0 / (zradius * zradius);
 
+        //System.out.println("invXR: " + invXR + ", invYR: " + invYR + ", invZR: " + invZR);
+
         // calculate values of a, b, c for the quadratic equation
         // a = the dot product of normx, normy, normz - should always equal 1
         double a = (ray.getDirX() * ray.getDirX() * invXR) + (ray.getDirY() * ray.getDirY() * invYR) + (ray.getDirZ() * ray.getDirZ() * invZR);
@@ -77,25 +79,32 @@ public class Sphere implements SceneObjects {
         // calculate the discriminant | b^2 - 2ac
         double discriminant = (b * b) - (4 * (a * c));
 
+        //System.out.println("a: " + a);
+        //System.out.println("b: " + b);
+        //System.out.println("c: " + c);
+        //System.out.println("discriminant:  " + discriminant);
+
         if (discriminant < 0) {
             return false;
-        } else {
-            double sqrtDiscriminant = Math.sqrt(discriminant);
-            double sqrt1 = (-b - sqrtDiscriminant) / (2 * a);
-            double sqrt2 = (-b + sqrtDiscriminant) / (2 * a);
-
-            if (sqrt1 >= 0 || sqrt2 >= 0) {
-                return true;
-            }
-            else {
-                return false;
-            }
         }
+
+        double sqrtDiscriminant = Math.sqrt(discriminant);
+        double sqrt1 = (-b - sqrtDiscriminant) / (2 * a);
+        double sqrt2 = (-b + sqrtDiscriminant) / (2 * a);
+        //System.out.println("sqrtdisc:  " + sqrtDiscriminant);
+        //System.out.println("sqrt1:  " + sqrt1);
+        //System.out.println("sqrt2:  " + sqrt2);
+
+        if (sqrt1 >= 0 || sqrt2 >= 0) {
+            return true;
+        } else {
+            return false;
+        }
+
     }
 
     // this is a weird hack idk why it works. the real ellipsoid equation refuses to work
-    public boolean intersectionCheck(Ray ray)
-    {
+    public boolean intersectionCheck(Ray ray) {
         // distance of the ray to the center of the sphere
         double sradius = 1;
         double scaledX = (ray.getPosX() - this.centerx) / xradius;
@@ -119,9 +128,12 @@ public class Sphere implements SceneObjects {
             this.normalz = normalz / magnitude;
         }
         if (centerx == 0 && centery == 0 && centerz == 0) {
-            normalx = -ray.getPosX() / (xradius * xradius);;
-            normaly = -ray.getPosY() / (yradius * yradius);;
-            normalz = -ray.getPosZ() / (zradius * zradius);;
+            normalx = -ray.getPosX() / (xradius * xradius);
+            ;
+            normaly = -ray.getPosY() / (yradius * yradius);
+            ;
+            normalz = -ray.getPosZ() / (zradius * zradius);
+            ;
         }
     }
 
@@ -215,13 +227,19 @@ public class Sphere implements SceneObjects {
         return this.roughness;
     }
 
-    public boolean getTransparent() {return false;}
-    public double getRefractiveIndex() {return 1;}
+    public boolean getTransparent() {
+        return false;
+    }
+
+    public double getRefractiveIndex() {
+        return 1;
+    }
 
     public double[] distanceToEntryExit(Ray ray) {
         double[] distance = new double[2];
         return distance;
     }
+
     public void printType() {
         System.out.println("Type: Sphere");
     }

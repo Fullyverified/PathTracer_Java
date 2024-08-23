@@ -194,6 +194,7 @@ public class BoundingBox {
         double tFar = Math.min(Math.min(minMax[1], minMax[3]), minMax[5]);
 
         // if tNear < 0, return tFar, else return tNear
+        //System.out.println("tNear: " + tNear + ", tFar: " + tFar);
         if (tNear < 0 && tFar >= 0) {
             return new double[]{0, tFar};
         }
